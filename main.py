@@ -22,7 +22,7 @@ logger.setLevel(logging.DEBUG)
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    # bot.send_message(message.from_user.id, str(message))
+    bot.send_message(message.from_user.id, operations.user_exist(message.from_user.id))
     if operations.user_exist(message.from_user.id):
         bot.send_message(message.from_user.id, 'Выберите действие')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
