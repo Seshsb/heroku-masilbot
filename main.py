@@ -7,6 +7,7 @@ from flask import Flask, request
 from os.path import join, dirname
 from dotenv import load_dotenv
 from db import operations
+from functions.register import register
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -35,14 +36,10 @@ def start(message: types.Message):
     return bot.send_message(message.chat.id, text, reply_markup=markup)
 
 @bot.message_handler(content_types=['contact', 'text'])
-def register(message: types.Message):
-    # phone_number = message.contact.phone_number
-    phone_number_msg = message.text
+def text_contacts(message: types.Message):
+    register(message, bot)
+
     bot.send_message(message.from_user.id, str(message))
-    bot.send_message(message.from_user.id, phone_number_msg)
-    # bot.send_message(message.from_user.id, phone_number)
-    id = message.from_user.id
-    text = 'Отлично, вы успешно зарегистрированы'
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
 def redirect_message():
