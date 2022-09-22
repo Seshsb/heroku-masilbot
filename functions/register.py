@@ -5,7 +5,6 @@ from db import operations
 
 
 def register(msg, bt):
-    phone_number = msg.contact.phone_number
     text = 'Отлично, вы успешно зарегистрированы'
     if msg.text[:5] == '+998':
         if msg.text[1:].isdigit() and len(msg.text) == 13:
