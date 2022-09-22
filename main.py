@@ -45,12 +45,9 @@ def text_contacts(message: types.Message):
             operations.create_user(message.from_user.id, phone_number)
             return bot.send_message(message.from_user.id, text)
         return bot.send_message(message.from_user.id, 'Введите правильный номер телефона')
+    bot.send_message(message.from_user.id, str(message))
     return bot.send_message(message.from_user.id, 'Введите правильный номер телефона')
 
-
-
-
-    bot.send_message(message.from_user.id, str(message))
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
 def redirect_message():
