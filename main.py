@@ -22,7 +22,6 @@ logger.setLevel(logging.DEBUG)
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.from_user.id, str(operations.user_exist(message.from_user.id)))
     if operations.user_exist(message.from_user.id):
         return bot.send_message(message.from_user.id, 'Выберите действие')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
@@ -34,7 +33,7 @@ def start(message: types.Message):
 
     return bot.send_message(message.from_user.id, text, reply_markup=markup)
 
-@bot.message_handler(content_types=['contact'])
+@bot.message_handler()
 def register(message):
     bot.send_message(message.from_user.id, str(message))
     id = message.from_user.id
