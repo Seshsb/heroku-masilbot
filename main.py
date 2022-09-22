@@ -38,7 +38,6 @@ def start(message: types.Message):
 @bot.message_handler(content_types=['contact', 'text'])
 def text_contacts(message: types.Message):
     register(message, bot)
-
     bot.send_message(message.from_user.id, str(message))
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
