@@ -1,9 +1,12 @@
 import os
 import telebot
 import logging
+
+from telebot import types
 from flask import Flask, request
 from os.path import join, dirname
 from dotenv import load_dotenv
+from db import operations
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -18,9 +21,21 @@ logger.setLevel(logging.DEBUG)
 
 
 @bot.message_handler(commands=['start'])
-def start(message):
-    username = message.from_user.username
-    bot.reply_to(message, f'Hello, {username}')
+def start(message: types.Message):
+    bot.send_message(message.from_user.id, str(message))
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
+    button = types.KeyboardButton('Отправить контакт', request_contact=True)
+    markup.add(button)
+    text = 'Пройди регистрацию, нажми на кнопку и отправь номер телефона или напиши его в формате (+998*********)'
+
+    bot.send_message(message.from_user.id, text, reply_markup=markup)
+
+@bot.message_handler(commands=['contact'])
+def register(message):
+    id = message.from_user.id
+    if operations.cursor.execute('SELECT * FROM users WHERE phone_number=%s ;', (message.from_user.phone_number)):
+        text = ''
+    text = 'Отлично, вы успешно зарегистрированы'
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
 def redirect_message():
