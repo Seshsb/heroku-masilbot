@@ -34,9 +34,11 @@ def start(message: types.Message):
 
     return bot.send_message(message.chat.id, text, reply_markup=markup)
 
-@bot.message_handler(content_types=['contact'])
-def register(message):
+@bot.message_handler(content_types=['contact', 'text'])
+def register(message: types.Message):
+    phone_number = message.contact.phone_number or message.text
     bot.send_message(message.from_user.id, str(message))
+    bot.send_message(message.from_user.id, phone_number)
     id = message.from_user.id
     text = 'Отлично, вы успешно зарегистрированы'
 
