@@ -23,12 +23,16 @@ logger.setLevel(logging.DEBUG)
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     bot.send_message(message.from_user.id, str(message))
+    if operations.user_exist(message.from_user.id):
+        return bot.send_message(message.from_user.id, 'Выберите действие')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     button = types.KeyboardButton('Отправить контакт', request_contact=True)
     markup.add(button)
-    text = 'Пройди регистрацию, нажми на кнопку и отправь номер телефона или напиши его в формате (+998*********)'
+    text = 'Вас приветсвует MasilBot, ' \
+           'для того чтобы воспользоваться ботом, вам нужно пройти регистрацию, ' \
+           'нажми на кнопку и отправь номер телефона или напиши его в формате (+998*********)'
 
-    bot.send_message(message.from_user.id, text, reply_markup=markup)
+    return bot.send_message(message.from_user.id, text, reply_markup=markup)
 
 @bot.message_handler(content_types=['contact'])
 def register(message):

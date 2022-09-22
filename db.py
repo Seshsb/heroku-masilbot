@@ -29,10 +29,9 @@ class DataBaseOperations:
             self.cursor.execute('INSERT INTO users (id, phone_number) VALUES (%s, %s);', (user_id, phone_number))
             self.connection.commit()
 
-    def user_exist(self, user_id, phone_number):
+    def user_exist(self, user_id):
         with self.connection:
-            result = self.cursor.execute('SELECT * FROM users WHERE id=%s AND phone_number=%s;',
-                                         (user_id, phone_number)).fetchall()
+            result = self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id)).fetchall()
             return bool(len(result))
 
 
