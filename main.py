@@ -22,7 +22,7 @@ logger.setLevel(logging.DEBUG)
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.from_user.id, operations.user_exist(message.from_user.id))
+    bot.send_message(message.from_user.id, str(operations.user_exist(message.from_user.id)))
     if operations.user_exist(message.from_user.id):
         bot.send_message(message.from_user.id, 'Выберите действие')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
@@ -32,14 +32,12 @@ def start(message: types.Message):
            'для того чтобы воспользоваться ботом, вам нужно пройти регистрацию, ' \
            'нажми на кнопку и отправь номер телефона или напиши его в формате (+998*********)'
 
-    return bot.send_message(message.from_user.id, text, reply_markup=markup)
+    bot.send_message(message.from_user.id, text, reply_markup=markup)
 
 @bot.message_handler(content_types=['contact'])
 def register(message):
     bot.send_message(message.from_user.id, str(message))
     id = message.from_user.id
-    if operations.cursor.execute('SELECT * FROM users WHERE phone_number=%s ;', (message.from_user.phone_number)):
-        text = ''
     text = 'Отлично, вы успешно зарегистрированы'
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
