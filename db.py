@@ -37,4 +37,3 @@ class DataBaseOperations:
 
 
 operations = DataBaseOperations()
-operations.create_user(12, '123123')
