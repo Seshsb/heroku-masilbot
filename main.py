@@ -7,7 +7,7 @@ from flask import Flask, request
 from os.path import join, dirname
 from dotenv import load_dotenv
 from db import operations
-from functions.register import register
+from functions import register
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -37,7 +37,18 @@ def start(message: types.Message):
 
 @bot.message_handler(content_types=['contact', 'text'])
 def text_contacts(message: types.Message):
-    register(message, bot)
+    # phone_number = message.contact.phone_number
+    text = 'Отлично, вы успешно зарегистрированы'
+    if message.text[:5] == '+998':
+        phone_number = message.text
+        if phone_number[1:].isdigit() and len(phone_number) == 13:
+            operations.create_user(message.from_user.id, phone_number)
+            return bot.send_message(message.from_user.id, text)
+        return bot.send_message(message.from_user.id, 'Введите правильный номер телефона')
+
+
+
+
     bot.send_message(message.from_user.id, str(message))
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
