@@ -32,6 +32,7 @@ def start(message: types.Message):
 
 @bot.message_handler(commands=['contact'])
 def register(message):
+    bot.send_message(message.from_user.id, str(message))
     id = message.from_user.id
     if operations.cursor.execute('SELECT * FROM users WHERE phone_number=%s ;', (message.from_user.phone_number)):
         text = ''
