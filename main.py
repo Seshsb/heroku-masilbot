@@ -22,7 +22,7 @@ logger.setLevel(logging.DEBUG)
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.from_user.id, str(message))
+    bot.send_message(message.from_user.id, 'hi')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     button = types.KeyboardButton('Отправить контакт', request_contact=True)
     markup.add(button)
