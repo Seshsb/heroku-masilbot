@@ -31,7 +31,7 @@ class DataBaseOperations:
 
     def user_exist(self, user_id):
         with self.connection:
-            result = self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id)).fetchall()
+            result = self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id)).fetchone()
             return bool(len(result))
 
 

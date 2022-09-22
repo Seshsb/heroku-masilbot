@@ -24,7 +24,7 @@ logger.setLevel(logging.DEBUG)
 def start(message: types.Message):
     bot.send_message(message.from_user.id, str(operations.user_exist(message.from_user.id)))
     if operations.user_exist(message.from_user.id):
-        bot.send_message(message.from_user.id, 'Выберите действие')
+        return bot.send_message(message.from_user.id, 'Выберите действие')
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     button = types.KeyboardButton('Отправить контакт', request_contact=True)
     markup.add(button)
