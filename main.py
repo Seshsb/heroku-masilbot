@@ -30,12 +30,12 @@ def start(message: types.Message):
 
     bot.send_message(message.from_user.id, text, reply_markup=markup)
 
-@bot.message_handler(commands=['contact'])
-def register(message):
-    id = message.from_user.id
-    if operations.cursor.execute('SELECT * FROM users WHERE phone_number=%s ;', (message.from_user.phone_number)):
-        text = ''
-    text = 'Отлично, вы успешно зарегистрированы'
+# @bot.message_handler(commands=['contact'])
+# def register(message):
+#     id = message.from_user.id
+#     if operations.cursor.execute('SELECT * FROM users WHERE phone_number=%s ;', (message.from_user.phone_number)):
+#         text = ''
+#     text = 'Отлично, вы успешно зарегистрированы'
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
 def redirect_message():
