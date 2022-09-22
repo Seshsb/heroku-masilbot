@@ -36,11 +36,11 @@ def start(message: types.Message):
 
 @bot.message_handler(content_types=['contact', 'text'])
 def register(message: types.Message):
-    phone_number = message.contact.phone_number
+    # phone_number = message.contact.phone_number
     phone_number_msg = message.text
     bot.send_message(message.from_user.id, str(message))
     bot.send_message(message.from_user.id, phone_number_msg)
-    bot.send_message(message.from_user.id, phone_number)
+    # bot.send_message(message.from_user.id, phone_number)
     id = message.from_user.id
     text = 'Отлично, вы успешно зарегистрированы'
 
