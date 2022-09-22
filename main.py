@@ -31,9 +31,9 @@ def start(message: types.Message):
            'для того чтобы воспользоваться ботом, вам нужно пройти регистрацию, ' \
            'нажми на кнопку и отправь номер телефона или напиши его в формате (+998*********)'
 
-    return bot.send_message(message.from_user.id, text, reply_markup=markup)
+    return bot.send_message(message.chat.id, text, reply_markup=markup)
 
-@bot.message_handler()
+@bot.message_handler(content_types=['contact'])
 def register(message):
     bot.send_message(message.from_user.id, str(message))
     id = message.from_user.id
