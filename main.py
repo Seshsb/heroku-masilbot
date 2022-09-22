@@ -30,7 +30,7 @@ def start(message: types.Message):
 
     bot.send_message(message.from_user.id, text, reply_markup=markup)
 
-@bot.message_handler(commands=['contact'])
+@bot.message_handler(content_types=['contact'])
 def register(message):
     bot.send_message(message.from_user.id, str(message))
     id = message.from_user.id
