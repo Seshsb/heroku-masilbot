@@ -43,6 +43,11 @@ def text_contacts(message: types.Message):
     bot.send_message(message.from_user.id, str(message))
 
 
+@bot.message_handler(func=get_phone_number, content_types=['text', 'contact'])
+def test(message):
+    bot.send_message(message.from_user.id, 'test')
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'tables':
