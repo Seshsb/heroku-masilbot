@@ -8,6 +8,8 @@ from os.path import join, dirname
 from dotenv import load_dotenv
 from db import operations
 from functions.register import register
+from keyboards.default import navigation, register
+from data.config import START
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -25,15 +27,10 @@ logger.setLevel(logging.DEBUG)
 def start(message: types.Message):
     bot.send_message(message.from_user.id, str(message))
     if operations.user_exist(message.from_user.id):
-        return bot.send_message(message.from_user.id, 'Выберите действие')
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    button = types.KeyboardButton('Отправить контакт', request_contact=True)
-    markup.add(button)
-    text = 'Вас приветсвует MasilBot, ' \
-           'для того чтобы воспользоваться ботом, вам нужно пройти регистрацию, ' \
-           'нажми на кнопку и отправь номер телефона или напиши его в формате (+998*********)'
+        return bot.send_message(message.from_user.id, 'Выберите действие',
+                                reply_markup=navigation.booking_or_delivery())
+    return bot.send_message(message.chat.id, START, reply_markup=register.send_contact())
 
-    return bot.send_message(message.chat.id, text, reply_markup=markup)
 
 @bot.message_handler(content_types=['contact', 'text'])
 def text_contacts(message: types.Message):
