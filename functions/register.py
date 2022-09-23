@@ -10,6 +10,9 @@ def register(message, bot):
             return bot.send_message(message.from_user.id, REGISTER_VALID)
         return bot.send_message(message.from_user.id, REGISTER_INVALID)
 
+    elif message.text[1:].isdigit and message.text[:4] != '+998':
+        return bot.send_message(message.from_user.id, REGISTER_INVALID)
+
     elif message.content_type == 'contact':
         if message.contact.phone_number[:3] == '998' and len(message.contact.phone_number) == 12:
             phone_number = '+' + message.contact.phone_number
@@ -20,3 +23,5 @@ def register(message, bot):
 
         operations.create_user(message.from_user.id, phone_number)
         return bot.send_message(message.from_user.id, REGISTER_VALID)
+
+

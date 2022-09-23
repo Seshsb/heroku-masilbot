@@ -26,7 +26,8 @@ class DataBaseOperations:
 
     def create_user(self, user_id, phone_number):
         with self.connection:
-            self.cursor.execute('INSERT INTO users (id, phone_number) VALUES (%s, %s);', (user_id, phone_number))
+            self.cursor.execute('INSERT INTO users (id, phone_number) '
+                                'VALUES (%s, %s);', (user_id, phone_number))
             self.connection.commit()
 
     def user_exist(self, user_id):
@@ -34,6 +35,12 @@ class DataBaseOperations:
             self.cursor.execute('SELECT * FROM users WHERE id=%s', (user_id,))
             result = self.cursor.fetchall()
             return bool(len(result))
+
+    def start_booking(self, tbl_id, start_at, user_phone):
+        with self.connection:
+            self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
+                                'VALUES (%s, %s, %s, %s);', (tbl_id, start_at, user_phone))
+            self.connection.commit()
 
 
 operations = DataBaseOperations()
