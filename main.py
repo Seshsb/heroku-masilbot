@@ -7,7 +7,7 @@ from flask import Flask, request
 from os.path import join, dirname
 from dotenv import load_dotenv
 from db import operations
-from functions.handlers import reserve_time, get_phone_number
+from functions.handlers import reserve_time
 from keyboards.default import navigation, register
 from data.config import START
 from keyboards.inline.navigations import inline_category
