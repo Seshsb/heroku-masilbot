@@ -7,7 +7,7 @@ def reserve_time(message: types.Message, bot):
     time = message.text
     time_sql = time[:2] + '-' + time[3:5] + ' ' + time[6:]
     bot.send_message(message.from_user.id, 'success')
-    bot.register_next_step_handler(message, get_phone_number, time)
+    bot.register_next_step_handler(message, get_phone_number, time, phone_number)
 
 
 def get_phone_number(message: types.Message, time, phone_number):
