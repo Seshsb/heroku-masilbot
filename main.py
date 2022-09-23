@@ -48,7 +48,7 @@ def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'tables':
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                             'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
-        bot.register_next_step_handler(call.message, reserve_time, bot)
+        bot.register_next_step_handler(call.message, reserve_time, bot, time)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
