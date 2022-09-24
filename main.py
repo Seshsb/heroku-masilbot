@@ -33,14 +33,19 @@ def start(message: types.Message):
     return bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
-@bot.message_handler(content_types=['contact', 'text'])
-def text_contacts(message: types.Message):
-    if message.text == 'Бронирование':
-        bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
-                         reply_markup=inline_category())
+@bot.message_handler(regexp='Бронирование')
+def booking(message):
+    bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
+                              reply_markup=inline_category())
 
-    # booking(message, bot)
-    bot.send_message(message.from_user.id, str(message))
+# @bot.message_handler(content_types=['contact', 'text'])
+# def text_contacts(message: types.Message):
+#     if message.text == 'Бронирование':
+#         bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
+#                          reply_markup=inline_category())
+#
+#     # booking(message, bot)
+#     bot.send_message(message.from_user.id, str(message))
 
 
 @bot.message_handler(func=get_phone_number, content_types=['text', 'contact'])
