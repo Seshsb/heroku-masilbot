@@ -40,7 +40,7 @@ def booking(message):
                               reply_markup=inline_category())
 
 
-@bot.message_handler(regexp=r"\b+998")
+@bot.message_handler(regexp=r'^\b+998')
 def booking(message):
     bot.send_message(message.from_user.id, 'ok')
 
