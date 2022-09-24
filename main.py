@@ -38,6 +38,11 @@ def booking(message):
     bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
                               reply_markup=inline_category())
 
+
+@bot.message_handler(regexp=r'\b+998')
+def booking(message):
+    bot.send_message(message.from_user.id, 'ok')
+
 # @bot.message_handler(content_types=['contact', 'text'])
 # def text_contacts(message: types.Message):
 #     if message.text == 'Бронирование':
