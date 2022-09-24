@@ -40,7 +40,7 @@ def booking(message):
                               reply_markup=inline_category())
 
 
-@bot.message_handler(regexp=r'\b/+[9][9][8]')
+@bot.message_handler(regexp=r'\b/+[89]+[0+9]+')
 def phone(message):
     bot.send_message(message.from_user.id, 'ok')
 
