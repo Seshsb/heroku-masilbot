@@ -41,7 +41,7 @@ def booking(message):
 
 
 @bot.message_handler(regexp=r'^\b+998')
-def booking(message):
+def phone(message):
     bot.send_message(message.from_user.id, 'ok')
 
 # @bot.message_handler(content_types=['contact', 'text'])
