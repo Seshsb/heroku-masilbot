@@ -39,7 +39,7 @@ class DataBaseOperations:
     def start_booking(self, table_id, time_at, phone_number):
         with self.connection:
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
-                                'VALUES (%s, %s, %s, %s);', (table_id, time_at, phone_number))
+                                'VALUES (%s, %s, %s);', (table_id, time_at, phone_number))
             self.connection.commit()
 
 
