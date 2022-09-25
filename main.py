@@ -23,11 +23,11 @@ def booking(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
 
 
-@bot.message_handler(func=lambda message: reserve_time(message) == True, content_types=['contact'])
-def request_contact(message):
-    phone_number = '+' + message.contact.phone_number
-    bot.send_message(message.from_user.id, GET_TABLEID)
-    bot.register_next_step_handler(message, get_table_id, phone_number)
+# @bot.message_handler(func=lambda message: reserve_time(message) == True, content_types=['contact'])
+# def request_contact(message):
+#     phone_number = '+' + message.contact.phone_number
+#     bot.send_message(message.from_user.id, GET_TABLEID)
+#     bot.register_next_step_handler(message, get_table_id, phone_number)
 
 
 @bot.message_handler(regexp=r'\+998+')
