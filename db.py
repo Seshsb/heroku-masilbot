@@ -36,8 +36,9 @@ class DataBaseOperations:
             result = self.cursor.fetchall()
             return bool(len(result))
 
-    def start_booking(self, table_id, time_at, phone_number):
+    def start_booking(self, user_id, table_id, time_at, phone_number):
         with self.connection:
+            self.create_user(user_id, phone_number)
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
                                 'VALUES (%s, %s, %s);', (table_id, time_at, phone_number))
             self.connection.commit()

@@ -39,7 +39,7 @@ def booking(message):
 
 @bot.message_handler(content_types=['contact'])
 def request_contact(message):
-    phone_number = message.contact.phone_number
+    phone_number = '+' + message.contact.phone_number
     bot.send_message(message.from_user.id, GET_TABLEID)
     bot.register_next_step_handler(message, get_table_id, phone_number)
 
