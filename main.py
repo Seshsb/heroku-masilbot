@@ -1,14 +1,8 @@
-import os
 import telebot
-import logging
-import re
 
 from connections import *
 from telebot import types
 from flask import Flask, request
-from os.path import join, dirname
-from dotenv import load_dotenv
-from db import operations
 from functions.handlers import reserve_time, get_table_id
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID
@@ -43,7 +37,7 @@ def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'tables':
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                             'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
-        bot.register_next_step_handler(call.message, reserve_time, bot)
+        bot.register_next_step_handler(call.message, reserve_time)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
