@@ -24,11 +24,11 @@ class DataBaseOperations:
                               password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
         self.cursor = self.connection.cursor()
 
-    def create_user(self, user_id, phone_number):
-        with self.connection:
-            self.cursor.execute('INSERT INTO users (id, phone_number) '
-                                'VALUES (%s, %s);', (user_id, phone_number))
-            self.connection.commit()
+    # def create_user(self, user_id, phone_number):
+    #     with self.connection:
+    #         self.cursor.execute('INSERT INTO users (id, phone_number) '
+    #                             'VALUES (%s, %s);', (user_id, phone_number))
+    #         self.connection.commit()
 
     def user_exist(self, user_id):
         with self.connection:
@@ -38,7 +38,8 @@ class DataBaseOperations:
 
     def start_booking(self, user_id, table_id, time_at, phone_number):
         with self.connection:
-            self.create_user(user_id, phone_number)
+            self.cursor.execute('INSERT INTO users (id, phone_number) '
+                                'VALUES (%s, %s);', (user_id, phone_number))
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
                                 'VALUES (%s, %s, %s);', (table_id, time_at, phone_number))
             self.connection.commit()
