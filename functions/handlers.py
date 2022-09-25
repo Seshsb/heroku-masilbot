@@ -20,7 +20,7 @@ def get_phone_number(message: types.Message, time, bot):
 
 
 def get_table_id(message: types.Message, phone_number):
-    table_id = message.text
+    table_id = int(message.text)
     operations.start_booking(table_id, time_sql, phone_number)
 #
 # @bot.message_handler(func=get_phone_number, content_types=['text', 'contact'])
