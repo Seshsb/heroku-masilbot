@@ -3,9 +3,9 @@ import config
 
 from connections import *
 from telebot import types
-from flask import Flask, request
+from flask import request
 from functions.handlers import reserve_time, get_table_id
-from keyboards.default import navigation, register
+from keyboards.default import navigation
 from data.config import START, GET_TABLEID
 from keyboards.inline.navigations import inline_category
 
