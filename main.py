@@ -3,6 +3,7 @@ import telebot
 import logging
 import re
 
+from connections import *
 from telebot import types
 from flask import Flask, request
 from os.path import join, dirname
@@ -13,31 +14,19 @@ from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID
 from keyboards.inline.navigations import inline_category
 
-dotenv_path = join(dirname(__file__), '.env')
-load_dotenv(dotenv_path)
-
-
-BOT_TOKEN = os.environ.get('BOT_TOKEN')
-
-bot = telebot.TeleBot(BOT_TOKEN)
-server = Flask(__name__)
-logger = telebot.logger
-logger.setLevel(logging.DEBUG)
-
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.from_user.id, str(message))
     return bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
 @bot.message_handler(regexp='Бронирование')
 def booking(message):
     bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
-                              reply_markup=inline_category())
+                     reply_markup=inline_category())
 
 
-@bot.message_handler(content_types=['contact'])
+@bot.message_handler(func=lambda message: reserve_time(message) == True, content_types=['contact'])
 def request_contact(message):
     phone_number = '+' + message.contact.phone_number
     bot.send_message(message.from_user.id, GET_TABLEID)

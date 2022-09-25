@@ -1,3 +1,5 @@
+from connections import *
+
 from datetime import datetime
 from telebot import types
 from keyboards.default import register
@@ -5,11 +7,12 @@ from db import operations
 from data.config import GET_PHONE_NUMBER, GET_TABLEID
 
 
-def reserve_time(message: types.Message, bot):
+def reserve_time(message: types.Message):
     time = message.text
     global time_sql
     time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
     bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+    return True
     # bot.register_next_step_handler(message, get_phone_number, time)
 
 
