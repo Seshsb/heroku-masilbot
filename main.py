@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from db import operations
 from functions.handlers import reserve_time, get_table_id
 from keyboards.default import navigation, register
-from data.config import START, GET_PHONE_TABLEID
+from data.config import START, GET_TABLEID
 from keyboards.inline.navigations import inline_category
 
 dotenv_path = join(dirname(__file__), '.env')
@@ -38,10 +38,10 @@ def booking(message):
 
 
 @bot.message_handler(content_types=['contact'])
-def request_contact(message, time):
+def request_contact(message):
     phone_number = message.contact.phone_number
-    bot.send_message(message.from_user.id, GET_PHONE_TABLEID)
-    bot.register_next_step_handler(message, get_table_id, time, phone_number)
+    bot.send_message(message.from_user.id, GET_TABLEID)
+    bot.register_next_step_handler(message, get_table_id, phone_number)
 
 
 @bot.message_handler(regexp=r'\+998+')
