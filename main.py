@@ -42,6 +42,7 @@ def phone(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value)
 def get_first_name(message):
     first_name = message.text
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     bot.send_message(message.from_user.id, GET_TABLEID)
     bot.register_next_step_handler(message, get_table_id, phone_number, first_name)
 
