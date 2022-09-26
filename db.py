@@ -48,4 +48,9 @@ class DataBaseOperations:
             self.cursor.execute('SELECT name FROM tables WHERE seating_category=1 ORDER BY id;')
             return self.cursor.fetchall()
 
+    def table_id(self, table):
+        with self.connection:
+            self.cursor.execute('SELECT id FROM tables WHERE name=%s', (table, ))
+            return self.cursor.fetchone()
+
 operations = DataBaseOperations()
