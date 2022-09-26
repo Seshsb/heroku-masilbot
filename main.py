@@ -12,22 +12,24 @@ from keyboards.inline.navigations import inline_category
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+    bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE, regexp='Бронирование')
-def booking(message):
-    bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
-                     reply_markup=inline_category())
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value, regexp=['Бронирование'])
+def text(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
+    bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
+                    reply_markup=inline_category())
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
 
 
-# @bot.message_handler(func=lambda message: reserve_time(message) == True, content_types=['contact'])
-# def request_contact(message):
-#     phone_number = '+' + message.contact.phone_number
-#     bot.send_message(message.from_user.id, GET_TABLEID)
-#     bot.register_next_step_handler(message, get_table_id, phone_number)
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_TABLE.value, content_types=['contact'])
+def request_contact(message):
+    phone_number = '+' + message.contact.phone_number
+    bot.send_message(message.from_user.id, GET_TABLEID)
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+    bot.register_next_step_handler(message, get_table_id, phone_number)
 
 
 @bot.message_handler(regexp=r'\+998+')
@@ -35,9 +37,10 @@ def phone(message):
     bot.send_message(message.from_user.id, 'ok')
 
 
-@bot.callback_query_handler(func=lambda call: True)
+@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING)
 def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'tables':
+        dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE.value)
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                             'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
         bot.register_next_step_handler(call.message, reserve_time)

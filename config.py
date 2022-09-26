@@ -11,8 +11,10 @@ class States(Enum):
     S_ACTION_CHOICE = "choice"
     S_BOOKING = "booking"
     S_BOOKING_SEATING_CATEGORY = "seating category"
+    S_CHOICE_TABLE = "choice table"
+    S_CHOICE_CABINS = "choice cabins"
     S_BOOKING_START_AT = "start at"
     S_BOOKING_PHONE_NUMBER = "phone number"
-    S_CHOICE_TABLE = "choice table"
+    S_CHOICE_TABLE_ID = "choice table id"
 
 
