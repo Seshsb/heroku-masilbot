@@ -8,3 +8,11 @@ def booking_or_delivery():
     markup.add(button1, button2)
 
     return markup
+
+
+def back_to_menu():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    button1 = types.KeyboardButton('Вернуться в меню')
+    markup.add(button1)
+
+    return markup

@@ -1,10 +1,12 @@
+import telebot.apihelper
+
 import config
 import dbworker
 from connections import *
 
 from datetime import datetime
 from telebot import types
-from keyboards.default import register
+from keyboards.default import register, navigation
 from db import operations
 from data.config import GET_PHONE_NUMBER, BOOKING_SUCCESS
 
@@ -21,9 +23,8 @@ def get_table_id(message: types.Message, phone_number, first_name):
     table_id = message.text
     operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, first_name)
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
-    bot.send_message(message.from_user.id, BOOKING_SUCCESS)
+    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
     dbworker.set_states(message.from_user.id, config.States.S_START.value)
-
 #
 # @bot.message_handler(func=get_phone_number, content_types=['text', 'contact'])
 # def test(message):
