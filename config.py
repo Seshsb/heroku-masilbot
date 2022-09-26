@@ -17,5 +17,6 @@ class States(Enum):
     S_BOOKING_PHONE_NUMBER = "phone number"
     S_BOOKING_FIRSTNAME = "first name"
     S_CHOICE_TABLE_ID = "choice table id"
+    S_CHOICE_TABLE_ID_INLINE = "choice table id inline"
 
 
