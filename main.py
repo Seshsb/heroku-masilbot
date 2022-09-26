@@ -37,7 +37,7 @@ def phone(message):
     bot.send_message(message.from_user.id, 'ok')
 
 
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING)
+@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING.value)
 def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'tables':
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE.value)
