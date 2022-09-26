@@ -63,6 +63,7 @@ def get_first_name(message):
     global name
     name = message.text
     bot.send_message(message.from_user.id, GET_TABLEID)
+    bot.send_message(message.from_user.id, name)
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
 
