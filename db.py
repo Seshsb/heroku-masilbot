@@ -35,7 +35,7 @@ class DataBaseOperations:
             self.cursor.execute('SELECT * FROM users WHERE phone_number=%s;', (phone_number,))
             if not self.cursor.fetchall():
                 self.cursor.execute('INSERT INTO users (id, first_name, phone_number) '
-                                    'VALUES (%s, %s);', (user_id, name, phone_number))
+                                    'VALUES (%s, %s, %s);', (user_id, name, phone_number))
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
                                 'VALUES (%s, %s, %s);', (table_id, time_at, phone_number))
             self.connection.commit()
