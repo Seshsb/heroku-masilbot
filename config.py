@@ -7,7 +7,7 @@ class States(Enum):
     Мы используем БД Vedis, в которой хранимые значения всегда строки,
     поэтому и тут будем использовать тоже строки (str)
     """
-    # Начало нового диалога
+    S_START = 'start'# Начало нового диалога
     S_ACTION_CHOICE = "choice"
     S_BOOKING = "booking"
     S_BOOKING_SEATING_CATEGORY = "seating category"

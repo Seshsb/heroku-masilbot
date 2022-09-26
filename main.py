@@ -10,7 +10,7 @@ from data.config import START, GET_TABLEID, GET_FIRST_NAME
 from keyboards.inline.navigations import inline_category
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value, commands=['start'])
 def start(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
