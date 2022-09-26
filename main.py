@@ -7,7 +7,7 @@ from db import operations
 from connections import *
 from telebot import types
 from flask import request
-from functions.handlers import get_table_id
+from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
 from keyboards.inline.navigations import inline_category, choice_table
@@ -85,6 +85,8 @@ def inline_seating_category(call: types.CallbackQuery):
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                             'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
+    bot.send_message(call.from_user.id, call.message.text)
+    # elif call.data == f'table{choice_tableid()}'
 
 
 ############################################################################################

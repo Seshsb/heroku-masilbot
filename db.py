@@ -48,4 +48,3 @@ class DataBaseOperations:
             return self.cursor.fetchall()
 
 operations = DataBaseOperations()
-print(operations.tables())
