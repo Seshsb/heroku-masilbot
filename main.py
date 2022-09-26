@@ -57,18 +57,24 @@ def request_contact(message):
 def phone(message):
     global phone_number
     phone_number = message.text
+    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID_INLINE.value)
     bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                    reply_markup=choice_table())
-    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
 def get_first_name(message):
     global first_name
     first_name = message.text
+    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID_INLINE.value)
     bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                    reply_markup=choice_table())
-    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE.value)
+
+
+@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID_INLINE.value)
+def inline_choice_table(call: types.CallbackQuery):
+    if call.data == f'table{call.data}':
+        bot.send_message(call.from_user.id, 'well done')
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
