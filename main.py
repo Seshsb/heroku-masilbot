@@ -71,7 +71,7 @@ def get_first_name(message):
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID_INLINE.value)
 
 
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID_INLINE.value)
+@bot.callback_query_handler(func=lambda call: True)
 def tableId(call):
     bot.send_message(call.from_user.id, call)
 
