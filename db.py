@@ -24,12 +24,6 @@ class DataBaseOperations:
                               password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
         self.cursor = self.connection.cursor()
 
-    # def create_user(self, user_id, phone_number):
-    #     with self.connection:
-    #         self.cursor.execute('INSERT INTO users (id, phone_number) '
-    #                             'VALUES (%s, %s);', (user_id, phone_number))
-    #         self.connection.commit()
-
     def user_exist(self, user_id):
         with self.connection:
             self.cursor.execute('SELECT * FROM users WHERE id=%s', (user_id,))
@@ -38,7 +32,8 @@ class DataBaseOperations:
 
     def start_booking(self, user_id, table_id, time_at, phone_number, name):
         with self.connection:
-            if not self.cursor.execute('SELECT * FROM users WHERE phone_number=%s;', (phone_number)):
+            self.cursor.execute('SELECT * FROM users WHERE phone_number=%s;', (phone_number,))
+            if not self.cursor.fetchall():
                 self.cursor.execute('INSERT INTO users (id, first_name, phone_number) '
                                     'VALUES (%s, %s);', (user_id, name, phone_number))
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
@@ -47,3 +42,4 @@ class DataBaseOperations:
 
 
 operations = DataBaseOperations()
+operations.start_booking(1, 1, '2022-09-30 15:30', '+998900336635', 'Ruslan')
