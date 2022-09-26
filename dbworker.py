@@ -7,7 +7,7 @@ def get_current_state(user_id):
         try:
             return db[user_id].decode()
         except KeyError:
-            return config.States.S_START.value
+            return config.States.S_ACTION_CHOICE.value
 
 
 def set_states(user_id, value):
