@@ -65,24 +65,17 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID_INLINE.value)
+    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
     bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                    reply_markup=choice_table())
 
 
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID_INLINE.value)
+@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
-    if call.data == 'table1':
-        bot.send_message(call.from_user.id, 'well done')
-
-
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
-def get_table_id(message: types.Message):
-    table_id = message.text
-    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, first_name)
-    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
-    dbworker.set_states(message.from_user.id, config.States.S_START.value)
-
+    table_id = call.data
+    operations.start_booking(call.from_user.id, table_id, time_sql, phone_number, first_name)
+    bot.send_message(call.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
+    dbworker.set_states(call.from_user.id, config.States.S_START.value)
 
 
 @bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
