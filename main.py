@@ -68,13 +68,7 @@ def get_first_name(message):
     first_name = message.text
     bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                    reply_markup=choice_table())
-    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID_INLINE.value)
-
-
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID_INLINE.value)
-def inline_seating_category(call: types.CallbackQuery):
-    if call.data == f'table{call.data}':
-        bot.send_message(call.from_user.id, 'ok')
+    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
@@ -93,8 +87,8 @@ def inline_seating_category(call: types.CallbackQuery):
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                             'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
-    elif call.data == f'table{call.data}':
-        bot.send_message(call.message.from_user.id, call.data)
+    elif call.data == 'table1':
+        bot.send_message(call.message.from_user.id, call)
 
 
 ############################################################################################
