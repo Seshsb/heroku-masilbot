@@ -60,17 +60,16 @@ def phone(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
 def get_first_name(message):
-    global name
-    name = message.text
+    global first_name
+    first_name = message.text
     bot.send_message(message.from_user.id, GET_TABLEID)
-    bot.send_message(message.from_user.id, name)
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
 def get_table_id(message: types.Message):
     table_id = message.text
-    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, name)
+    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, first_name)
     bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
     dbworker.set_states(message.from_user.id, config.States.S_START.value)
 
