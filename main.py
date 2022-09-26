@@ -6,7 +6,7 @@ from telebot import types
 from flask import request
 from functions.handlers import reserve_time, get_table_id
 from keyboards.default import navigation
-from data.config import START, GET_TABLEID
+from data.config import START, GET_TABLEID, GET_FIRST_NAME
 from keyboards.inline.navigations import inline_category
 
 
@@ -27,14 +27,24 @@ def text(message):
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_START_AT.value, content_types=['contact'])
 def request_contact(message):
     phone_number = '+' + message.contact.phone_number
-    bot.send_message(message.from_user.id, GET_TABLEID)
+    bot.send_message(message.from_user.id, GET_FIRST_NAME)
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
     bot.register_next_step_handler(message, get_table_id, phone_number)
 
 
-@bot.message_handler(regexp=r'\+998+')
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_START_AT.value, regexp=r'\+998{13}$')
 def phone(message):
-    bot.send_message(message.from_user.id, 'ok')
+    global phone_number
+    phone_number = message.text
+    bot.send_message(message.from_user.id, GET_FIRST_NAME)
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value)
+def get_first_name(message):
+    first_name = message.text
+    bot.send_message(message.from_user.id, GET_TABLEID)
+    bot.register_next_step_handler(message, get_table_id, phone_number, first_name)
 
 
 @bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)

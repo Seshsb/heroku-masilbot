@@ -36,10 +36,10 @@ class DataBaseOperations:
             result = self.cursor.fetchall()
             return bool(len(result))
 
-    def start_booking(self, user_id, table_id, time_at, phone_number):
+    def start_booking(self, user_id, table_id, time_at, phone_number, name):
         with self.connection:
-            self.cursor.execute('INSERT INTO users (id, phone_number) '
-                                'VALUES (%s, %s);', (user_id, phone_number))
+            self.cursor.execute('INSERT INTO users (id, first_name, phone_number) '
+                                'VALUES (%s, %s);', (user_id, name, phone_number))
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_phone) '
                                 'VALUES (%s, %s, %s);', (table_id, time_at, phone_number))
             self.connection.commit()
