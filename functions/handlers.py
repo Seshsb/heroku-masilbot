@@ -19,7 +19,7 @@ def reserve_time(message: types.Message):
 
 def get_table_id(message: types.Message, phone_number, first_name):
     table_id = message.text
-    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number)
+    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, first_name)
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
     bot.send_message(message.from_user.id, BOOKING_SUCCESS)
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
