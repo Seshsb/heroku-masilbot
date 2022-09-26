@@ -55,7 +55,7 @@ def request_contact(message):
 def phone(message):
     global phone_number
     phone_number = message.text
-    bot.send_photo(message.from_user.id, open('heroku-masilbot/static/booking/tables.jpeg', 'rb'), GET_TABLEID,
+    bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                    reply_markup=choice_table())
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
