@@ -1,6 +1,7 @@
 import dbworker
 import config
 
+from db import operations
 from connections import *
 from telebot import types
 from flask import request
@@ -21,7 +22,7 @@ def back_to_menu(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
-
+############################################################################################
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value, regexp='Бронирование')
 def text(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
@@ -32,6 +33,7 @@ def text(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_START_AT.value, content_types=['contact'])
 def request_contact(message):
+    global phone_number
     phone_number = '+' + message.contact.phone_number
     bot.send_message(message.from_user.id, GET_FIRST_NAME)
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
@@ -47,10 +49,20 @@ def phone(message):
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value)
 def get_first_name(message):
-    first_name = message.text
+    name = message.text
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     bot.send_message(message.from_user.id, GET_TABLEID)
-    bot.register_next_step_handler(message, get_table_id, phone_number, first_name)
+    bot.register_next_step_handler(message, get_table_id, phone_number, name)
+
+
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
+def get_table_id(message: types.Message, phone_number, first_name):
+    table_id = message.text
+    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, first_name)
+    dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
+    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
+    dbworker.set_states(message.from_user.id, config.States.S_START.value)
+
 
 
 @bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
