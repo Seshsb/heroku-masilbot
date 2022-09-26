@@ -64,7 +64,7 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    bot.send_photo(message.from_user.id, open('heroku-masilbot/static/booking/tables.jpeg', 'rb'), GET_TABLEID,
+    bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                    reply_markup=choice_table())
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
