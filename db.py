@@ -33,7 +33,8 @@ class DataBaseOperations:
     def start_booking(self, user_id, table_id, time_at, phone_number, name):
         with self.connection:
             self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
-            if not self.cursor.fetchall():
+            if not self.cursor.fetchone():
+                print(self.cursor.fetchone())
                 self.cursor.execute('INSERT INTO users (id, first_name, phone_number) '
                                     'VALUES (%s, %s, %s);', (user_id, name, phone_number))
             else:
@@ -48,4 +49,3 @@ class DataBaseOperations:
             return self.cursor.fetchall()
 
 operations = DataBaseOperations()
-print(operations.tables())
