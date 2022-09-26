@@ -44,7 +44,8 @@ class DataBaseOperations:
 
     def tables(self):
         with self.connection:
-            self.cursor.execute('SELECT id FROM tables WHERE seating_category=1;')
+            self.cursor.execute('SELECT name FROM tables WHERE seating_category=1 ORDER BY id;')
             return self.cursor.fetchall()
 
 operations = DataBaseOperations()
+print(operations.tables())
