@@ -10,7 +10,7 @@ from flask import request
 from functions.handlers import get_table_id
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
-from keyboards.inline.navigations import inline_category
+from keyboards.inline.navigations import inline_category, choice_table
 
 
 @bot.message_handler(commands=['start'])
@@ -24,6 +24,7 @@ def back_to_menu(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
+# Бронирование
 ############################################################################################
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value, regexp='Бронирование')
 def text(message):
@@ -62,7 +63,7 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    bot.send_message(message.from_user.id, GET_TABLEID)
+    bot.send_photo(message.from_user.id, open('/static/booking/tables.jpeg'), GET_TABLEID, reply_markup=choice_table())
     dbworker.set_states(message.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
 
@@ -82,6 +83,9 @@ def inline_seating_category(call: types.CallbackQuery):
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                             'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
+
+
+############################################################################################
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

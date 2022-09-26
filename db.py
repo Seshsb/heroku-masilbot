@@ -42,5 +42,9 @@ class DataBaseOperations:
                                 'VALUES (%s, %s, %s);', (table_id, time_at, user_id))
             self.connection.commit()
 
+    def tables(self):
+        with self.connection:
+            self.cursor.execute('SELECT id FROM tables WHERE seating_category=1;')
+            return self.cursor.fetchall()
 
 operations = DataBaseOperations()
