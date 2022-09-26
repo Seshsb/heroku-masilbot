@@ -84,7 +84,7 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    operations.start_booking(message.from_user.id, table_id, time_sql, phone_number, first_name)
+    operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
     bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
     dbworker.set_states(message.from_user.id, config.States.S_START.value)
 
