@@ -14,7 +14,7 @@ def inline_category():
 
 def choice_table():
     markup = types.InlineKeyboardMarkup(row_width=2)
-    tables = [str(table[0]) for table in operations.tables()]
+    tables = [types.InlineKeyboardButton(text=str(table[0]), callback_data=table[0]) for table in operations.tables()]
     markup.add(*tables)
 
     return markup
