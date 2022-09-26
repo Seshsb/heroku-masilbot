@@ -38,7 +38,7 @@ class DataBaseOperations:
                                     'VALUES (%s, %s, %s);', (user_id, name, phone_number))
             else:
                 self.cursor.execute('UPDATE users SET phone_number=%s WHERE id=%s;', (phone_number, user_id))
-            self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user) '
+            self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_id) '
                                 'VALUES (%s, %s, %s);', (table_id, time_at, user_id))
             self.connection.commit()
 
