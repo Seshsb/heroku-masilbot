@@ -16,7 +16,7 @@ def start(message: types.Message):
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value, regexp=['Бронирование'])
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value, regexp='Бронирование')
 def text(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
     bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
