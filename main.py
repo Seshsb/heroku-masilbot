@@ -32,7 +32,7 @@ def request_contact(message):
     bot.register_next_step_handler(message, get_table_id, phone_number)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_START_AT.value, regexp=r'\+998{13}$')
+@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_START_AT.value, regexp=r'\+998{13,13}$')
 def phone(message):
     global phone_number
     phone_number = message.text
