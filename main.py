@@ -113,7 +113,7 @@ def callback_date(call: CallbackQuery):
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
 def callback_time(call: types.CallbackQuery):
-    time = call.message.json['reply_markup']['inline_keyboard'][0][0][1]
+    time = call.message.json['reply_markup']['inline_keyboard'][0][0]
     hours = int(time[:2])
     minutes = int(time[3:])
     if call.data == 'left':
