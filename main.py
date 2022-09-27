@@ -18,8 +18,8 @@ from keyboards.inline.navigations import inline_category, choice_table
 
 now = datetime.datetime.now()
 calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
-calendar_ = Calendar()
-calendar_2 = calendar_.create_calendar(
+calendar = Calendar()
+show_calendar = calendar.create_calendar(
                          name=calendar_1.prefix,
                          year=now.year,
                          month=now.month
@@ -69,8 +69,39 @@ def inline_choice_table(call: types.CallbackQuery):
     if table[0] == 'R':
         table = operations.table_id(call.data)
     bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=calendar_2)
+                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=show_calendar)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_1.prefix))
+def callback_inline(call: CallbackQuery):
+    """
+    Обработка inline callback запросов
+    :param call:
+    :return:
+    """
+
+    # At this point, we are sure that this calendar is ours. So we cut the line by the separator of our calendar
+    name, action, year, month, day = call.data.split(calendar_1.sep)
+    # Processing the calendar. Get either the date or None if the buttons are of a different type
+    date = calendar.calendar_query_handler(
+        bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
+    )
+    # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
+    if action == "DAY":
+        bot.send_message(
+            chat_id=call.from_user.id,
+            text=f"You have chosen {date.strftime('%d.%m.%Y')}",
+            reply_markup=types.ReplyKeyboardRemove(),
+        )
+        bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date.strftime('%d.%m.%Y')}")
+    elif action == "CANCEL":
+        bot.send_message(
+            chat_id=call.from_user.id,
+            text="Cancellation",
+            reply_markup=types.ReplyKeyboardRemove(),
+        )
+        bot.send_message(call.from_user.id, f"{calendar_1}: Cancellation")
 
 
 @bot.message_handler(
