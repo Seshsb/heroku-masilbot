@@ -4,7 +4,6 @@ import telebot.apihelper
 import dbworker
 import config
 
-from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from db import operations
 from connections import *
 from telebot import types
