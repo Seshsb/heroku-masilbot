@@ -1,6 +1,5 @@
-from datetime import datetime
 from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
-import telebot.apihelper
+# import telebot.apihelper
 
 import dbworker
 import config
@@ -85,14 +84,14 @@ def phone(message):
     bot.send_message(message.from_user.id, GET_FIRST_NAME)
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
-
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
-def get_first_name(message):
-    global first_name
-    first_name = message.text
-    operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
-    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
-    dbworker.set_states(message.from_user.id, config.States.S_START.value)
+#
+# @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
+# def get_first_name(message):
+#     global first_name
+#     first_name = message.text
+#     operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
+#     bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
+#     dbworker.set_states(message.from_user.id, config.States.S_START.value)
 
 
 
