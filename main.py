@@ -1,7 +1,6 @@
-from datetime import date
-
-from telegram_bot_calendar import *
-# import telebot.apihelper
+from datetime import datetime
+from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
+import telebot.apihelper
 
 import dbworker
 import config
@@ -48,27 +47,22 @@ def inline_seating_category(call: types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
     global table
+    calendar, step = DetailedTelegramCalendar().build()
     table = call.data
-    CALENDAR, step = WMonthTelegramCalendar(locale='uz', min_date=date.today()).build()
     if table[0] == 'R':
         table = operations.table_id(call.data)
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени',reply_markup=CALENDAR)
+                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=calendar)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
-@bot.callback_query_handler(func=WMonthTelegramCalendar.func())
+@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
 def reserve_time(call: types.CallbackQuery):
-    result, key, step = WMonthTelegramCalendar(locale='uz', min_date=date.today()).process(call.data)
-    if not result and key:
-        bot.edit_message_text(f'Select {LSTEP[step]}', call.message.chat.id, call.message.message_id, reply_markup=key)
-    elif result:
-        bot.edit_message_text(f'You selectes {result}', call.message.chat.id, call.message.message_id)
-    # time = message.text
-    # global time_sql
-    # time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
-    # bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-    # dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+    time = message.text
+    global time_sql
+    time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
+    bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value, content_types=['contact'])
