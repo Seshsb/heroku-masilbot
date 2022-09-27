@@ -13,7 +13,7 @@ from flask import request
 from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
-from keyboards.inline.navigations import inline_category, choice_table
+from keyboards.inline.navigations import inline_category, choice_table, start_time
 
 
 now = datetime.datetime.now()
@@ -69,11 +69,12 @@ def inline_choice_table(call: types.CallbackQuery):
         table = operations.table_id(call.data)
     bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                         'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=show_calendar)
-    # dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
+    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith(calendar_1.prefix))
-def callback_inline(call: CallbackQuery):
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE)
+def callback_date(call: CallbackQuery):
     """
     Обработка inline callback запросов
     :param call:
@@ -85,15 +86,19 @@ def callback_inline(call: CallbackQuery):
     # Processing the calendar. Get either the date or None if the buttons are of a different type
     date = calendar.calendar_query_handler(
         bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
-    )
+    ).strftime('%Y-%m-%d')
     # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
     if action == "DAY":
+        if month == datetime.now().month and day < datetime.now().day:
+            bot.send_message(call.from_user, 'выберите правильный день')
         bot.send_message(
             chat_id=call.from_user.id,
-            text=f"You have chosen {date.strftime('%d.%m.%Y')}",
+            text=f"You have chosen {date}",
             reply_markup=types.ReplyKeyboardRemove(),
         )
-        bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date.strftime('%d.%m.%Y')}")
+
+        bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}", reply_markup=start_time())
+        dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
     elif action == "CANCEL":
         bot.send_message(
             chat_id=call.from_user.id,
@@ -103,14 +108,25 @@ def callback_inline(call: CallbackQuery):
         bot.send_message(call.from_user.id, f"{calendar_1}: Cancellation")
 
 
-@bot.message_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
-def reserve_time(message: types.Message):
-    time = message.text
-    global time_sql
-    time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
-    bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
+def callback_time(call: types.CallbackQuery):
+    if call.data == '<':
+        bot.send_message(call.from_user.id, call)
+    elif call.data == '>':
+        pass
+    elif call.data == 'submit':
+        pass
+
+
+# @bot.message_handler(
+#     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
+# def reserve_time(message: types.Message):
+#     # time = message.text
+#     # global time_sql
+#     # time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
+#     bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+#     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
 
 @bot.message_handler(
@@ -133,14 +149,14 @@ def phone(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
 
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
-def get_first_name(message):
-    global first_name
-    first_name = message.text
-    operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
-    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
-    dbworker.set_states(message.from_user.id, config.States.S_START.value)
+# @bot.message_handler(
+#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
+# def get_first_name(message):
+#     global first_name
+#     first_name = message.text
+#     operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
+#     bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
+#     dbworker.set_states(message.from_user.id, config.States.S_START.value)
 
 
 ############################################################################################
