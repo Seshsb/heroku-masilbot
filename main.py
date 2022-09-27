@@ -69,7 +69,7 @@ def inline_choice_table(call: types.CallbackQuery):
         table = operations.table_id(call.data)
     bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                         'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=show_calendar)
-    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
+    # dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
 
 @bot.callback_query_handler(
@@ -89,8 +89,9 @@ def callback_date(call: CallbackQuery):
     ).strftime('%Y-%m-%d')
     # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
     if action == "DAY":
-        if month == datetime.now().month and day < datetime.now().day:
-            bot.send_message(call.from_user, 'выберите правильный день')
+        bot.send_message(call.from_user.id, month)
+        # if month == datetime.now().month and day < datetime.now().day:
+        #     bot.send_message(call.from_user, 'выберите правильный день')
         bot.send_message(
             chat_id=call.from_user.id,
             text=f"You have chosen {date}",
