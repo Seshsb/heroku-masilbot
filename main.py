@@ -69,9 +69,11 @@ def inline_choice_table(call: types.CallbackQuery):
         table = operations.table_id(call.data)
     bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                         'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=show_calendar)
-    # dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
+    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
 
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
 @bot.callback_query_handler(
     func=lambda call: call.data.startswith(calendar_1.prefix))
 def callback_date(call: CallbackQuery):
