@@ -34,7 +34,6 @@ class DataBaseOperations:
         with self.connection:
             self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
             if not self.cursor.fetchone():
-                print(self.cursor.fetchone())
                 self.cursor.execute('INSERT INTO users (id, first_name, phone_number) '
                                     'VALUES (%s, %s, %s);', (user_id, name, phone_number))
             else:
@@ -50,7 +49,8 @@ class DataBaseOperations:
 
     def table_id(self, table):
         with self.connection:
-            self.cursor.execute('SELECT id FROM tables WHERE name=%s', (table, ))
+            self.cursor.execute('SELECT id FROM tables WHERE name=%s, is_occupied=false ', (table, ))
             return self.cursor.fetchone()
+
 
 operations = DataBaseOperations()
