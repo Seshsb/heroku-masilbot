@@ -5,7 +5,6 @@ import telebot_calendar
 import dbworker
 import config
 
-import telebot
 from telebot_calendar import *
 from db import operations
 from connections import *
@@ -17,7 +16,14 @@ from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET
 from keyboards.inline.navigations import inline_category, choice_table
 
 
+now = datetime.datetime.now()
 calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
+calendar_ = Calendar()
+calendar_2 = calendar_.create_calendar(
+                         name=calendar_1.prefix,
+                         year=now.year,
+                         month=now.month
+)
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -63,13 +69,7 @@ def inline_choice_table(call: types.CallbackQuery):
     if table[0] == 'R':
         table = operations.table_id(call.data)
     bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени',
-                     reply_markup=telebot_calendar.create_calendar(
-                         name=calendar_1.prefix,
-                         year=now.year,
-                         month=now.month
-                     ),
-                     )
+                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=calendar_2)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
