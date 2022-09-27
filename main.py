@@ -1,9 +1,12 @@
 from datetime import datetime
-import telebot.apihelper
+
+import telebot_calendar
 
 import dbworker
 import config
 
+import telebot
+from telebot_calendar import *
 from db import operations
 from connections import *
 from telebot import types
@@ -14,28 +17,36 @@ from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET
 from keyboards.inline.navigations import inline_category, choice_table
 
 
+calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
+
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value, regexp='Вернуться в меню')
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value,
+    regexp='Вернуться в меню')
 def back_to_menu(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
+
 # Бронирование
 ############################################################################################
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value, regexp='Бронирование')
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value,
+    regexp='Бронирование')
 def text(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
     bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
-                    reply_markup=inline_category())
+                     reply_markup=inline_category())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
 
 
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
 def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'tables':
         bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
@@ -43,18 +54,27 @@ def inline_seating_category(call: types.CallbackQuery):
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
 
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
     global table
     table = call.data
+    now = datetime.datetime.now()
     if table[0] == 'R':
         table = operations.table_id(call.data)
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
+                                            'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени',
+                         reply_markup=telebot_calendar.create_calendar(
+                             name=calendar_1.prefix,
+                             year=now.year,
+                             month=now.month
+                         ),
+                         )
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
-@bot.message_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
+@bot.message_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
 def reserve_time(message: types.Message):
     time = message.text
     global time_sql
@@ -63,7 +83,9 @@ def reserve_time(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value, content_types=['contact'])
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value,
+    content_types=['contact'])
 def request_contact(message):
     global phone_number
     phone_number = '+' + message.contact.phone_number
@@ -71,7 +93,9 @@ def request_contact(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value, regexp=r'\+998[0-9]{9,9}$')
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value,
+    regexp=r'\+998[0-9]{9,9}$')
 def phone(message):
     global phone_number
     phone_number = message.text
@@ -79,15 +103,14 @@ def phone(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
 def get_first_name(message):
     global first_name
     first_name = message.text
     operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
     bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
     dbworker.set_states(message.from_user.id, config.States.S_START.value)
-
-
 
 
 ############################################################################################
