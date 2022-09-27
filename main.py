@@ -1,5 +1,5 @@
 from datetime import datetime
-from telegram_bot_calendar import DetailedTelegramCalendar
+from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 import telebot.apihelper
 
 import dbworker
@@ -56,13 +56,18 @@ def inline_choice_table(call: types.CallbackQuery):
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
-@bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_START_AT.value)
-def reserve_time(message: types.Message):
-    time = message.text
-    global time_sql
-    time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
-    bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
+def reserve_time(call: types.CallbackQuery):
+    result, key, step = DetailedTelegramCalendar().process(call.data)
+    if not result and key:
+        bot.edit_message_text(f'Select {LSTEP[step]}', call.message.chat.id, call.message.message_id, reply_markup=key)
+    elif result:
+        bot.edit_message_text(f'You selectes {result}', call.message.chat.id, call.message.message_id)
+    # time = message.text
+    # global time_sql
+    # time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
+    # bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+    # dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
 
 @bot.message_handler(func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value, content_types=['contact'])
