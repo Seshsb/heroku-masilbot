@@ -73,7 +73,7 @@ def inline_choice_table(call: types.CallbackQuery):
 
 
 @bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE)
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
 def callback_date(call: CallbackQuery):
     """
     Обработка inline callback запросов
