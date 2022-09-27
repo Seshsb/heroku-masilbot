@@ -114,7 +114,7 @@ def callback_date(call: CallbackQuery):
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
 def callback_time(call: types.CallbackQuery):
     if call.data == 'left':
-        bot.send_message(call.from_user.id, call.message.json.reply_markup.inline_keyboard[0][0][1]["text"])
+        bot.send_message(call.from_user.id, call.message.json)
         # bot.edit_message_text(call.message.chat.id, call.message.message_id, f'{int(call.message.json.reply_markup.inline_keyboard[0][0][1]["text"])}', start_time(),)
     elif call.data == 'right':
         pass
