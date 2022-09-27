@@ -1,10 +1,10 @@
 from datetime import datetime
-from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 import telebot.apihelper
 
 import dbworker
 import config
 
+from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from db import operations
 from connections import *
 from telebot import types
@@ -47,17 +47,16 @@ def inline_seating_category(call: types.CallbackQuery):
 @bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
     global table
-    calendar, step = DetailedTelegramCalendar().build()
     table = call.data
     if table[0] == 'R':
         table = operations.table_id(call.data)
         bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=calendar)
+                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
-@bot.callback_query_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
-def reserve_time(call: types.CallbackQuery):
+@bot.message_handler(func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_AT.value)
+def reserve_time(message: types.Message):
     time = message.text
     global time_sql
     time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
