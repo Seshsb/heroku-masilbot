@@ -49,7 +49,7 @@ class DataBaseOperations:
 
     def table_id(self, table):
         with self.connection:
-            self.cursor.execute('SELECT id FROM tables WHERE name=%s, is_occupied=false ', (table, ))
+            self.cursor.execute('SELECT id FROM tables WHERE name=%s and is_occupied=false ', (table, ))
             return self.cursor.fetchone()
 
 
