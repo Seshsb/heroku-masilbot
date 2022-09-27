@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from telegram_bot_calendar import DetailedTelegramCalendar
 import telebot.apihelper
 
 import dbworker
@@ -48,10 +48,11 @@ def inline_seating_category(call: types.CallbackQuery):
 def inline_choice_table(call: types.CallbackQuery):
     global table
     table = call.data
+    calendar, step = DetailedTelegramCalendar().build()
     if table[0] == 'R':
         table = operations.table_id(call.data)
-    bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени')
+        bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
+                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени',reply_markup=calendar)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
