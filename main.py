@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import telebot.apihelper
 import telebot_calendar
 
 import dbworker
@@ -62,14 +62,14 @@ def inline_choice_table(call: types.CallbackQuery):
     now = datetime.datetime.now()
     if table[0] == 'R':
         table = operations.table_id(call.data)
-        bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                            'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени',
-                         reply_markup=telebot_calendar.create_calendar(
-                             name=calendar_1.prefix,
-                             year=now.year,
-                             month=now.month
-                         ),
-                         )
+    bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
+                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени',
+                     reply_markup=telebot_calendar.create_calendar(
+                         name=calendar_1.prefix,
+                         year=now.year,
+                         month=now.month
+                     ),
+                     )
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_AT.value)
 
 
