@@ -25,7 +25,7 @@ def start_time():
     left_arrow = types.InlineKeyboardButton('<', callback_data='left')
     right_arrow = types.InlineKeyboardButton('>', callback_data='right')
     time_start = types.InlineKeyboardButton('00:00')
-    submit = types.InlineKeyboardButton('Дальше')
+    submit = types.InlineKeyboardButton('Дальше', callback_data='submit')
     markup.add(left_arrow, time_start, right_arrow, submit)
 
     return markup

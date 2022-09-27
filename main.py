@@ -91,8 +91,9 @@ def callback_date(call: CallbackQuery):
     ).strftime('%Y-%m-%d')
     # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
     if action == "DAY":
+        bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}", reply_markup=start_time())
         bot.send_message(call.from_user.id, month)
-        if month == datetime.now().month and day < datetime.now().day:
+        if month == datetime.datetime.now().month and day < datetime.datetime.now().day:
             bot.send_message(call.from_user, 'выберите правильный день')
         # bot.send_message(
         #     chat_id=call.from_user.id,
