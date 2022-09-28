@@ -20,12 +20,13 @@ def choice_table():
     return markup
 
 
-def start_time():
-    markup = types.InlineKeyboardMarkup(row_width=3)
-    left_arrow = types.InlineKeyboardButton('<', callback_data='left')
-    right_arrow = types.InlineKeyboardButton('>', callback_data='right')
-    time_start = types.InlineKeyboardButton('00:00', callback_data='time')
-    submit = types.InlineKeyboardButton('Дальше', callback_data='submit')
-    markup.add(*[left_arrow, time_start, right_arrow, submit])
 
-    return markup
+# def start_time():
+#     markup = types.InlineKeyboardMarkup(row_width=3)
+#     left_arrow = types.InlineKeyboardButton('<', callback_data='left')
+#     right_arrow = types.InlineKeyboardButton('>', callback_data='right')
+#     time_start = types.InlineKeyboardButton('00:00', callback_data='time')
+#     submit = types.InlineKeyboardButton('Дальше', callback_data='submit')
+#     markup.add(*[left_arrow, time_start, right_arrow, submit])
+#
+#     return markup

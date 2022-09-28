@@ -1,6 +1,5 @@
 from datetime import datetime
 import telebot.apihelper
-import telebot_calendar
 
 import dbworker
 import config
@@ -13,7 +12,7 @@ from flask import request
 from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
-from keyboards.inline.navigations import inline_category, choice_table, start_time
+from keyboards.inline.navigations import inline_category, choice_table
 
 
 now = datetime.datetime.now()
@@ -91,15 +90,12 @@ def callback_date(call: CallbackQuery):
     ).strftime('%Y-%m-%d')
     # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
     if action == "DAY":
-        if month == datetime.datetime.now().month and day < datetime.datetime.now().day:
-            bot.send_message(call.from_user, 'выберите правильный день')
-        # bot.send_message(
-        #     chat_id=call.from_user.id,
-        #     text=f"You have chosen {date}",
-        #     reply_markup=types.ReplyKeyboardRemove(),
-        # )
-
-        bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}", reply_markup=start_time())
+        if month == datetime.datetime.today().month and day < datetime.datetime.today().day:
+            return bot.send_message(call.from_user, 'выберите правильный день')
+        global date
+        bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}"),
+        bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
+                                            'Формат времени ЧЧ:ММ (18:55)')
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
     elif action == "CANCEL":
         bot.send_message(
@@ -110,35 +106,26 @@ def callback_date(call: CallbackQuery):
         bot.send_message(call.from_user.id, f"{calendar_1}: Cancellation")
 
 
-@bot.callback_query_handler(
+@bot.message_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
-def callback_time(call: types.CallbackQuery):
-    time = call.message.json['reply_markup']['inline_keyboard'][0][0]["text"]
-    bot.send_message(call.from_user.id, call.message)
-    hours = int(time[:2])
-    minutes = int(time[3:])
-    if call.data == 'left':
-        bot.send_message(call.from_user.id, time)
-        if minutes > 59:
-            hours += 1
-            minutes = 00
-        bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id, text= f'{hours}:{minutes}', reply_markup=start_time())
-        bot.send_message(call.from_user.id, time)
-        # bot.edit_message_text(call.message.chat.id, call.message.message_id, f'{int(call.message.json.reply_markup.inline_keyboard[0][0][1]["text"])}', start_time(),)
-    elif call.data == 'right':
-        pass
-    elif call.data == 'submit':
-        pass
+def reserve_time(message: types.Message):
+    time = message.text
+    if time[:2].isdigit() and time[3:].isdigit():
+        if int(time[:2]) <= 23 and int(time[3:]) <= 59:
+            global datetime_sql
+            datetime_sql = f'{date} {time}'
+            bot.send_message(message.from_user.id, 'Пожалйуста, введите количество человек')
+            dbworker.set_states(message.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
 
 
-# @bot.message_handler(
-#     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
-# def reserve_time(message: types.Message):
-#     # time = message.text
-#     # global time_sql
-#     # time_sql = f'{str(datetime.today().year)}-{time[3:5]}-{time[:2]} {time[6:]}'
-#     bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-#     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
+def request_people(message: types.Message):
+    global people
+    people = message.text
+    if people.isdigit():
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+        dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER)
 
 
 @bot.message_handler(
@@ -161,14 +148,14 @@ def phone(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
 
-# @bot.message_handler(
-#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
-# def get_first_name(message):
-#     global first_name
-#     first_name = message.text
-#     operations.start_booking(message.from_user.id, table, time_sql, phone_number, first_name)
-#     bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
-#     dbworker.set_states(message.from_user.id, config.States.S_START.value)
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_FIRSTNAME.value)
+def get_first_name(message):
+    global first_name
+    first_name = message.text
+    operations.start_booking(message.from_user.id, table, datetime_sql, phone_number, first_name, people)
+    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
+    dbworker.set_states(message.from_user.id, config.States.S_START.value)
 
 
 ############################################################################################
