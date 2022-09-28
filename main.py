@@ -85,6 +85,7 @@ def callback_date(call: CallbackQuery):
     # At this point, we are sure that this calendar is ours. So we cut the line by the separator of our calendar
     name, action, year, month, day = call.data.split(calendar_1.sep)
     # Processing the calendar. Get either the date or None if the buttons are of a different type
+    global date
     date = calendar.calendar_query_handler(
         bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
     ).strftime('%Y-%m-%d')
@@ -92,7 +93,6 @@ def callback_date(call: CallbackQuery):
     if action == "DAY":
         if month == datetime.datetime.today().month and day < datetime.datetime.today().day:
             return bot.send_message(call.from_user, 'выберите правильный день')
-        global date
         bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}"),
         bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
                                             'Формат времени ЧЧ:ММ (18:55)')
