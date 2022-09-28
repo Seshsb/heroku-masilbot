@@ -9,8 +9,8 @@ from db import operations
 
 def inline_category():
     markup = types.InlineKeyboardMarkup(row_width=2)
-    tables = types.InlineKeyboardButton(text='Столы', callback_data='tables')
-    cabins = types.InlineKeyboardButton(text='Кабинки', callback_data='cabins')
+    tables = types.InlineKeyboardButton(text='Столы', callback_data='Столы')
+    cabins = types.InlineKeyboardButton(text='Кабинки', callback_data='Кабинки')
     markup.add(tables, cabins)
 
     return markup
@@ -29,6 +29,15 @@ def choice_cabins():
     tables = [types.InlineKeyboardButton(text=str(table[0]), callback_data=str(table[0])) for table in
               operations.cabins()]
     markup.add(*tables)
+
+    return markup
+
+
+def booking_confirm():
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    confirm = types.InlineKeyboardButton('Подтвердить', callback_data='confirm')
+    cancel = types.InlineKeyboardButton('Отменить', callback_data='cancel')
+    markup.add(confirm, cancel)
 
     return markup
 

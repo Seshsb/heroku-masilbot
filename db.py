@@ -56,11 +56,11 @@ class DataBaseOperations:
         with self.connection:
             self.cursor.execute('SELECT id FROM tables WHERE name=%s and seating_category=%s;', (table, seating_category))
             return self.cursor.fetchone()
-    #
-    # def cabin_id(self, cabin):
-    #     with self.connection:
-    #         self.cursor.execute('SELECT id FROM tables WHERE name=%s and seating_category=2;', (cabin, ))
-    #         return self.cursor.fetchone()
+
+    def seating_category(self, id):
+        with self.connection:
+            self.cursor.execute('SELECT seating_name FROM seating_categories WHERE id=%s;', (id, ))
+            return self.cursor.fetchone()
 
 
 operations = DataBaseOperations()

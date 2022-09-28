@@ -10,14 +10,12 @@ from telebot import types
 from flask import request
 from keyboards.default import navigation, register
 from data.config import *
-from keyboards.inline.navigations import inline_category, choice_table, calendar_1, calendar, show_calendar, \
-    choice_cabins
+from keyboards.inline.navigations import *
 
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    bot.send_message(message.from_user.id, '*bold \*Title*', parse_mode='MarkdownV2')
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
@@ -44,11 +42,11 @@ def text(message):
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
 def inline_seating_category(call: types.CallbackQuery):
     global seating_category
-    if call.data == 'tables':
+    if call.data == 'Столы':
         seating_category = 1
         bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                        reply_markup=choice_table())
-    elif call.data == 'cabins':
+    elif call.data == 'Кабинки':
         seating_category = 2
         bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
                        reply_markup=choice_cabins())
@@ -58,8 +56,10 @@ def inline_seating_category(call: types.CallbackQuery):
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_SEATING_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
+    global table_id
     global table
-    table = operations.table_id(call.data, seating_category)
+    table = call.data
+    table_id = operations.table_id(table, seating_category)
     bot.send_message(call.from_user.id, REQUEST_DATE, reply_markup=show_calendar)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
@@ -139,9 +139,26 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    operations.start_booking(message.from_user.id, table, datetime_sql, phone_number, first_name, people)
-    bot.send_message(message.from_user.id, BOOKING_SUCCESS, reply_markup=navigation.back_to_menu())
-    dbworker.set_states(message.from_user.id, config.States.S_START.value)
+    bot.send_message(message.from_user.id, f'*Детали бронирования:*\n'
+                                           f'Имя: {first_name}\n'
+                                           f'Телефон: {phone_number}\n'
+                                           f'Дата и время: {datetime_sql}\n'
+                                           f'Посадочное место: {operations.seating_category(seating_category)}'
+                                           f'Стол: {table}',
+                                           f'Количество человек: {people}',
+                     parse_mode='MarkdownV2', reply_markup=booking_confirm())
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_CONFIRMATION.value)
+def inline_confirmation(call):
+    if call.data == 'confirm':
+        operations.start_booking(call.from_user.id, table_id, datetime_sql, phone_number, first_name, people)
+        bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
+        dbworker.set_states(call.from_user.id, config.States.S_START.value)
+    bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
+    dbworker.set_states(call.from_user.id, config.States.S_START.value)
 
 
 ############################################################################################
