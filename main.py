@@ -139,7 +139,7 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    bot.send_message(message.from_user.id, f'\*Детали бронирования:\*\n'
+    bot.send_message(message.from_user.id, f'*Детали \*бронирования:*\n'
                                            f'Имя: {first_name}\n'
                                            f'Телефон: {phone_number}\n'
                                            f'Дата и время: {datetime_sql}\n'
