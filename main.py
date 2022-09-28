@@ -12,17 +12,7 @@ from flask import request
 from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
-from keyboards.inline.navigations import inline_category, choice_table
-
-
-now = datetime.datetime.now()
-calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
-calendar = Calendar()
-show_calendar = calendar.create_calendar(
-                         name=calendar_1.prefix,
-                         year=now.year,
-                         month=now.month
-)
+from keyboards.inline.navigations import inline_category, choice_table, calendar_1, calendar, show_calendar
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -89,8 +79,8 @@ def callback_date(call: CallbackQuery):
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
         if int(month) == int(today_month) and int(day) < int(today_day):
-            bot.send_message(call.from_user.id, 'выберите правильный день')
-            return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
+            bot.send_message(call.from_user.id, 'выберите правильный день', reply_markup=show_calendar)
+            return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
         bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
                                             'Формат времени ЧЧ:ММ (18:55)')
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)

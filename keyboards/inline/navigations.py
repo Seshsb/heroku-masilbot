@@ -1,5 +1,9 @@
+import datetime
+
 import telebot
 from telebot import types
+from telebot_calendar import CallbackData, Calendar
+
 from db import operations
 
 
@@ -19,7 +23,14 @@ def choice_table():
 
     return markup
 
-
+now = datetime.datetime.now()
+calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
+calendar = Calendar()
+show_calendar = calendar.create_calendar(
+                         name=calendar_1.prefix,
+                         year=now.year,
+                         month=now.month
+)
 
 # def start_time():
 #     markup = types.InlineKeyboardMarkup(row_width=3)
