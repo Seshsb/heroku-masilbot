@@ -89,8 +89,8 @@ def callback_date(call: CallbackQuery):
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
         if int(month) == int(today_month) and int(day) < int(today_day):
-            bot.send_message(call.from_user, 'выберите правильный день')
-            return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID)
+            bot.send_message(call.from_user.id, 'выберите правильный день')
+            return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
         bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
                                             'Формат времени ЧЧ:ММ (18:55)')
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
