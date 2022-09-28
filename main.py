@@ -100,7 +100,7 @@ def reserve_time(message: types.Message):
         if int(time[:2]) <= 23 and int(time[3:]) <= 59:
             global datetime_sql
             datetime_sql = f'{date} {time}'
-            bot.send_message(message.from_user.id, 'Пожалйуста, введите количество человек')
+            bot.send_message(message.from_user.id, REQUEST_PEOPLE)
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
 
 
@@ -140,7 +140,7 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    bot.send_message(message.from_user.id, 'Детали бронирования:\n'
+    bot.send_message(message.from_user.id, 'Детали бронирования:\n\n'
                                            f'Имя: {first_name}\n'
                                            f'Телефон: {phone_number[1:]}\n'
                                            f'Дата и время: {datetime_sql.replace("-", ".")}\n'
