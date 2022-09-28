@@ -105,7 +105,8 @@ def reserve_time(message: types.Message):
 
 
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
+    func=lambda message: dbworker.get_current_state(
+        message.from_user.id) == config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
 def request_people(message: types.Message):
     global people
     people = message.text
@@ -139,9 +140,9 @@ def phone(message):
 def get_first_name(message):
     global first_name
     first_name = message.text
-    bot.send_message(message.from_user.id, f'*Детали \*бронирования:*\n'
+    bot.send_message(message.from_user.id, '*Детали \*бронирования:*\n'
                                            f'Имя: {first_name}\n'
-                                           f'Телефон: {phone_number}\n'
+                                           f'Телефон: {phone_number[1:]}\n'
                                            f'Дата и время: {datetime_sql}\n'
                                            f'Посадочное место: {operations.seating_category(seating_category)}\n'
                                            f'Стол: {table}\n'
