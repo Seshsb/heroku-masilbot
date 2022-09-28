@@ -81,17 +81,18 @@ def callback_date(call: CallbackQuery):
     :param call:
     :return:
     """
-
+    global date
     # At this point, we are sure that this calendar is ours. So we cut the line by the separator of our calendar
     name, action, year, month, day = call.data.split(calendar_1.sep)
     # Processing the calendar. Get either the date or None if the buttons are of a different type
-    global date
     date = calendar.calendar_query_handler(
         bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
     ).strftime('%Y-%m-%d')
     # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
     if action == "DAY":
-        if month == datetime.datetime.today().month and day < datetime.datetime.today().day:
+        today_month = datetime.today().strftime('%m')
+        today_day = datetime.today().strftime('%d')
+        if month == today_month and day < datetime.datetime.today().day:
             return bot.send_message(call.from_user, 'выберите правильный день')
         bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}"),
         bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
