@@ -157,8 +157,9 @@ def inline_confirmation(call):
         operations.start_booking(call.from_user.id, table_id, datetime_sql, phone_number, first_name, people)
         bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
         dbworker.set_states(call.from_user.id, config.States.S_START.value)
-    bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
-    dbworker.set_states(call.from_user.id, config.States.S_START.value)
+    else:
+        bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
+        dbworker.set_states(call.from_user.id, config.States.S_START.value)
 
 
 ############################################################################################
