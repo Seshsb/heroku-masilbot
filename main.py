@@ -146,7 +146,7 @@ def get_first_name(message):
                                            f'Посадочное место: {operations.seating_category(seating_category)}'
                                            f'Стол: {table}',
                                            f'Количество человек: {people}',
-                     parse_mode='MarkdownV2', reply_markup=booking_confirm())
+                     parse_mode='Markdown', reply_markup=booking_confirm())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
 
 
