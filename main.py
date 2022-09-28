@@ -143,10 +143,10 @@ def get_first_name(message):
                                            f'Имя: {first_name}\n'
                                            f'Телефон: {phone_number}\n'
                                            f'Дата и время: {datetime_sql}\n'
-                                           f'Посадочное место: {operations.seating_category(seating_category)}'
-                                           f'Стол: {table}',
+                                           f'Посадочное место: {operations.seating_category(seating_category)}\n'
+                                           f'Стол: {table}\n'
                                            f'Количество человек: {people}',
-                     parse_mode='Markdown', reply_markup=booking_confirm())
+                     parse_mode='MarkdownV2', reply_markup=booking_confirm())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
 
 
