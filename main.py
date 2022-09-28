@@ -11,7 +11,7 @@ from telebot import types
 from flask import request
 from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
-from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
+from data.config import *
 from keyboards.inline.navigations import inline_category, choice_table, calendar_1, calendar, show_calendar, \
     choice_cabins
 
@@ -37,7 +37,7 @@ def back_to_menu(message: types.Message):
     regexp='Бронирование')
 def text(message):
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
-    bot.send_message(message.from_user.id, 'Выберите категорию посадочных мест',
+    bot.send_message(message.from_user.id, REQUEST_CATEGORY,
                      reply_markup=inline_category())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
 
@@ -62,8 +62,7 @@ def inline_seating_category(call: types.CallbackQuery):
 def inline_choice_table(call: types.CallbackQuery):
     global table
     table = operations.table_id(call.data, seating_category)
-    bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
-                                        'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=show_calendar)
+    bot.send_message(call.from_user.id, REQUEST_DATE, reply_markup=show_calendar)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
 
@@ -82,10 +81,9 @@ def callback_date(call: CallbackQuery):
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
         if int(month) == int(today_month) and int(day) < int(today_day):
-            bot.send_message(call.from_user.id, 'выберите правильный день', reply_markup=show_calendar)
+            bot.send_message(call.from_user.id, UNSUCCESS_DATE, reply_markup=show_calendar)
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
-        bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
-                                            'Формат времени ЧЧ:ММ (18:55)')
+        bot.send_message(call.from_user.id, REQUEST_TIME)
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
     elif action == "CANCEL":
         bot.send_message(
