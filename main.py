@@ -144,7 +144,7 @@ def get_first_name(message):
                                            f'Имя: {first_name}\n'
                                            f'Телефон: {phone_number[1:]}\n'
                                            f'Дата и время: {datetime_sql.replace("-", ".")}\n'
-                                           f'Посадочное место: {operations.seating_category(seating_category)}\n'
+                                           f'Посадочное место: {operations.seating_category(seating_category)[0]}\n'
                                            f'Стол: {table}\n'
                                            f'Количество человек: {people}', reply_markup=booking_confirm())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
