@@ -17,7 +17,7 @@ from keyboards.inline.navigations import inline_category, choice_table, calendar
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    bot.send_message(message.from_user.id, '#Title#', parse_mode='MarkdownV2')
+    bot.send_message(message.from_user.id, '\#Title', parse_mode='MarkdownV2')
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
