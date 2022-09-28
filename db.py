@@ -52,7 +52,7 @@ class DataBaseOperations:
             self.cursor.execute('SELECT name FROM tables WHERE seating_category=2 and is_occupied=false ORDER BY id;')
             return self.cursor.fetchall()
 
-    def table_id(self,seating_category, table):
+    def table_id(self, table, seating_category):
         with self.connection:
             self.cursor.execute('SELECT id FROM tables WHERE name=%s and seating_category=%s;', (table, seating_category))
             return self.cursor.fetchone()
