@@ -76,24 +76,17 @@ def inline_choice_table(call: types.CallbackQuery):
 @bot.callback_query_handler(
     func=lambda call: call.data.startswith(calendar_1.prefix))
 def callback_date(call: CallbackQuery):
-    """
-    Обработка inline callback запросов
-    :param call:
-    :return:
-    """
     global date
-    # At this point, we are sure that this calendar is ours. So we cut the line by the separator of our calendar
     name, action, year, month, day = call.data.split(calendar_1.sep)
-    # Processing the calendar. Get either the date or None if the buttons are of a different type
     date = calendar.calendar_query_handler(
         bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
     ).strftime('%Y-%m-%d')
-    # There are additional steps. Let's say if the date DAY is selected, you can execute your code. I sent a message.
     if action == "DAY":
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
         if str(month) == today_month and str(day) < today_day:
-            return bot.send_message(call.from_user, 'выберите правильный день')
+            bot.send_message(call.from_user, 'выберите правильный день')
+            return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID)
         bot.send_message(call.from_user.id, f"{calendar_1}: Day: {date}"),
         bot.send_message(call.from_user.id, 'Пожалуйста, введите время на которое хотите забронировать столик.\n'
                                             'Формат времени ЧЧ:ММ (18:55)')
