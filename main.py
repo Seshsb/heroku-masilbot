@@ -12,7 +12,9 @@ from flask import request
 from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
 from data.config import START, GET_TABLEID, GET_FIRST_NAME, BOOKING_SUCCESS, GET_PHONE_NUMBER
-from keyboards.inline.navigations import inline_category, choice_table, calendar_1, calendar, show_calendar
+from keyboards.inline.navigations import inline_category, choice_table, calendar_1, calendar, show_calendar, \
+    choice_cabins
+
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -43,19 +45,23 @@ def text(message):
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
 def inline_seating_category(call: types.CallbackQuery):
+    global seating_category
     if call.data == 'tables':
+        seating_category = 1
         bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
                        reply_markup=choice_table())
-        dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
+    elif call.data == 'cabins':
+        seating_category = 2
+        bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpeg', 'rb'), GET_TABLEID,
+                       reply_markup=choice_cabins())
+    dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
 
 
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
     global table
-    table = call.data
-    if table[0] == 'R':
-        table = operations.table_id(call.data)
+    table = operations.table_id(call.data, seating_category)
     bot.send_message(call.from_user.id, 'Отправьте дату и время на которое хотите забронировать \n'
                                         'В формате: дд.мм ЧЧ:ММ. В 24 часовом формате времени', reply_markup=show_calendar)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
@@ -71,10 +77,7 @@ def callback_date(call: CallbackQuery):
     date = calendar.calendar_query_handler(
         bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
     ).strftime('%Y-%m-%d')
-    bot.send_message(call.from_user.id, f'{date}-{type(date)}\n'
-                                        f'{month}-{type(month)}\n'
-                                        f'{day}-{type(day)}\n'
-                                        f'{datetime.date.today().strftime("%m")}-{type(datetime.date.today().strftime("%m"))}')
+
     if action == "DAY":
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')

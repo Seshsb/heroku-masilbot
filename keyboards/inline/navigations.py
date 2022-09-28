@@ -23,6 +23,16 @@ def choice_table():
 
     return markup
 
+
+def choice_cabins():
+    markup = types.InlineKeyboardMarkup(row_width=2, )
+    tables = [types.InlineKeyboardButton(text=str(table[0]), callback_data=str(table[0])) for table in
+              operations.cabins()]
+    markup.add(*tables)
+
+    return markup
+
+
 now = datetime.datetime.now()
 calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
 calendar = Calendar()
