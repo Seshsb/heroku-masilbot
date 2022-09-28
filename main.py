@@ -1,5 +1,4 @@
 from datetime import datetime
-import telebot.apihelper
 
 import dbworker
 import config
@@ -9,7 +8,6 @@ from db import operations
 from connections import *
 from telebot import types
 from flask import request
-from functions.handlers import choice_tableid
 from keyboards.default import navigation, register
 from data.config import *
 from keyboards.inline.navigations import inline_category, choice_table, calendar_1, calendar, show_calendar, \
@@ -19,6 +17,7 @@ from keyboards.inline.navigations import inline_category, choice_table, calendar
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+    bot.send_message(message.from_user.id, '#Title#', parse_mode='MarkdownV2')
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
 
 
@@ -36,7 +35,6 @@ def back_to_menu(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value,
     regexp='Бронирование')
 def text(message):
-    dbworker.set_states(message.from_user.id, config.States.S_BOOKING.value)
     bot.send_message(message.from_user.id, REQUEST_CATEGORY,
                      reply_markup=inline_category())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
@@ -54,11 +52,11 @@ def inline_seating_category(call: types.CallbackQuery):
         seating_category = 2
         bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
                        reply_markup=choice_cabins())
-    dbworker.set_states(call.from_user.id, config.States.S_CHOICE_TABLE_ID.value)
+    dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
 
 
 @bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_TABLE_ID.value)
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_SEATING_ID.value)
 def inline_choice_table(call: types.CallbackQuery):
     global table
     table = operations.table_id(call.data, seating_category)
