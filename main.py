@@ -81,6 +81,10 @@ def callback_date(call: CallbackQuery):
     date = calendar.calendar_query_handler(
         bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
     ).strftime('%Y-%m-%d')
+    bot.send_message(call.from_user.id, f'{date}-{type(date)}\n'
+                                        f'{month}-{type(month)}\n'
+                                        f'{day}-{type(day)}\n'
+                                        f'{datetime.date.today().strftime("%m")}-{type(datetime.date.today().strftime("%m"))}')
     if action == "DAY":
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
@@ -119,7 +123,7 @@ def request_people(message: types.Message):
     people = message.text
     if people.isdigit():
         bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-        dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER)
+        dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
 
 @bot.message_handler(
