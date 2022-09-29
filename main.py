@@ -73,7 +73,7 @@ def reserve_time(message: types.Message):
             global datetime_end
             time = datetime.strptime(message.text, '%H:%M')
             datetime_start = f'{date} {time}'
-            datetime_end = f'{date} {time + datetime.time().timedelta(hours=3)}'
+            datetime_end = f'{date} {time + datetime.timedelta(hours=3)}'
             bot.send_message(message.from_user.id, REQUEST_CATEGORY, reply_markup=inline_category())
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         else:
