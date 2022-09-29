@@ -155,17 +155,15 @@ def get_first_name(message):
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_CONFIRMATION.value)
 def inline_confirmation(call: types.CallbackQuery):
-    try:
-        if call.data == 'confirm':
-            operations.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
-                                     first_name, people)
-            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
-            dbworker.set_states(call.from_user.id, config.States.S_START.value)
-        else:
-            bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
-            dbworker.set_states(call.from_user.id, config.States.S_START.value)
-    except:
-        bot.send_message(call.from_user.id, 'False')
+    if call.data == 'confirm':
+        operations.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
+                                 first_name, people)
+        bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
+        dbworker.set_states(call.from_user.id, config.States.S_START.value)
+    else:
+        bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
+        dbworker.set_states(call.from_user.id, config.States.S_START.value)
+
 
 
 ############################################################################################
