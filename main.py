@@ -71,9 +71,9 @@ def reserve_time(message: types.Message):
         if int(message.text[:2]) <= 23 and int(message.text[3:]) <= 59:
             global datetime_start
             global datetime_end
-            time = datetime.datetime.strptime(message.text, '%H:%M')
-            datetime_start = f'{date} {time}'
-            datetime_end = f'{date} {time + datetime.timedelta(hours=3)}'
+            date_time = datetime.datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
+            datetime_start = f'{date_time}'
+            datetime_end = f'{date_time + datetime.timedelta(hours=3)}'
             bot.send_message(message.from_user.id, REQUEST_CATEGORY, reply_markup=inline_category())
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         else:
