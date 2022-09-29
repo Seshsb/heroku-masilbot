@@ -71,7 +71,7 @@ def reserve_time(message: types.Message):
         if int(message.text[:2]) <= 23 and int(message.text[3:]) <= 59:
             global datetime_start
             global datetime_end
-            time = datetime.time().strptime(message.text)
+            time = datetime.strptime(message.text, '%H:%M')
             datetime_start = f'{date} {time}'
             datetime_end = f'{date} {time + datetime.time().timedelta(hours=3)}'
             bot.send_message(message.from_user.id, REQUEST_CATEGORY, reply_markup=inline_category())
