@@ -51,7 +51,7 @@ def callback_date(call: CallbackQuery):
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
         if int(month) == int(today_month) and int(day) < int(today_day):
-            bot.send_message(call.from_user.id, UNSUCCESS_DATE, reply_markup=show_calendar)
+            bot.send_message(call.from_user.id, FAILED_DATE, reply_markup=show_calendar)
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
         bot.send_message(call.from_user.id, REQUEST_TIME)
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
@@ -67,13 +67,19 @@ def callback_date(call: CallbackQuery):
 @bot.message_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
 def reserve_time(message: types.Message):
-    time = message.text
-    if time[:2].isdigit() and time[3:].isdigit():
-        if int(time[:2]) <= 23 and int(time[3:]) <= 59:
-            global datetime_sql
-            datetime_sql = f'{date} {time}'
+    if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
+        if int(message.text[:2]) <= 23 and int(message.text[3:]) <= 59:
+            global datetime_start
+            global datetime_end
+            time = message.text.split(':')
+            time = [int(hm) for hm in time]
+            time = datetime.time(time[0], time[1])
+            datetime_start = f'{date} {time}'
+            datetime_end = f'{date} {time + datetime.timedelta(hours=3)}'
             bot.send_message(message.from_user.id, REQUEST_CATEGORY, reply_markup=inline_category())
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
+        else:
+            bot.send_message(message.from_user.id, FAILED_TIME)
 
 
 @bot.callback_query_handler(
@@ -141,7 +147,7 @@ def get_first_name(message):
     bot.send_message(message.from_user.id, 'Детали бронирования:\n\n'
                                            f'Имя: {first_name}\n'
                                            f'Телефон: {phone_number}\n'
-                                           f'Дата и время: {datetime_sql.replace("-", ".")}\n'
+                                           f'Дата и время: {datetime_start.replace("-", ".")}\n'
                                            f'Посадочное место: {operations.seating_category(seating_category)[0]}\n'
                                            f'Стол: {table}\n'
                                            f'Количество человек: {people}', reply_markup=booking_confirm())
@@ -153,7 +159,8 @@ def get_first_name(message):
 def inline_confirmation(call: types.CallbackQuery):
     try:
         if call.data == 'confirm':
-            operations.start_booking(call.from_user.id, table_id, datetime_sql, phone_number, first_name, people)
+            operations.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
+                                     first_name, people)
             bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:

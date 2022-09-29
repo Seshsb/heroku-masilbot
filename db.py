@@ -30,7 +30,7 @@ class DataBaseOperations:
             result = self.cursor.fetchall()
             return bool(len(result))
 
-    def start_booking(self, user_id, table_id, time_at, phone_number, name, people):
+    def start_booking(self, user_id, table_id, start_at, end_at, phone_number, name, people):
         with self.connection:
             self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
             if not self.cursor.fetchone():
@@ -39,7 +39,7 @@ class DataBaseOperations:
             else:
                 self.cursor.execute('UPDATE users SET first_name=%s, phone_number=%s WHERE id=%s;', (name, phone_number, user_id))
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, user_id, people) '
-                                'VALUES (%s, %s, %s, %s);', (table_id, time_at, user_id, people))
+                                'VALUES (%s, %s, %s, %s, %s);', (table_id, start_at, end_at, user_id, people))
             self.connection.commit()
 
     def tables(self):
