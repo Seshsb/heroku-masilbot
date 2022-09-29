@@ -31,35 +31,9 @@ def back_to_menu(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value,
     regexp='Бронирование')
 def text(message):
-    bot.send_message(message.from_user.id, REQUEST_CATEGORY,
-                     reply_markup=inline_category())
-    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-
-
-@bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
-def inline_seating_category(call: types.CallbackQuery):
-    global seating_category
-    if call.data == 'Столы':
-        seating_category = 1
-        bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
-                       reply_markup=choice_table())
-    elif call.data == 'Кабинки':
-        seating_category = 2
-        bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
-                       reply_markup=choice_cabins())
-    dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
-
-
-@bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_SEATING_ID.value)
-def inline_choice_table(call: types.CallbackQuery):
-    global table_id
-    global table
-    table = call.data
-    table_id = operations.table_id(table, seating_category)
-    bot.send_message(call.from_user.id, REQUEST_DATE, reply_markup=show_calendar)
-    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
+    bot.send_message(message.from_user.id, REQUEST_DATE,
+                     reply_markup=show_calendar)
+    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
 
 @bot.callback_query_handler(
@@ -98,8 +72,34 @@ def reserve_time(message: types.Message):
         if int(time[:2]) <= 23 and int(time[3:]) <= 59:
             global datetime_sql
             datetime_sql = f'{date} {time}'
-            bot.send_message(message.from_user.id, REQUEST_PEOPLE)
-            dbworker.set_states(message.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
+            bot.send_message(message.from_user.id, REQUEST_CATEGORY, reply_markup=inline_category())
+            dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
+def inline_seating_category(call: types.CallbackQuery):
+    global seating_category
+    if call.data == 'Столы':
+        seating_category = 1
+        bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
+                       reply_markup=choice_table())
+    elif call.data == 'Кабинки':
+        seating_category = 2
+        bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
+                       reply_markup=choice_cabins())
+    dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_CHOICE_SEATING_ID.value)
+def inline_choice_table(call: types.CallbackQuery):
+    global table_id
+    global table
+    table = call.data
+    table_id = operations.table_id(table, seating_category)
+    bot.send_message(call.from_user.id, REQUEST_PEOPLE)
+    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
 
 
 @bot.message_handler(
@@ -159,8 +159,8 @@ def inline_confirmation(call: types.CallbackQuery):
         else:
             bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
-    except Exception:
-        bot.send_message(call.from_user.id, Exception)
+    except:
+        bot.send_message(call.from_user.id, 'False')
 
 
 ############################################################################################
