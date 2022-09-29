@@ -4,9 +4,7 @@ import dbworker
 import config
 
 from telebot_calendar import *
-from db import operations
 from connections import *
-from telebot import types
 from flask import request
 from keyboards.default import navigation, register
 from data.config import *
@@ -152,14 +150,17 @@ def get_first_name(message):
 
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_CONFIRMATION.value)
-def inline_confirmation(call):
-    if call.data == 'confirm':
-        operations.start_booking(call.from_user.id, table_id, datetime_sql, phone_number, first_name, people)
-        bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
-        dbworker.set_states(call.from_user.id, config.States.S_START.value)
-    else:
-        bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
-        dbworker.set_states(call.from_user.id, config.States.S_START.value)
+def inline_confirmation(call: types.CallbackQuery):
+    try:
+        if call.data == 'confirm':
+            operations.start_booking(call.from_user.id, table_id, datetime_sql, phone_number, first_name, people)
+            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
+            dbworker.set_states(call.from_user.id, config.States.S_START.value)
+        else:
+            bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
+            dbworker.set_states(call.from_user.id, config.States.S_START.value)
+    except Exception:
+        bot.send_message(call.from_user.id, Exception)
 
 
 ############################################################################################
