@@ -78,6 +78,8 @@ def reserve_time(message: types.Message):
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         else:
             bot.send_message(message.from_user.id, FAILED_TIME)
+    else:
+        bot.send_message(message.from_user.id, FAILED_TIME)
 
 
 @bot.callback_query_handler(
