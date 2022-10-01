@@ -47,7 +47,7 @@ class DataBaseOperations:
     def tables(self, reserve_time):
         with self.connection:
             self.cursor.execute('SELECT start_at, end_at, tbl_id FROM booking WHERE date(start_at)=%s;',
-                                (datetime.strptime(reserve_time, '%Y-%m-%d %H:%M').hour, ))
+                                (datetime.strptime(reserve_time, '%Y-%m-%d %H:%M').date(), ))
             for start, end in self.cursor.fetchall():
                 range_hours = []
                 type_datetime = datetime.strptime(reserve_time, '%Y-%m-%d %H:%M')
@@ -90,3 +90,4 @@ class DataBaseOperations:
 operations = DataBaseOperations()
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
+operations.tables('2022-10-01 15:00')
