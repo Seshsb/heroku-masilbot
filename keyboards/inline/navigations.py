@@ -25,10 +25,10 @@ def choice_table(reserve_time):
     return markup
 
 
-def choice_cabins():
+def choice_cabins(reserve_time):
     markup = types.InlineKeyboardMarkup(row_width=2, )
     tables = [types.InlineKeyboardButton(text=str(table[0]), callback_data=str(table[0])) for table in
-              operations.cabins()]
+              operations.cabins(reserve_time)]
     markup.add(*tables)
 
     return markup
