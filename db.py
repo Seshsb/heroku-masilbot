@@ -68,7 +68,7 @@ class DataBaseOperations:
             else:
                 self.cursor.execute(
                     'SELECT name FROM tables WHERE seating_category=1 and is_occupied=false ORDER BY id;')
-                print(self.cursor.fetchall())
+                return self.cursor.fetchall()
 
     def cabins(self):
         with self.connection:
@@ -101,4 +101,4 @@ class DataBaseOperations:
 operations = DataBaseOperations()
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
-# operations.tables(datetime.strptime('2022-10-02 12:00', '%Y-%m-%d %H:%M'))
+operations.tables(datetime.strptime('2022-10-02 15:00', '%Y-%m-%d %H:%M'))
