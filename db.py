@@ -39,7 +39,8 @@ class DataBaseOperations:
                 self.cursor.execute('INSERT INTO users (id, first_name, phone_number) '
                                     'VALUES (%s, %s, %s);', (user_id, name, phone_number))
             else:
-                self.cursor.execute('UPDATE users SET first_name=%s, phone_number=%s WHERE id=%s;', (name, phone_number, user_id))
+                self.cursor.execute('UPDATE users SET first_name=%s, phone_number=%s WHERE id=%s;', (name, phone_number,
+                                                                                                     user_id))
             self.cursor.execute('INSERT INTO booking (tbl_id, start_at, end_at, user_id, people) '
                                 'VALUES (%s, %s, %s, %s, %s);', (table_id, start_at, end_at, user_id, people))
             self.connection.commit()
@@ -47,7 +48,7 @@ class DataBaseOperations:
     def tables(self, reserve_time):
         with self.connection:
             self.cursor.execute('SELECT start_at, end_at, tbl_id FROM booking WHERE date(start_at)=%s;',
-                                (datetime.strptime(reserve_time, '%Y-%m-%d %H:%M').date(), ))
+                                (reserve_time.date(), ))
             if self.cursor.fetchall():
                 for start, end in self.cursor.fetchall():
                     range_hours = []
@@ -56,7 +57,8 @@ class DataBaseOperations:
                         for time_hours in range(start.hour-2, end.hour+3):
                             range_hours.append(time_hours)
                     if reserve_time.hour not in range_hours:
-                        self.cursor.execute('SELECT name FROM tables WHERE seating_category=1 and is_occupied=false ORDER BY id;')
+                        self.cursor.execute(
+                            'SELECT name FROM tables WHERE seating_category=1 and is_occupied=false ORDER BY id;')
                         return self.cursor.fetchall()
             else:
                 self.cursor.execute(
@@ -94,4 +96,4 @@ class DataBaseOperations:
 operations = DataBaseOperations()
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
-operations.tables('2022-10-01 15:00')
+print(operations.tables('2022-10-01 15:00'))

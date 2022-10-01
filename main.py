@@ -69,6 +69,7 @@ def callback_date(call: CallbackQuery):
 def reserve_time(message: types.Message):
     if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
         if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
+            global date_time
             global datetime_start
             global datetime_end
             date_time = datetime.datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
@@ -89,7 +90,7 @@ def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'Столы':
         seating_category = 1
         bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
-                       reply_markup=choice_table(datetime_start))
+                       reply_markup=choice_table(date_time))
     elif call.data == 'Кабинки':
         seating_category = 2
         bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
