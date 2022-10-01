@@ -16,9 +16,10 @@ def inline_category():
     return markup
 
 
-def choice_table():
+def choice_table(reserve_time):
     markup = types.InlineKeyboardMarkup(row_width=2, )
-    tables = [types.InlineKeyboardButton(text=str(table[0]), callback_data=str(table[0])) for table in operations.tables()]
+    tables = [types.InlineKeyboardButton(text=str(table[0]),
+                                         callback_data=str(table[0])) for table in operations.tables(reserve_time)]
     markup.add(*tables)
 
     return markup
@@ -50,13 +51,3 @@ show_calendar = calendar.create_calendar(
                          year=now.year,
                          month=now.month
 )
-
-# def start_time():
-#     markup = types.InlineKeyboardMarkup(row_width=3)
-#     left_arrow = types.InlineKeyboardButton('<', callback_data='left')
-#     right_arrow = types.InlineKeyboardButton('>', callback_data='right')
-#     time_start = types.InlineKeyboardButton('00:00', callback_data='time')
-#     submit = types.InlineKeyboardButton('Дальше', callback_data='submit')
-#     markup.add(*[left_arrow, time_start, right_arrow, submit])
-#
-#     return markup

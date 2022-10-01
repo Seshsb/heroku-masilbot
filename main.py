@@ -68,7 +68,7 @@ def callback_date(call: CallbackQuery):
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
 def reserve_time(message: types.Message):
     if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
-        if int(message.text[:2]) <= 23 and int(message.text[3:]) <= 59:
+        if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
             global datetime_start
             global datetime_end
             date_time = datetime.datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
@@ -89,7 +89,7 @@ def inline_seating_category(call: types.CallbackQuery):
     if call.data == 'Столы':
         seating_category = 1
         bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
-                       reply_markup=choice_table())
+                       reply_markup=choice_table(datetime_start))
     elif call.data == 'Кабинки':
         seating_category = 2
         bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
@@ -157,14 +157,17 @@ def get_first_name(message):
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_CONFIRMATION.value)
 def inline_confirmation(call: types.CallbackQuery):
-    if call.data == 'confirm':
-        operations.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
-                                 first_name, people)
-        bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
-        dbworker.set_states(call.from_user.id, config.States.S_START.value)
-    else:
-        bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
-        dbworker.set_states(call.from_user.id, config.States.S_START.value)
+    try:
+        if call.data == 'confirm':
+            operations.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
+                                     first_name, people)
+            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
+            dbworker.set_states(call.from_user.id, config.States.S_START.value)
+        else:
+            bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
+            dbworker.set_states(call.from_user.id, config.States.S_START.value)
+    except:
+        bot.send_message(call.from_user.id, '')
 
 
 
