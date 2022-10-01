@@ -48,16 +48,20 @@ class DataBaseOperations:
         with self.connection:
             self.cursor.execute('SELECT start_at, end_at, tbl_id FROM booking WHERE date(start_at)=%s;',
                                 (datetime.strptime(reserve_time, '%Y-%m-%d %H:%M').date(), ))
-            for start, end in self.cursor.fetchall():
-                range_hours = []
-                type_datetime = datetime.strptime(reserve_time, '%Y-%m-%d %H:%M')
-                if type_datetime.date() == start.date():
-                    for time_hours in range(start.hour-2, end.hour+3):
-                        print(time_hours)
-                        range_hours.append(time_hours)
-                if reserve_time.hour not in range_hours:
-                    self.cursor.execute('SELECT name FROM tables WHERE seating_category=1 and is_occupied=false ORDER BY id;')
-                    return self.cursor.fetchall()
+            if self.cursor.fetchall():
+                for start, end in self.cursor.fetchall():
+                    range_hours = []
+                    type_datetime = datetime.strptime(reserve_time, '%Y-%m-%d %H:%M')
+                    if type_datetime.date() == start.date():
+                        for time_hours in range(start.hour-2, end.hour+3):
+                            range_hours.append(time_hours)
+                    if reserve_time.hour not in range_hours:
+                        self.cursor.execute('SELECT name FROM tables WHERE seating_category=1 and is_occupied=false ORDER BY id;')
+                        return self.cursor.fetchall()
+            else:
+                self.cursor.execute(
+                    'SELECT name FROM tables WHERE seating_category=1 and is_occupied=false ORDER BY id;')
+                return self.cursor.fetchall()
 
     def cabins(self):
         with self.connection:
