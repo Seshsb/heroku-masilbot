@@ -96,4 +96,4 @@ class DataBaseOperations:
 operations = DataBaseOperations()
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
-print(operations.tables('2022-10-01 15:00'))
+# print(operations.tables('2022-10-01 15:00'))
