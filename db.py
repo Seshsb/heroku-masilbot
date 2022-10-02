@@ -86,7 +86,7 @@ class DataBaseOperations:
                         return self.cursor.fetchall()
             else:
                 self.cursor.execute(
-                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category))
+                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category, ))
                 return self.cursor.fetchall()
 
 operations = DataBaseOperations()
