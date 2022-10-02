@@ -65,6 +65,8 @@ class DataBaseOperations:
 
     def check_time_reserve(self, category, time):
         with self.connection:
+            free_tables = []
+            busy_tables = []
             self.cursor.execute('SELECT start_at, end_at, tbl_id FROM booking WHERE date(start_at)=%s;',
                                 (time.date(),))
             if self.cursor.fetchall():
@@ -73,23 +75,38 @@ class DataBaseOperations:
                 for start, end, table in self.cursor.fetchall():
                     range_hours = []
                     if time.date() == start.date():
-                        for time_hours in range(start.hour - 2, end.hour + 4):
+                        for time_hours in range(start.hour - 2, end.hour + 1):
                             range_hours.append(time_hours)
-                    if time.hour not in range_hours:
+                    if time.hour in range_hours:
                         self.cursor.execute(
-                            'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category, ))
-                        return self.cursor.fetchall()
-                    else:
-                        self.cursor.execute(
-                            'SELECT name FROM tables WHERE seating_category=%s and id!=%s ORDER BY id;',
-                            (category, table,))
-                        return self.cursor.fetchall()
+                            'SELECT name FROM tables WHERE seating_category=%s and id=%s ORDER BY id;',
+                            (category, table, ))
+                        busy_tables.append(self.cursor.fetchone())
+                self.cursor.execute(
+                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
+                result = self.cursor.fetchall()
+                for tbl in result:
+                    if tbl not in busy_tables:
+                        free_tables.append(tbl)
             else:
                 self.cursor.execute(
                     'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category, ))
-                return self.cursor.fetchall()
+                free_tables = self.cursor.fetchall()
+
+            return free_tables
+
+    def result(self):
+        with self.connection:
+            self.cursor.execute(
+                'SELECT name FROM tables WHERE seating_category=1 ORDER BY id;')
+            result = self.cursor.fetchall()
+            return result
+
+
+
 
 operations = DataBaseOperations()
+# print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
-# operations.tables(datetime.strptime('2022-10-02 15:00', '%Y-%m-%d %H:%M'))
+operations.tables(datetime.strptime('2022-10-05 18:00', '%Y-%m-%d %H:%M'))
