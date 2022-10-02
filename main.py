@@ -94,7 +94,7 @@ def inline_seating_category(call: types.CallbackQuery):
     elif call.data == 'Кабинки':
         seating_category = 2
         bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
-                       reply_markup=choice_cabins(datetime))
+                       reply_markup=choice_cabins(date_time))
     dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
 
 
