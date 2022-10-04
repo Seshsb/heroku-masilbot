@@ -257,7 +257,7 @@ def basket(message: types.Message):
             for good in goods:
                 total += int(good[2])
                 cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
-            cart = f'\nИтого: {total} сум'
+            cart += f'\nИтого: {total} сум'
             return bot.send_message(message.from_user.id, cart)
     global quantity
     quantity = int(message.text)
