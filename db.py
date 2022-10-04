@@ -141,6 +141,7 @@ class Delivery(DataBase):
 
 bookingDB = Booking()
 deliveryDB = Delivery()
+print(deliveryDB.get_dish('Рис с мясом и овощами в соусе '))
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))

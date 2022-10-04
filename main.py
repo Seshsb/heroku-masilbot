@@ -225,7 +225,7 @@ def basket(message: types.Message):
     # try:
     global quantity
     quantity = int(message.text)
-    total_price = int(detail[1]) * quantity
+    total_price = int(detail[0]) * quantity
     deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
     bot.send_message(message.from_user.id, DELIVERY_BASKET)
 
