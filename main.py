@@ -210,7 +210,7 @@ def quantity_dish(message: types.Message):
         dish = message.text
         detail = deliveryDB.get_dish(dish)
         bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
-                                               f'{detail[2]}')
+                                               f'{detail[2]} сум')
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                          reply_markup=numbers())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
@@ -229,7 +229,7 @@ def basket(message: types.Message):
         deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
         bot.send_message(message.from_user.id, DELIVERY_BASKET)
 
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except:
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
                          reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
