@@ -22,8 +22,8 @@ def start(message: types.Message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value)
 def back_to_menu(message: types.Message):
-    dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+    dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
 # Бронирование
@@ -205,7 +205,7 @@ def dishes(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         elif message.text == 'Вернуться на главную страницу':
 
-            return dbworker.set_states(message.from_user.id, config.States.S_START.value)
+            dbworker.set_states(message.from_user.id, config.States.S_START.value)
         global category
         category = message.text
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
