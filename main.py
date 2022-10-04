@@ -231,7 +231,7 @@ def quantity_dish(message: types.Message):
             total += int(good[2])
             cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
         cart = f'\nИтого: {total} сум'
-        return bot.send_message(message, cart)
+        return bot.send_message(message.from_user.id, cart)
     global dish
     global detail
     dish = message.text
