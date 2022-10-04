@@ -190,7 +190,7 @@ def delivery(message):
             total += int(good[2])
             cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
         cart = f'\nИтого: {total} сум'
-        return bot.send_message(message, cart)
+        return bot.send_message(message.from_user.id, cart)
     bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                      reply_markup=food_categoriesRu())
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
@@ -208,7 +208,7 @@ def dishes(message: types.Message):
                 total += int(good[2])
                 cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
             cart = f'\nИтого: {total} сум'
-            return bot.send_message(message, cart)
+            return bot.send_message(message.from_user.id, cart)
         global category
         category = message.text
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
