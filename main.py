@@ -15,8 +15,8 @@ from keyboards.booking.inline.navigations import *
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+    dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
 @bot.message_handler(
@@ -204,8 +204,8 @@ def dishes(message: types.Message):
 
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         elif message.text == 'Вернуться на главную страницу':
-
-            dbworker.set_states(message.from_user.id, config.States.S_START.value)
+            bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+            dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global category
         category = message.text
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
@@ -229,8 +229,8 @@ def quantity_dish(message: types.Message):
 
         return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     elif message.text == 'Вернуться на главную страницу':
-
-        return dbworker.set_states(message.from_user.id, config.States.S_START.value)
+        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     global dish
     global detail
     dish = message.text
@@ -256,7 +256,8 @@ def basket(message: types.Message):
                          reply_markup=numbers())
         return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     elif message.text == 'Вернуться на главную страницу':
-        return dbworker.set_states(message.from_user.id, config.States.S_START.value)
+        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     global quantity
     quantity = int(message.text)
     total_price = int(detail[2]) * quantity
