@@ -133,7 +133,7 @@ def request_contact(message):
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value,
-    regexp=r'\+998[0-9]{9,9}$')
+    regexp=r'\+998[0-9]{9}$')
 def phone(message):
     global phone_number
     phone_number = message.text
@@ -191,6 +191,7 @@ def delivery(message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_MENU_CATEGORY.value)
 def dishes(message: types.Message):
     try:
+        global category
         category = message.text
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
                          reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
@@ -203,21 +204,36 @@ def dishes(message: types.Message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_DISHES.value)
 def quantity_dish(message: types.Message):
-    category = message.text
-    bot.send_message(message.from_user.id, '''Детальная информация блюдо''')
-    bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
-                     reply_markup='''Количество''')
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)\
+    try:
+        global dish
+        global detail
+        dish = message.text
+        detail = deliveryDB.get_dish(dish)
+        bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
+                                               f'{detail[2]}')
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                         reply_markup=numbers())
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
+    except:
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_QUANTITY.value)
-def dishes(message: types.Message):
-    category = message.text
-    bot.send_message(message.from_user.id, DELIVERY_BASKET,
-                     reply_markup='''категории меню''')
+def basket(message: types.Message):
+    try:
+        global quantity
+        quantity = int(message.text)
+        total_price = int(detail[1]) * quantity
+        deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
+        bot.send_message(message.from_user.id, DELIVERY_BASKET)
 
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+    except:
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

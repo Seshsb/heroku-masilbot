@@ -14,3 +14,10 @@ def dishesRu(cat_id):
     markup.add(*[dish[0] for dish in deliveryDB.get_dishes(cat_id)])
 
     return markup
+
+
+def numbers():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
+    markup.add(*[str(num) for num in range(0, 10)])
+
+    return markup

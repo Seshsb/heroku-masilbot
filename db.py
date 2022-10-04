@@ -125,6 +125,18 @@ class Delivery(DataBase):
                 (cat_id,))
             return self.cursor.fetchall()
 
+    def get_dish(self, name):
+        with self.connection:
+            self.cursor.execute(
+                'SELECT id, name_rus, price FROM foods WHERE name_rus=%s',
+                (name, ))
+            return self.cursor.fetchone()
+
+    def insert_toBasket(self, dish_id, qnt, price, user_id):
+        with self.connection:
+            self.cursor.execute(
+                'INSERT INTO basket(food_id, quantity, price, user_id) VALUES (%s, %s, %s, %s)',
+                (dish_id, qnt, price, user_id))
 
 bookingDB = Booking()
 deliveryDB = Delivery()
