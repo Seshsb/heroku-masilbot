@@ -192,8 +192,8 @@ def delivery(message):
 def dishes(message: types.Message):
     try:
         category = message.text
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
-                         reply_markup=dishesRu(delivery.get_categoryId(category)[0]))
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(delivery.get_categoryId(category)))
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except:
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,

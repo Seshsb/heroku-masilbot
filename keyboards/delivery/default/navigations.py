@@ -11,6 +11,6 @@ def food_categoriesRu():
 
 def dishesRu(cat_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    markup.add(*[dish[0] for dish in delivery.get_dishes(cat_id)])
+    markup.add(*[dish[0] for dish in delivery.get_dishes(cat_id[0])])
 
     return markup
