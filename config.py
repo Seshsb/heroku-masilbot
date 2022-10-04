@@ -26,3 +26,8 @@ class States(Enum):
     S_DELIVERY_QUANTITY = 'quantity'
 
 
+basket_state = [
+    States.S_DELIVERY_MENU_CATEGORY.value,
+    States.S_DELIVERY_DISHES.value,
+    States.S_DELIVERY_QUANTITY.value,
+]
