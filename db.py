@@ -113,7 +113,7 @@ class Delivery(DataBase):
                 self.cursor.execute(
                     'SELECT id FROM food_categories WHERE id=%s;',
                     (name, ))
-                return self.cursor.fetchall()
+                return self.cursor.fetchone()
             except:
                 raise ValueError
 
