@@ -23,7 +23,7 @@ cursor = connection.cursor()
 class DataBase:
     def __init__(self):
         self.connection = psycopg2.connect(dbname=DATABASE_NAME, user=DATABASE_USERNAME,
-                              password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
+                                           password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
         self.cursor = self.connection.cursor()
 
 
@@ -51,12 +51,13 @@ class Booking(DataBase):
 
     def table_id(self, table, seating_category):
         with self.connection:
-            self.cursor.execute('SELECT id FROM tables WHERE name=%s and seating_category=%s;', (table, seating_category))
+            self.cursor.execute('SELECT id FROM tables WHERE name=%s and seating_category=%s;',
+                                (table, seating_category))
             return self.cursor.fetchone()
 
     def seating_category(self, id):
         with self.connection:
-            self.cursor.execute('SELECT seating_name FROM seating_categories WHERE id=%s;', (id, ))
+            self.cursor.execute('SELECT seating_name FROM seating_categories WHERE id=%s;', (id,))
             return self.cursor.fetchone()
 
     def check_time_reserve(self, category, time):
@@ -76,7 +77,7 @@ class Booking(DataBase):
                     if time.hour in range_hours:
                         self.cursor.execute(
                             'SELECT name FROM tables WHERE seating_category=%s and id=%s ORDER BY id;',
-                            (category, table, ))
+                            (category, table,))
                         busy_tables.append(self.cursor.fetchone())
                 self.cursor.execute(
                     'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
@@ -86,7 +87,7 @@ class Booking(DataBase):
                         free_tables.append(tbl)
             else:
                 self.cursor.execute(
-                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category, ))
+                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
                 free_tables = self.cursor.fetchall()
 
             return free_tables
@@ -112,7 +113,7 @@ class Delivery(DataBase):
             try:
                 self.cursor.execute(
                     'SELECT id FROM food_categories WHERE name_rus=%s;',
-                    (name, ))
+                    (name,))
                 return self.cursor.fetchone()
             except:
                 raise ValueError
@@ -121,12 +122,12 @@ class Delivery(DataBase):
         with self.connection:
             self.cursor.execute(
                 'SELECT name_rus, name_kor FROM foods WHERE category_id=%s;',
-                (cat_id, ))
+                (cat_id,))
             return self.cursor.fetchall()
 
 
-booking = Booking()
-delivery = Delivery()
+bookingDB = Booking()
+deliveryDB = Delivery()
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
