@@ -20,18 +20,14 @@ connection = psycopg2.connect(dbname=DATABASE_NAME, user=DATABASE_USERNAME,
 cursor = connection.cursor()
 
 
-class DataBaseOperations:
+class DataBase:
     def __init__(self):
         self.connection = psycopg2.connect(dbname=DATABASE_NAME, user=DATABASE_USERNAME,
                               password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
         self.cursor = self.connection.cursor()
 
-    def user_exist(self, user_id):
-        with self.connection:
-            self.cursor.execute('SELECT * FROM users WHERE id=%s', (user_id,))
-            result = self.cursor.fetchall()
-            return bool(len(result))
 
+class Booking(DataBase):
     def start_booking(self, user_id, table_id, start_at, end_at, phone_number, name, people):
         with self.connection:
             self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
@@ -103,10 +99,35 @@ class DataBaseOperations:
             return result
 
 
+class Delivery(DataBase):
+    def get_categories(self):
+        with self.connection:
+            self.cursor.execute(
+                'SELECT name_rus, name_kor FROM food_categories;'
+            )
+            return self.cursor.fetchall()
+
+    def get_categoryId(self, name):
+        with self.connection:
+            try:
+                self.cursor.execute(
+                    'SELECT id FROM food_categories WHERE id=%s;',
+                    (name, ))
+                return self.cursor.fetchall()
+            except:
+                raise ValueError
+
+    def get_dishes(self, cat_id):
+        with self.connection:
+            self.cursor.execute(
+                'SELECT name_rus, name_kor FROM food_categories WHERE category_id=%s;',
+                (cat_id, ))
+            return self.cursor.fetchall()
 
 
-operations = DataBaseOperations()
+booking = Booking()
+delivery = Delivery()
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
-operations.tables(datetime.strptime('2022-10-05 18:00', '%Y-%m-%d %H:%M'))
+# operations.tables(datetime.strptime('2022-10-05 18:00', '%Y-%m-%d %H:%M'))

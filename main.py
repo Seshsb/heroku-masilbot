@@ -6,9 +6,10 @@ import config
 from telebot_calendar import *
 from connections import *
 from flask import request
-from keyboards.default import navigation, register
+from keyboards.booking.default import register, navigation
+from keyboards.delivery.default.navigations import *
 from data.config import *
-from keyboards.inline.navigations import *
+from keyboards.booking.inline.navigations import *
 
 
 @bot.message_handler(commands=['start'])
@@ -30,8 +31,8 @@ def back_to_menu(message: types.Message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value,
     regexp='Бронирование')
-def text(message):
-    bot.send_message(message.from_user.id, REQUEST_DATE,
+def booking(message):
+    bot.send_message(message.from_user.id, BOOKING_REQUEST_DATE,
                      reply_markup=show_calendar)
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
 
@@ -51,9 +52,9 @@ def callback_date(call: CallbackQuery):
         today_month = datetime.date.today().strftime('%m')
         today_day = datetime.date.today().strftime('%d')
         if int(month) == int(today_month) and int(day) < int(today_day):
-            bot.send_message(call.from_user.id, FAILED_DATE, reply_markup=show_calendar)
+            bot.send_message(call.from_user.id, BOOKING_FAILED_DATE, reply_markup=show_calendar)
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
-        bot.send_message(call.from_user.id, REQUEST_TIME)
+        bot.send_message(call.from_user.id, BOOKING_REQUEST_TIME)
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
     elif action == "CANCEL":
         bot.send_message(
@@ -61,7 +62,7 @@ def callback_date(call: CallbackQuery):
             text="Cancellation",
             reply_markup=types.ReplyKeyboardRemove(),
         )
-        bot.send_message(call.from_user.id, f"{calendar_1}: Cancellation")
+        bot.send_message(call.from_user.id, f"{calendar_1}: Отменен")
 
 
 @bot.message_handler(
@@ -74,13 +75,13 @@ def reserve_time(message: types.Message):
             global datetime_end
             date_time = datetime.datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
             datetime_start = f'{date_time}'
-            datetime_end = f'{date_time + datetime.timedelta(hours=3)}'
-            bot.send_message(message.from_user.id, REQUEST_CATEGORY, reply_markup=inline_category())
+            datetime_end = f'{date_time + datetime.timedelta(hours=2)}'
+            bot.send_message(message.from_user.id, BOOKING_REQUEST_CATEGORY, reply_markup=inline_category())
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         else:
-            bot.send_message(message.from_user.id, FAILED_TIME)
+            bot.send_message(message.from_user.id, BOOKING_FAILED_TIME)
     else:
-        bot.send_message(message.from_user.id, FAILED_TIME)
+        bot.send_message(message.from_user.id, BOOKING_FAILED_TIME)
 
 
 @bot.callback_query_handler(
@@ -89,11 +90,11 @@ def inline_seating_category(call: types.CallbackQuery):
     global seating_category
     if call.data == 'Столы':
         seating_category = 1
-        bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), GET_TABLEID,
+        bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), BOOKING_GET_TABLEID,
                        reply_markup=choice_table(date_time))
     elif call.data == 'Кабинки':
         seating_category = 2
-        bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), GET_TABLEID,
+        bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), BOOKING_GET_TABLEID,
                        reply_markup=choice_cabins(date_time))
     dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
 
@@ -104,8 +105,8 @@ def inline_choice_table(call: types.CallbackQuery):
     global table_id
     global table
     table = call.data
-    table_id = operations.table_id(table, seating_category)
-    bot.send_message(call.from_user.id, REQUEST_PEOPLE)
+    table_id = booking.table_id(table, seating_category)
+    bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE)
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
 
 
@@ -149,7 +150,7 @@ def get_first_name(message):
                                            f'Имя: {first_name}\n'
                                            f'Телефон: {phone_number}\n'
                                            f'Дата и время: {datetime_start.replace("-", ".")}\n'
-                                           f'Посадочное место: {operations.seating_category(seating_category)[0]}\n'
+                                           f'Посадочное место: {booking.seating_category(seating_category)[0]}\n'
                                            f'Стол: {table}\n'
                                            f'Количество человек: {people}', reply_markup=booking_confirm())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
@@ -160,7 +161,7 @@ def get_first_name(message):
 def inline_confirmation(call: types.CallbackQuery):
     try:
         if call.data == 'confirm':
-            operations.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
+            booking.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
                                      first_name, people)
             bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
@@ -173,6 +174,50 @@ def inline_confirmation(call: types.CallbackQuery):
 
 
 ############################################################################################
+
+
+# Доставка
+############################################################################################
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value,
+    regexp='Доставка')
+def delivery(message):
+    bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+                     reply_markup=food_categoriesRu())
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_MENU_CATEGORY.value)
+def dishes(message: types.Message):
+    try:
+        category = message.text
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+                         reply_markup=dishesRu(delivery.get_categoryId(category)))
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+    except:
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+                         reply_markup=food_categoriesRu())
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_DISHES.value)
+def quantity_dish(message: types.Message):
+    category = message.text
+    bot.send_message(message.from_user.id, '''Детальная информация блюдо''')
+    bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                     reply_markup='''Количество''')
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)\
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_QUANTITY.value)
+def dishes(message: types.Message):
+    category = message.text
+    bot.send_message(message.from_user.id, DELIVERY_BASKET,
+                     reply_markup='''категории меню''')
+
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

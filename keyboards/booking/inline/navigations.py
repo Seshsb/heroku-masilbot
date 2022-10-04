@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 from telebot_calendar import CallbackData, Calendar
 
-from db import operations
+from db import booking
 
 
 def inline_category():
@@ -19,7 +19,7 @@ def inline_category():
 def choice_table(reserve_time):
     markup = types.InlineKeyboardMarkup(row_width=2, )
     tables = [types.InlineKeyboardButton(text=str(table[0]),
-                                         callback_data=str(table[0])) for table in operations.tables(reserve_time)]
+                                         callback_data=str(table[0])) for table in booking.tables(reserve_time)]
     markup.add(*tables)
 
     return markup
@@ -28,7 +28,7 @@ def choice_table(reserve_time):
 def choice_cabins(reserve_time):
     markup = types.InlineKeyboardMarkup(row_width=2, )
     tables = [types.InlineKeyboardButton(text=str(table[0]), callback_data=str(table[0])) for table in
-              operations.cabins(reserve_time)]
+              booking.cabins(reserve_time)]
     markup.add(*tables)
 
     return markup
