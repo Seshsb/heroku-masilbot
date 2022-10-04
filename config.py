@@ -31,3 +31,4 @@ basket_state = [
     States.S_DELIVERY_DISHES.value,
     States.S_DELIVERY_QUANTITY.value,
 ]
+print(basket_state)
