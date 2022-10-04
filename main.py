@@ -20,8 +20,7 @@ def start(message: types.Message):
 
 
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value,
-    regexp='Вернуться на главную страницу')
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value)
 def back_to_menu(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
