@@ -142,7 +142,7 @@ class Delivery(DataBase):
     def show_basket(self, user_id):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_rus, basket.quantity, basket.price '
+                'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
                 'FROM basket '
                 'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
             return self.cursor.fetchall()
@@ -150,7 +150,7 @@ class Delivery(DataBase):
 
 bookingDB = Booking()
 deliveryDB = Delivery()
-print(deliveryDB.show_basket(275755142))
+# print(deliveryDB.show_basket(275755142))
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))

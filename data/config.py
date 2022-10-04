@@ -24,4 +24,5 @@ BOOKING_CANCELED = 'Бронирование отменено'
 DELIVERY_REQUEST_CATEGORY = 'Категории меню'
 DELIVERY_REQUEST_DISH = 'Выберите блюдо'
 DELIVERY_REQUEST_QUANTITY = 'Пожалуйста, выберите или введите количество'
-DELIVERY_BASKET = 'Добавлено в корзину'
+DELIVERY_BASKET = 'Добавлено в корзину.\n' \
+                  'Хотите что-то еще?'

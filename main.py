@@ -6,6 +6,7 @@ import config
 from telebot_calendar import *
 from connections import *
 from flask import request
+from keyboards import back_to_menu
 from keyboards.booking.default import register, navigation
 from keyboards.delivery.default.navigations import *
 from data.config import *
@@ -20,7 +21,7 @@ def start(message: types.Message):
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value,
-    regexp='Вернуться в меню')
+    regexp='Вернуться на главную страницу')
 def back_to_menu(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
@@ -54,7 +55,7 @@ def callback_date(call: CallbackQuery):
         if int(month) == int(today_month) and int(day) < int(today_day):
             bot.send_message(call.from_user.id, BOOKING_FAILED_DATE, reply_markup=show_calendar)
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
-        bot.send_message(call.from_user.id, BOOKING_REQUEST_TIME)
+        bot.send_message(call.from_user.id, BOOKING_REQUEST_TIME, reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
     elif action == "CANCEL":
         bot.send_message(
@@ -106,7 +107,7 @@ def inline_choice_table(call: types.CallbackQuery):
     global table
     table = call.data
     table_id = booking.table_id(table, seating_category)
-    bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE)
+    bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE, reply_markup=types.ReplyKeyboardRemove())
     dbworker.set_states(call.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
 
 
@@ -116,7 +117,7 @@ def inline_choice_table(call: types.CallbackQuery):
 def request_people(message: types.Message):
     global people
     people = message.text
-    if people.isdigit():
+    if people.isdigit():  # Сделать обработку людей
         bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
@@ -127,7 +128,7 @@ def request_people(message: types.Message):
 def request_contact(message):
     global phone_number
     phone_number = '+' + message.contact.phone_number
-    bot.send_message(message.from_user.id, GET_FIRST_NAME)
+    bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
 
@@ -137,7 +138,7 @@ def request_contact(message):
 def phone(message):
     global phone_number
     phone_number = message.text
-    bot.send_message(message.from_user.id, GET_FIRST_NAME)
+    bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
 
 
@@ -163,10 +164,10 @@ def inline_confirmation(call: types.CallbackQuery):
         if call.data == 'confirm':
             booking.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
                                      first_name, people)
-            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=navigation.back_to_menu())
+            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:
-            bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=navigation.back_to_menu())
+            bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
     except:
         bot.send_message(call.from_user.id, '')
@@ -183,14 +184,9 @@ def inline_confirmation(call: types.CallbackQuery):
     regexp='Доставка')
 def delivery(message):
     if message.text == 'Корзина':
-        goods = deliveryDB.show_basket(message.from_user.id)
-        cart = f'Корзина\n\n'
-        total = 0
-        for good in goods:
-            total += int(good[2])
-            cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
-        cart += f'\nИтого: {total} сум'
-        return bot.send_message(message.from_user.id, cart)
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+    elif message.text == 'Назад':
+        return dbworker.set_states(message.from_user.id, config.States.S_START.value)
     bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                      reply_markup=food_categoriesRu())
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
@@ -200,15 +196,17 @@ def delivery(message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_MENU_CATEGORY.value)
 def dishes(message: types.Message):
     try:
-        # if message.text == 'Корзина':
-        #     goods = deliveryDB.show_basket(message.from_user.id)
-        #     cart = f'Корзина\n\n'
-        #     total = 0
-        #     for good in goods:
-        #         total += int(good[2])
-        #         cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
-        #     cart += f'\nИтого: {total} сум'
-        #     return bot.send_message(message.from_user.id, cart)
+        if message.text == 'Корзина':
+
+            return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+        elif message.text == 'Назад':
+            bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+                             reply_markup=food_categoriesRu())
+
+            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+        elif message.text == 'Вернуться на главную страницу':
+
+            return dbworker.set_states(message.from_user.id, config.States.S_START.value)
         global category
         category = message.text
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
@@ -223,21 +221,23 @@ def dishes(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_DISHES.value)
 def quantity_dish(message: types.Message):
     # try:
-    # if message.text == 'Корзина':
-    #     goods = deliveryDB.show_basket(message.from_user.id)
-    #     cart = f'Корзина\n\n'
-    #     total = 0
-    #     for good in goods:
-    #         total += int(good[2])
-    #         cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
-    #     cart += f'\nИтого: {total} сум'
-    #     return bot.send_message(message.from_user.id, cart)
+    if message.text == 'Корзина':
+
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+    elif message.text == 'Назад':
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+    elif message.text == 'Вернуться на главную страницу':
+
+        return dbworker.set_states(message.from_user.id, config.States.S_START.value)
     global dish
     global detail
     dish = message.text
     detail = deliveryDB.get_dish(dish)
     bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
-                                           f'{detail[2]} сум')
+                                           f'{detail[2]} сум', reply_markup=types.ReplyKeyboardRemove())
     bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                      reply_markup=numbers())
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
@@ -250,20 +250,19 @@ def quantity_dish(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_QUANTITY.value)
 def basket(message: types.Message):
     # try:
-    # if message.text == 'Корзина':
-    #         goods = deliveryDB.show_basket(message.from_user.id)
-    #         cart = f'Корзина\n\n'
-    #         total = 0
-    #         for good in goods:
-    #             total += int(good[2])
-    #             cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
-    #         cart += f'\nИтого: {total} сум'
-    #         return bot.send_message(message.from_user.id, cart)
+    if message.text == 'Корзина':
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+    elif message.text == 'Назад':
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                         reply_markup=numbers())
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+    elif message.text == 'Вернуться на главную страницу':
+        return dbworker.set_states(message.from_user.id, config.States.S_START.value)
     global quantity
     quantity = int(message.text)
     total_price = int(detail[2]) * quantity
     deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-    bot.send_message(message.from_user.id, DELIVERY_BASKET)
+    bot.send_message(message.from_user.id, DELIVERY_BASKET, reply_markup=types.ReplyKeyboardRemove())
 
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     # except:
@@ -273,17 +272,17 @@ def basket(message: types.Message):
 
 #
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) in config.basket_state)
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CART.value)
 def show_basket(message: types.Message):
-    if message.text == 'Корзина':
-        goods = deliveryDB.show_basket(message.from_user.id)
-        cart = f'Корзина\n\n'
-        total = 0
-        for good in goods:
-            total += int(good[2])
-            cart += f'{good[1]}x - {good[0]} - {good[2]} сум\n'
-        cart = f'\nИтого: {total} сум'
-        bot.send_message(message.from_user.id, cart)
+    goods = deliveryDB.show_basket(message.from_user.id)
+    cart = f'Корзина\n\n'
+    total = 0
+    for good in goods:
+        total += int(good[2])
+        cart += f'{good[0]}\n' \
+                f'{good[2]} x {good[-1]} = {good[1]}\n'
+    cart = f'\nИтого: {total} сум'
+    bot.send_message(message.from_user.id, cart)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

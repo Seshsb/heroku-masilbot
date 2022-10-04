@@ -24,11 +24,4 @@ class States(Enum):
     S_DELIVERY_MENU_CATEGORY = 'menu category'
     S_DELIVERY_DISHES = 'dishes'
     S_DELIVERY_QUANTITY = 'quantity'
-
-
-basket_state = [
-    States.S_DELIVERY_MENU_CATEGORY.value,
-    States.S_DELIVERY_DISHES.value,
-    States.S_DELIVERY_QUANTITY.value,
-]
-print(basket_state)
+    S_DELIVERY_CART = 'cart'
