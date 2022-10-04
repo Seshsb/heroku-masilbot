@@ -204,36 +204,41 @@ def dishes(message: types.Message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_DISHES.value)
 def quantity_dish(message: types.Message):
-    # try:
-    global dish
-    global detail
-    dish = message.text
-    detail = deliveryDB.get_dish(dish)
-    bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
-                                           f'{detail[2]} сум')
-    bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
-                     reply_markup=numbers())
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
-    # except:
-    #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
-    #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+    try:
+        global dish
+        global detail
+        dish = message.text
+        detail = deliveryDB.get_dish(dish)
+        bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
+                                               f'{detail[2]} сум')
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                         reply_markup=numbers())
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
+    except:
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_QUANTITY.value)
 def basket(message: types.Message):
-    # try:
-    global quantity
-    quantity = int(message.text)
-    total_price = int(detail[0]) * quantity
-    deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-    bot.send_message(message.from_user.id, DELIVERY_BASKET)
+    try:
+        global quantity
+        quantity = int(message.text)
+        total_price = int(detail[2]) * quantity
+        deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
+        bot.send_message(message.from_user.id, DELIVERY_BASKET)
 
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
-    # except:
-    #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
-    #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
-    #     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+    except:
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+
+#
+# @bot.message_handler(regexp='Корзина')
+# def show_basket(message: types.Message):
+#
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

@@ -104,7 +104,7 @@ class Delivery(DataBase):
     def get_categories(self):
         with self.connection:
             self.cursor.execute(
-                'SELECT name_rus, name_kor FROM food_categories;'
+                'SELECT name_rus, name_kor FROM food_categories ORDER BY id;'
             )
             return self.cursor.fetchall()
 
@@ -121,7 +121,7 @@ class Delivery(DataBase):
     def get_dishes(self, cat_id):
         with self.connection:
             self.cursor.execute(
-                'SELECT name_rus, name_kor FROM foods WHERE category_id=%s;',
+                'SELECT name_rus, name_kor FROM foods WHERE category_id=%s ORDER BY id;',
                 (cat_id,))
             return self.cursor.fetchall()
 
@@ -139,9 +139,13 @@ class Delivery(DataBase):
                 (dish_id, qnt, price, user_id))
             self.connection.commit()
 
+    # def show_basket(self, user_id):
+    #     with self.connection:
+    #         self.cursor.execute(
+    #             'SELECT ')
+
 bookingDB = Booking()
 deliveryDB = Delivery()
-print(deliveryDB.get_dish('Рис с мясом и овощами в соусе '))
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
