@@ -236,9 +236,13 @@ def basket(message: types.Message):
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
 
 #
-# @bot.message_handler(regexp='Корзина')
-# def show_basket(message: types.Message):
-#
+@bot.message_handler(regexp='Корзина')
+def show_basket(message: types.Message):
+    goods = deliveryDB.show_basket(message.from_user.id)
+    result = f'Корзина\n\n'
+    for good in goods:
+        result += f'{good[1]}x - {good[0]} - {good[2]}сум\n'
+    bot.send_message(message, result)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
