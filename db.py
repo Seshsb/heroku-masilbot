@@ -111,7 +111,7 @@ class Delivery(DataBase):
         with self.connection:
             try:
                 self.cursor.execute(
-                    'SELECT id FROM food_categories WHERE id=%s;',
+                    'SELECT id FROM food_categories WHERE name_rus=%s;',
                     (name, ))
                 return self.cursor.fetchone()
             except:
