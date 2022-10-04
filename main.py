@@ -184,9 +184,9 @@ def inline_confirmation(call: types.CallbackQuery):
     regexp='Доставка')
 def delivery(message):
     if message.text == 'Корзина':
-        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     elif message.text == 'Назад':
-        return dbworker.set_states(message.from_user.id, config.States.S_START.value)
+        dbworker.set_states(message.from_user.id, config.States.S_START.value)
     bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                      reply_markup=food_categoriesRu())
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
