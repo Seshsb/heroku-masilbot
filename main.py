@@ -185,7 +185,8 @@ def delivery(message):
     if message.text == 'Корзина':
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     elif message.text == 'Назад':
-        dbworker.set_states(message.from_user.id, config.States.S_START.value)
+        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                      reply_markup=food_categoriesRu())
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
