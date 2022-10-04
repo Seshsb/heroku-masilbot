@@ -142,7 +142,9 @@ class Delivery(DataBase):
     def show_basket(self, user_id):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_rus, quantity, price FROM basket JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
+                'SELECT foods.name_rus, basket.quantity, basket.price '
+                'FROM basket '
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
             return self.cursor.fetchall()
 
 
