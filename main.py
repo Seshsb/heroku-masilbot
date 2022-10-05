@@ -186,7 +186,7 @@ def inline_confirmation(call: types.CallbackQuery):
 def dishes(message: types.Message):
     # try:
     if message.text == 'Корзина':
-        bot.register_next_step_handler(message, show_basket)
+        show_basket(message)
     elif message.text == 'Назад':
         bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
         return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
@@ -206,7 +206,7 @@ def dishes(message: types.Message):
 def quantity_dish(message: types.Message):
     # try:
     if message.text == 'Корзина':
-        bot.register_next_step_handler(message, show_basket)
+        show_basket(message)
     elif message.text == 'Назад':
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
                          reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
@@ -235,7 +235,7 @@ def quantity_dish(message: types.Message):
 def basket(message: types.Message):
     # try:
     if message.text == 'Корзина':
-        bot.register_next_step_handler(message, show_basket)
+        show_basket(message)
     elif message.text == 'Назад':
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                          reply_markup=numbers())
@@ -256,9 +256,6 @@ def basket(message: types.Message):
     #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
     #     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
 
-#
-# @bot.message_handler(
-#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CART.value)
 def show_basket(message: types.Message):
     goods = deliveryDB.show_basket(message.from_user.id)
     cart = f'Корзина\n\n'
@@ -269,6 +266,7 @@ def show_basket(message: types.Message):
                 f'{good[2]} x {good[-1]} = {good[1]}\n'
     cart += f'\nИтого: {total} сум'
     bot.send_message(message.from_user.id, cart)
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
