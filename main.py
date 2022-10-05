@@ -186,7 +186,7 @@ def inline_confirmation(call: types.CallbackQuery):
 def dishes(message: types.Message):
     try:
         if message.text == 'Корзина':
-            return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
         elif message.text == 'Назад':
             bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
@@ -205,7 +205,7 @@ def dishes(message: types.Message):
 def quantity_dish(message: types.Message):
     # try:
     if message.text == 'Корзина':
-        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     elif message.text == 'Назад':
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
                          reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
@@ -264,7 +264,7 @@ def show_basket(message: types.Message):
         total += int(good[2])
         cart += f'{good[0]}\n' \
                 f'{good[2]} x {good[-1]} = {good[1]}\n'
-    cart = f'\nИтого: {total} сум'
+    cart += f'\nИтого: {total} сум'
     bot.send_message(message.from_user.id, cart)
 
 
