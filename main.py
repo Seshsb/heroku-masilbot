@@ -261,11 +261,11 @@ def show_basket(message: types.Message):
     cart = f'Корзина\n\n'
     total = 0
     for good in goods:
-        total += int(good[1])
+        total += int(good[-1])
         cart += f'{good[0]}\n' \
-                f'{good[2]} x {good[-1]} = {good[1]}\n'
+                f'{good[2]} x {good[1]} = {good[-1]}\n'
     cart += f'\nИтого: {total} сум'
-    bot.send_message(message.from_user.id, cart)
+    bot.send_message(message.from_user.id, cart, reply_markup=types.ReplyKeyboardRemove())
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
 
 
