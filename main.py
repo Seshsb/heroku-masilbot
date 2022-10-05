@@ -1,5 +1,4 @@
 from datetime import datetime
-import locale
 
 import dbworker
 import config
@@ -13,7 +12,6 @@ from keyboards.delivery.default.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
 
-locale.setlocale(locale.LC_ALL, '')
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -265,8 +263,7 @@ def show_basket(message: types.Message):
     total = 0
     for good in goods:
         total += int(good[-1])
-        cart += f'<b>{good[0]}</b>\n' \
-                f'{good[2]} x {locale.format_string("%d", good[1], grouping=True)} = {locale.format_string("%d", good[-1], grouping=True)}\n'
+        cart += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     cart += '\n<b>Итого:{0:,}</b>'.format(total).replace(',', ' ')
     bot.send_message(message.from_user.id, cart, reply_markup=types.ReplyKeyboardRemove(), parse_mode='html')
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
