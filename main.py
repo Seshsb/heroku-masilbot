@@ -1,4 +1,5 @@
 from datetime import datetime
+import locale
 
 import dbworker
 import config
@@ -12,6 +13,7 @@ from keyboards.delivery.default.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
 
+locale.setlocale(locale.LC_ALL, '')
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -248,7 +250,7 @@ def basket(message: types.Message):
         quantity = int(message.text)
         total_price = int(detail[2]) * quantity
         deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-        bot.send_message(message.from_user.id, DELIVERY_BASKET, reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.from_user.id, DELIVERY_BASKET, reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     # except:
@@ -263,10 +265,10 @@ def show_basket(message: types.Message):
     total = 0
     for good in goods:
         total += int(good[-1])
-        cart += f'{good[0]}\n' \
-                f'{good[2]} x {good[1]} = {good[-1]}\n'
-    cart += f'\nИтого: {total} сум'
-    bot.send_message(message.from_user.id, cart, reply_markup=types.ReplyKeyboardRemove())
+        cart += f'<b>{good[0]}</b>\n' \
+                f'{good[2]} x {locale.format_string("%d", good[1], grouping=True)} = {locale.format_string("%d", good[-1], grouping=True)}\n'
+    cart += f'\n<b>Итого: {locale.format_string("%d", total, grouping=True)} сум</b>'
+    bot.send_message(message.from_user.id, cart, reply_markup=types.ReplyKeyboardRemove(), parse_mode='html')
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
 
 
