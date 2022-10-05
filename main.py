@@ -186,16 +186,10 @@ def inline_confirmation(call: types.CallbackQuery):
 def dishes(message: types.Message):
     try:
         if message.text == 'Корзина':
-
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
         elif message.text == 'Назад':
-            bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
-                             reply_markup=food_categoriesRu())
-
-            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        elif message.text == 'Вернуться на главную страницу':
             bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
-            dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global category
         category = message.text
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,

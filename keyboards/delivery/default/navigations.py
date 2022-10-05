@@ -6,9 +6,8 @@ def food_categoriesRu():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     basket = types.KeyboardButton('Корзина')
     back = types.KeyboardButton('Назад')
-    main_page = types.KeyboardButton('Вернуться на главную страницу')
     markup.add(*[category[0] for category in deliveryDB.get_categories()])
-    markup.add(basket, back, main_page)
+    markup.add(basket, back)
 
     return markup
 
