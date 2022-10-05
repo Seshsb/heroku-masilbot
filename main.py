@@ -13,7 +13,7 @@ from keyboards.delivery.default.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
 
-locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
+locale.setlocale(locale.LC_ALL, 'ru_RU')
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -261,7 +261,7 @@ def basket(message: types.Message):
 
 def show_basket(message: types.Message):
     goods = deliveryDB.show_basket(message.from_user.id)
-    cart = f'Корзина\n\n'
+    cart = f'<b>Корзина:</b>\n\n'
     total = 0
     for good in goods:
         total += int(good[-1])
