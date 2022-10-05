@@ -13,7 +13,7 @@ from keyboards.delivery.default.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
 
-locale.setlocale(locale.LC_ALL, '')
+locale.setlocale(locale.LC_ALL, 'ru_RU.UTF-8')
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
