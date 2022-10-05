@@ -261,7 +261,7 @@ def show_basket(message: types.Message):
     cart = f'Корзина\n\n'
     total = 0
     for good in goods:
-        total += int(good[2])
+        total += int(good[1])
         cart += f'{good[0]}\n' \
                 f'{good[2]} x {good[-1]} = {good[1]}\n'
     cart += f'\nИтого: {total} сум'
