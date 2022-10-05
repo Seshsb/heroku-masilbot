@@ -184,20 +184,20 @@ def inline_confirmation(call: types.CallbackQuery):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_MENU_CATEGORY.value)
 def dishes(message: types.Message):
-    try:
-        if message.text == 'Корзина':
-            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
-        elif message.text == 'Назад':
-            bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
-            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        global category
-        category = message.text
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
-                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
-    except:
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
-                         reply_markup=food_categoriesRu())
+    # try:
+    if message.text == 'Корзина':
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+    elif message.text == 'Назад':
+        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+    global category
+    category = message.text
+    bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                     reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+    # except:
+    #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+    #                      reply_markup=food_categoriesRu())
 
 
 @bot.message_handler(
