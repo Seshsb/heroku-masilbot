@@ -190,11 +190,12 @@ def dishes(message: types.Message):
     elif message.text == 'Назад':
         bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
         return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    global category
-    category = message.text
-    bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
-                     reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+    else:
+        global category
+        category = message.text
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     # except:
     #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
     #                      reply_markup=food_categoriesRu())
@@ -214,15 +215,16 @@ def quantity_dish(message: types.Message):
     elif message.text == 'Вернуться на главную страницу':
         bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    global dish
-    global detail
-    dish = message.text
-    detail = deliveryDB.get_dish(dish)
-    bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
-                                           f'{detail[2]} сум', reply_markup=types.ReplyKeyboardRemove())
-    bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
-                     reply_markup=numbers())
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
+    else:
+        global dish
+        global detail
+        dish = message.text
+        detail = deliveryDB.get_dish(dish)
+        bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
+                                               f'{detail[2]} сум', reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                         reply_markup=numbers())
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
     # except:
     #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
     #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
@@ -241,13 +243,14 @@ def basket(message: types.Message):
     elif message.text == 'Вернуться на главную страницу':
         bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    global quantity
-    quantity = int(message.text)
-    total_price = int(detail[2]) * quantity
-    deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-    bot.send_message(message.from_user.id, DELIVERY_BASKET, reply_markup=types.ReplyKeyboardRemove())
+    else:
+        global quantity
+        quantity = int(message.text)
+        total_price = int(detail[2]) * quantity
+        deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
+        bot.send_message(message.from_user.id, DELIVERY_BASKET, reply_markup=types.ReplyKeyboardRemove())
 
-    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     # except:
     #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
     #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
