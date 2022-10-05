@@ -186,7 +186,7 @@ def inline_confirmation(call: types.CallbackQuery):
 def dishes(message: types.Message):
     # try:
     if message.text == 'Корзина':
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     elif message.text == 'Назад':
         bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
         return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
