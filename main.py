@@ -220,7 +220,7 @@ def quantity_dish(message: types.Message):
         global detail
         dish = message.text
         detail = deliveryDB.get_dish(dish)
-        bot.send_message(message.from_user.id, f'{detail[1]}\n\n'
+        bot.send_photo(message.from_user.id, f'{detail[-1]}', f'{detail[1]}\n\n'
                                                f'{detail[2]} сум', reply_markup=types.ReplyKeyboardRemove())
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                          reply_markup=numbers())
@@ -255,6 +255,7 @@ def basket(message: types.Message):
     #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
     #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
     #     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+
 
 def show_basket(message: types.Message):
     goods = deliveryDB.show_basket(message.from_user.id)

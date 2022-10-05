@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import psycopg2
 import os
+from pathlib import Path
 
 from os.path import join, dirname
 from dotenv import load_dotenv
@@ -128,7 +129,7 @@ class Delivery(DataBase):
     def get_dish(self, name):
         with self.connection:
             self.cursor.execute(
-                'SELECT id, name_rus, price FROM foods WHERE name_rus=%s',
+                'SELECT id, name_rus, price, image FROM foods WHERE name_rus=%s',
                 (name, ))
             return self.cursor.fetchone()
 
@@ -147,9 +148,17 @@ class Delivery(DataBase):
                 'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
             return self.cursor.fetchall()
 
+    def add_image_to_db(self):
+        with self.connection:
+            for file in os.listdir('static/delivery/masil_menu'):
+                file_new = file.replace('.jpg', '')
+                # file_new = file.replace('.PNG', '')
+                self.cursor.execute('UPDATE foods SET image=%s WHERE name_rus=%s;',(f"./static/delivery/masil_menu/{file}", file_new))
+                self.connection.commit()
 
 bookingDB = Booking()
 deliveryDB = Delivery()
+# deliveryDB.add_image_to_db()
 # print(deliveryDB.show_basket(275755142))
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
