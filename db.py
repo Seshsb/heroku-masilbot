@@ -159,7 +159,7 @@ class Delivery(DataBase):
 bookingDB = Booking()
 deliveryDB = Delivery()
 # deliveryDB.add_image_to_db()
-# print(deliveryDB.show_basket(275755142))
+print(deliveryDB.show_basket(275755142))
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
