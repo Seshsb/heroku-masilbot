@@ -267,7 +267,7 @@ def show_basket(message: types.Message):
         total += int(good[-1])
         cart += f'<b>{good[0]}</b>\n' \
                 f'{good[2]} x {locale.format_string("%d", good[1], grouping=True)} = {locale.format_string("%d", good[-1], grouping=True)}\n'
-    cart += f'\n<b>Итого: {total}</b>'
+    cart += '\n<b>Итого:{0:,}</b>'.format(total).replace(',', ' ')
     bot.send_message(message.from_user.id, cart, reply_markup=types.ReplyKeyboardRemove(), parse_mode='html')
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
 
