@@ -220,8 +220,8 @@ def quantity_dish(message: types.Message):
         global detail
         dish = message.text
         detail = deliveryDB.get_dish(dish)
-        bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'), f'{detail[1]}\n\n'
-                                               f'{detail[2]} сум', reply_markup=types.ReplyKeyboardRemove())
+        bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'), f'<b>{detail[1]}</b>\n\n'
+                                               f'{detail[2]} сум', parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                          reply_markup=numbers())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
