@@ -148,6 +148,14 @@ class Delivery(DataBase):
                 'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
             return self.cursor.fetchall()
 
+    def foods_name(self, user_id):
+        with self.connection:
+            self.cursor.execute(
+                'SELECT foods.name_rus '
+                'FROM basket '
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
+            return self.cursor.fetchall()
+
     def add_image_to_db(self):
         with self.connection:
             for file in os.listdir('static/delivery/masil_menu'):
@@ -159,7 +167,7 @@ class Delivery(DataBase):
 bookingDB = Booking()
 deliveryDB = Delivery()
 # deliveryDB.add_image_to_db()
-# print(deliveryDB.show_basket(275755142))
+# print(deliveryDB.foods_name(275755142))
 # print(operations.result())
 # # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
