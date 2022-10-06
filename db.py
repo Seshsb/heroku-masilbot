@@ -135,7 +135,9 @@ class Delivery(DataBase):
 
     def insert_toBasket(self, dish_id, qnt, price, user_id):
         with self.connection:
-
+            self.cursor.execute(
+                'SELECT food_id FROM basket WHERE user_id=%s;', (user_id, )
+            )
             self.cursor.execute(
                 'INSERT INTO basket(food_id, quantity, price, user_id) VALUES (%s, %s, %s, %s);',
                 (dish_id, qnt, price, user_id))
