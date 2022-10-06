@@ -276,6 +276,7 @@ def action_in_basket(message: types.Message):
     del_good = message.text[9:]
     if del_good in goods:
         deliveryDB.delete_good_from_basket(del_good, message.from_user.id)
+        bot.send_message(message.from_user.id, 'Del')
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
