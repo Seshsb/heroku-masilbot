@@ -9,7 +9,6 @@ from flask import request
 from keyboards import back_to_menu
 from keyboards.booking.default import register, navigation
 from keyboards.delivery.default.navigations import *
-from keyboards.delivery.inline.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
 
@@ -266,7 +265,7 @@ def show_basket(message: types.Message):
         total += int(good[-1])
         cart += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     cart += '\n<b>Итого: {0:,} сум</b>'.format(total).replace(',', ' ')
-    bot.send_message(message.from_user.id, cart, reply_markup=inline_order(message.from_user.id), parse_mode='html')
+    bot.send_message(message.from_user.id, cart, reply_markup=order(message.from_user.id), parse_mode='html')
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
 
 
