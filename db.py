@@ -166,6 +166,7 @@ class Delivery(DataBase):
 
 bookingDB = Booking()
 deliveryDB = Delivery()
+# print(deliveryDB.show_basket(275755142))
 # deliveryDB.add_image_to_db()
 # print(deliveryDB.foods_name(275755142))
 # print(operations.result())
