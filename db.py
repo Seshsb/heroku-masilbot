@@ -159,16 +159,15 @@ class Delivery(DataBase):
                 'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
             return self.cursor.fetchall()
 
-    def add_image_to_db(self):
+    def delete_good_from_basket(self, name, user_id):
         with self.connection:
-            for file in os.listdir('static/delivery/masil_menu'):
-                file_new = file.replace('.jpg', '')
-                # file_new = file.replace('.PNG', '')
-                self.cursor.execute('UPDATE foods SET image=%s WHERE name_rus=%s;',(f"./static/delivery/masil_menu/{file}", file_new))
-                self.connection.commit()
+            self.cursor.execute(
+                'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_rus=%s) and user_id=%s', (name, user_id))
+            self.connection.commit()
 
 bookingDB = Booking()
 deliveryDB = Delivery()
+# deliveryDB.delete_good_from_basket('Каша с полезными продуктами', 275755142)
 # print(deliveryDB.show_basket(275755142))
 # deliveryDB.add_image_to_db()
 # print(deliveryDB.foods_name(275755142))

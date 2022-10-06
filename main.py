@@ -269,6 +269,15 @@ def show_basket(message: types.Message):
     dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
 
 
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CART.value)
+def action_in_basket(message: types.Message):
+    goods = [good[0] for good in deliveryDB.foods_name(message.from_user.id)]
+    del_good = message.text[9:]
+    if del_good in goods:
+        deliveryDB.delete_good_from_basket(del_good, message.from_user.id)
+
+
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])
 def redirect_message():
     json_string = request.get_data().decode('utf-8')
