@@ -37,6 +37,16 @@ def numbers():
 def order(user_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     cancel = [types.KeyboardButton(text=f'❌ Удалить {food[0]}') for food in deliveryDB.foods_name(int(user_id))]
+    main_page = types.KeyboardButton('Вернуться на главную страницу')
     markup.add(types.KeyboardButton('Оформить заказ'))
     markup.add(*cancel)
+    markup.add(main_page)
+    return markup
+
+
+def send_location():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=True)
+    location = types.KeyboardButton('Поделиться локацией 🌐',request_location=True)
+    markup.add(location)
+
     return markup

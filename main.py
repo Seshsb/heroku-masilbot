@@ -110,12 +110,12 @@ def inline_choice_table(call: types.CallbackQuery):
     table = call.data
     table_id = bookingDB.table_id(table, seating_category)
     bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE, reply_markup=types.ReplyKeyboardRemove())
-    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
+    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
 
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(
-        message.from_user.id) == config.States.S_BOOKING_HOW_MANY_PEOPLE.value)
+        message.from_user.id) == config.States.S_BOOKING_QUANTITY_PEOPLE.value)
 def request_people(message: types.Message):
     global people
     people = message.text
@@ -276,7 +276,22 @@ def action_in_basket(message: types.Message):
     del_good = message.text[10:]
     if del_good in goods:
         deliveryDB.delete_good_from_basket(del_good, message.from_user.id)
-        bot.send_message(message.from_user.id, 'Del')
+        show_basket(message)
+    elif message.text == 'Оформить заказ':
+        bot.send_message(message.from_user.id, 'Отправьте геолокацию', reply_markup=send_location())
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
+    elif message.text == 'Вернуться на главную страницу':
+        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CHECKOUT.value,
+content_types=['location'])
+def location_handler(message: types.Message):
+    latitude = message.location.latitude
+    longitude = message.location.longitude
+    bot.send_location(275755142, latitude, longitude)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

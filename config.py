@@ -15,7 +15,7 @@ class States(Enum):
     S_CHOICE_SEATING_ID = "choice seating id"
     S_BOOKING_START_DATE = "start date"
     S_BOOKING_START_TIME = "start time"
-    S_BOOKING_HOW_MANY_PEOPLE = "how many people"
+    S_BOOKING_QUANTITY_PEOPLE = "quantity people"
     S_BOOKING_PHONE_NUMBER = "phone number"
     S_BOOKING_FIRSTNAME = "first name"
     S_BOOKING_CONFIRMATION = "booking confirmation"
@@ -25,3 +25,4 @@ class States(Enum):
     S_DELIVERY_DISHES = 'dishes'
     S_DELIVERY_QUANTITY = 'quantity'
     S_DELIVERY_CART = 'cart'
+    S_DELIVERY_CHECKOUT = 'checkout'
