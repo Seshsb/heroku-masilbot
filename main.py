@@ -11,6 +11,7 @@ from keyboards.booking.default import register, navigation
 from keyboards.delivery.default.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
+from functions.handlers import get_address_from_coords
 
 
 @bot.message_handler(commands=['start'])
@@ -37,6 +38,7 @@ def booking_or_delivery(message):
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+
 
 # Бронирование
 ############################################################################################
@@ -164,8 +166,8 @@ def get_first_name(message):
 def inline_confirmation(call: types.CallbackQuery):
     try:
         if call.data == 'confirm':
-            bookingDB.start_booking(call.from_user.id, table_id, datetime_start, datetime_end,phone_number,
-                                     first_name, people)
+            bookingDB.start_booking(call.from_user.id, table_id, datetime_start, datetime_end, phone_number,
+                                    first_name, people)
             bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:
@@ -175,14 +177,14 @@ def inline_confirmation(call: types.CallbackQuery):
         bot.send_message(call.from_user.id, '')
 
 
-
 ############################################################################################
 
 
 # Доставка
 ############################################################################################
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_MENU_CATEGORY.value)
+    func=lambda message: dbworker.get_current_state(
+        message.from_user.id) == config.States.S_DELIVERY_MENU_CATEGORY.value)
 def dishes(message: types.Message):
     # try:
     if message.text == 'Корзина':
@@ -221,7 +223,8 @@ def quantity_dish(message: types.Message):
         dish = message.text
         detail = deliveryDB.get_dish(dish)
         bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'), f'<b>{detail[1]}</b>\n\n'
-                                               f'{detail[2]} сум', parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+                                                                          f'{detail[2]} сум', parse_mode='html',
+                       reply_markup=types.ReplyKeyboardRemove())
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                          reply_markup=numbers())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
@@ -248,7 +251,8 @@ def basket(message: types.Message):
         quantity = int(message.text)
         total_price = int(detail[2]) * quantity
         deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-        bot.send_message(message.from_user.id, DELIVERY_BASKET, reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+        bot.send_message(message.from_user.id, DELIVERY_BASKET,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     # except:
@@ -278,7 +282,8 @@ def action_in_basket(message: types.Message):
         deliveryDB.delete_good_from_basket(del_good, message.from_user.id)
         show_basket(message)
     elif message.text == 'Оформить заказ':
-        bot.send_message(message.from_user.id, 'Отправьте геолокацию', reply_markup=send_location())
+        bot.send_message(message.from_user.id, '<b>Введите адрес доставки</b>',
+                         parse_mode='html', reply_markup=send_location())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
     elif message.text == 'Вернуться на главную страницу':
         bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
@@ -287,11 +292,36 @@ def action_in_basket(message: types.Message):
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CHECKOUT.value,
-content_types=['location'])
-def location_handler(message: types.Message):
-    latitude = message.location.latitude
-    longitude = message.location.longitude
-    bot.send_location(275755142, latitude, longitude)
+    content_types=['location', 'text'])
+def takeaway_location_handler(message: types.Message):
+    if message.text == 'На вынос 🏃🏻‍♂️':
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_TAKEAWAY.value)
+    elif message.content_type == 'location':
+        latitude = message.location.latitude
+        longitude = message.location.longitude
+        bot.send_message(275755142, get_address_from_coords(f'{latitude},{longitude}'))
+        # bot.send_location(275755142, latitude, longitude)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY.value,
+    content_types=['contact'])
+def request_contact(message):
+    global phone_number
+    phone_number = '+' + message.contact.phone_number
+    bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
+
+
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY.value,
+    regexp=r'\+998[0-9]{9}$')
+def phone(message):
+    global phone_number
+    phone_number = message.text
+    bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

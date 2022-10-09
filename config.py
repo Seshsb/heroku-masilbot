@@ -26,3 +26,4 @@ class States(Enum):
     S_DELIVERY_QUANTITY = 'quantity'
     S_DELIVERY_CART = 'cart'
     S_DELIVERY_CHECKOUT = 'checkout'
+    S_DELIVERY_TAKEAWAY = 'takeaway'

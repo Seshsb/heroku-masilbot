@@ -47,6 +47,7 @@ def order(user_id):
 def send_location():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=True)
     location = types.KeyboardButton('Поделиться локацией 🌐',request_location=True)
-    markup.add(location)
+    takeaway = types.KeyboardButton('На вынос 🏃🏻‍♂️')
+    markup.add(takeaway, location)
 
     return markup

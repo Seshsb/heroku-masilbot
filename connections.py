@@ -14,6 +14,7 @@ load_dotenv(dotenv_path)
 
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
+YANDEX_TOKEN = os.environ.get('YANDEX_TOKEN')
 
 bot = telebot.TeleBot(BOT_TOKEN)
 server = Flask(__name__)
