@@ -27,3 +27,5 @@ def get_address_from_coords(coords):
     except Exception as e:
         #если не смогли, то возвращаем ошибку
         return "error"
+
+print(get_address_from_coords('37.617585,55.751903'))

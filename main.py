@@ -300,7 +300,7 @@ def takeaway_location_handler(message: types.Message):
     elif message.content_type == 'location':
         latitude = message.location.latitude
         longitude = message.location.longitude
-        bot.send_message(275755142, get_address_from_coords(f'{latitude},{longitude}'))
+        bot.send_message(275755142, get_address_from_coords(f'{longitude},{latitude}'))
         # bot.send_location(275755142, latitude, longitude)
 
 
