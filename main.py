@@ -294,34 +294,66 @@ def action_in_basket(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CHECKOUT.value,
     content_types=['location', 'text'])
 def takeaway_location_handler(message: types.Message):
+    global address
     if message.text == 'На вынос 🏃🏻‍♂️':
         bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_TAKEAWAY.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value)
     elif message.content_type == 'location':
         latitude = message.location.latitude
         longitude = message.location.longitude
-        bot.send_message(275755142, get_address_from_coords(f'{longitude},{latitude}'))
-        # bot.send_location(275755142, latitude, longitude)
+        address = get_address_from_coords(f'{longitude},{latitude}')
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
+    elif message.content_type == 'text':
+        address = message.text
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
 
 
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY.value,
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value,
+    content_types=['contact'])
+def takeaway_request_contact(message):
+    phone_number = '+' + message.contact.phone_number
+    deliveryDB.checkout(message.from_user.id, address, phone_number)
+    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
+                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
+                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value,
+    regexp=r'\+998[0-9]{9}$')
+def takeaway_phone(message):
+    phone_number = message.text
+    deliveryDB.checkout(message.from_user.id, address, phone_number)
+    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
+                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
+                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
     content_types=['contact'])
 def request_contact(message):
-    global phone_number
     phone_number = '+' + message.contact.phone_number
-    bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
-
+    deliveryDB.checkout(message.from_user.id, address, phone_number)
+    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
+                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
+                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
 
 
 
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY.value,
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
     regexp=r'\+998[0-9]{9}$')
 def phone(message):
     global phone_number
     phone_number = message.text
-    bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
+    deliveryDB.checkout(message.from_user.id, address, phone_number)
+    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
+                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
+                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

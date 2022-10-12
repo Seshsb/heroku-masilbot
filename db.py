@@ -170,19 +170,34 @@ class Delivery(DataBase):
                 'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_rus=%s) and user_id=%s', (name, user_id))
             self.connection.commit()
 
-    def checkout(self, basket_id, address, total_price, user_id):
+    def checkout(self, user_id, address, phone_number):
         with self.connection:
             self.cursor.execute('SET TIME ZONE "Asia/Tashkent"')
-            self.cursor.execute('UPDATE basket SET order=TRUE user_id=%s', (user_id, ))
-            self.cursor.execute('INSERT INTO orders (basket_id, address, total_price, created_at) '
-                                'VALUES (%s, %s, %s, now())',
-                                (basket_id, address, total_price))
+            self.cursor.execute('SELECT price FROM basket WHERE user_id=%s and ordered=false;', (user_id, ))
+            total_price = 0
+            for price in self.cursor.fetchall():
+                total_price += price[0]
+            self.cursor.execute('INSERT INTO orders (baskets_id, address, total_price, created_at, user_id, phone_number) '
+                                'VALUES('
+                                'array[]::integer[], %s, %s, now(), %s, %s'
+                                ');', (address, total_price, user_id, phone_number))
+            self.cursor.execute('select id from basket where user_id=%s and ordered=False;', (user_id, ))
+            for basket in self.cursor.fetchall():
+                self.cursor.execute('UPDATE orders SET baskets_id=array_append(baskets_id, %s) where user_id=275755142;', (basket[0], ))
+                self.cursor.execute('UPDATE basket SET ordered=TRUE where user_id=%s and id=%s;', (user_id, basket))
+
             self.connection.commit()
+
+    def order_id(self, user_id):
+        with self.connection:
+            self.cursor.execute('SELECT id FROM orders WHERE user_id=%s', (user_id, ))
+            return self.cursor.fetchone()
 
 
 
 bookingDB = Booking()
 deliveryDB = Delivery()
+# print(deliveryDB.test(275755142, 'qweqeqeqwe'))
 # deliveryDB.insert_toBasket(21, 1, 105000, 275755142)
 # deliveryDB.delete_good_from_basket('Каша с полезными продуктами', 275755142)
 # print(deliveryDB.show_basket(275755142))
