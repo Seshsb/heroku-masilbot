@@ -438,8 +438,8 @@ def show_order_client(client):
     total_amount = total + int(amount)
     order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум\n' \
                    'Сумма доставки: {1:,}\n' \
-                   'Итого: {2:,}</b>\n\n' \
-                   'Для связи с оператором @seshsb'.format(total, amount, total_amount).replace(',', ' ')
+                   'Итого:</b>\n\n' \
+                   'Для связи с оператором @seshsb'.format(total, amount).replace(',', ' ')
     bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
 
