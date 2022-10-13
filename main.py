@@ -8,7 +8,7 @@ import config
 from telebot_calendar import *
 from connections import *
 from flask import request
-from keyboards import back_to_menu
+from keyboards import general_nav
 from keyboards.booking.default import register, navigation
 from keyboards.delivery.default.navigations import *
 from keyboards.delivery.inline.navigations import *
@@ -311,7 +311,7 @@ def takeaway_location_handler(message: types.Message):
     global takeaway
     if message.text == 'На вынос 🏃🏻‍♂️':
         takeaway = message.text
-        bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value)
     elif message.content_type == 'location':
         latitude = message.location.latitude
@@ -321,6 +321,7 @@ def takeaway_location_handler(message: types.Message):
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
     else:
         address = message.text
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
 
 

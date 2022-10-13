@@ -161,13 +161,13 @@ class Delivery(DataBase):
             self.cursor.execute(
                 'SELECT foods.name_rus '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
             return self.cursor.fetchall()
 
     def delete_good_from_basket(self, name, user_id):
         with self.connection:
             self.cursor.execute(
-                'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_rus=%s) and user_id=%s', (name, user_id))
+                'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_rus=%s) and user_id=%s and ordered=false;', (name, user_id))
             self.connection.commit()
 
     def checkout(self, user_id, address, phone_number):
