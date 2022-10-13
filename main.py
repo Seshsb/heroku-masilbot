@@ -426,19 +426,20 @@ def accepting_admin(call: types.CallbackQuery):
 def show_order_client(client):
     goods = deliveryDB.get_order(client)
     order_admin = f'<b>Заказ #{deliveryDB.order_id(client)}</b>\n' \
-            f'Тип заказа: {takeaway if takeaway else "Доставка 🚘"}\n' \
-            f'Адрес: {takeaway if takeaway else address}\n' \
-            f'Номер телефона: {phone_number}\n' \
-            f'Метод оплаты: {method_pay}\n\n\n' \
+            f'Тип заказа: <b>{takeaway if takeaway else "Доставка 🚘"}</b>\n' \
+            f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
+            f'Номер телефона: <b>{phone_number}</b>\n' \
+            f'Метод оплаты: <b>{method_pay}</b>\n\n\n' \
             f'Время получения заказа: <b>В ближайшее время</b>\n\n\n'
     total = 0
     for good in goods:
         total += int(good[-1])
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    total_amount = total + int(amount)
     order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум\n' \
                    'Сумма доставки: {1:,}\n' \
                    'Итого: {2:,}</b>\n\n' \
-                   'Для связи с оператором \@seshsb'.format(total, amount, total+int(amount)).replace(',', ' ')
+                   'Для связи с оператором @seshsb'.format(total, amount, total_amount).replace(',', ' ')
     bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
 
