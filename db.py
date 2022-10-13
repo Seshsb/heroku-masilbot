@@ -184,8 +184,6 @@ class Delivery(DataBase):
             self.cursor.execute('select id from basket where user_id=%s and ordered=False;', (user_id, ))
             for basket in self.cursor.fetchall():
                 self.cursor.execute('UPDATE orders SET baskets_id=array_append(baskets_id, %s) where user_id=275755142;', (basket[0], ))
-                self.cursor.execute('UPDATE basket SET ordered=TRUE where user_id=%s and id=%s;', (user_id, basket))
-
             self.connection.commit()
 
     def order_id(self, user_id):
