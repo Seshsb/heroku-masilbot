@@ -437,7 +437,7 @@ def show_order_client(client):
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     total_amount = total + int(amount)
     order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум\n' \
-                   'Сумма доставки: {0:,}\n' \
+                   'Сумма доставки: {1:,}\n' \
                    'Итого:</b>\n\n' \
                    'Для связи с оператором @seshsb'.format(total, amount).replace(',', ' ')
     bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
