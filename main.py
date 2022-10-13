@@ -429,7 +429,7 @@ def show_order_client(client):
             f'Тип заказа: <b>{takeaway if takeaway else "Доставка 🚘"}</b>\n' \
             f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
             f'Номер телефона: <b>{phone_number}</b>\n' \
-            f'Метод оплаты: <b>{method_pay}</b>\n\n\n' \
+            f'Метод оплаты: <b>{method_pay}</b>\n' \
             f'Время получения заказа: <b>В ближайшее время</b>\n\n\n'
     total = 0
     for good in goods:
@@ -441,6 +441,7 @@ def show_order_client(client):
                    'Итого:</b>\n\n' \
                    'Для связи с оператором @seshsb'.format(total).replace(',', ' ')
     bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
+    bot.send_message(client, amount, parse_mode='html', reply_markup=accepting_order())
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
 
 
