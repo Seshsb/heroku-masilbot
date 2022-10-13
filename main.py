@@ -408,12 +408,12 @@ def show_order_admin(client):
 def delivery_amount(message: types.Message):
     global amount
     amount = message.text
-    bot.send_message(27755142, '<b>Подтвердить заказ?</b>', reply_markup=accepting_order())
-    dbworker.set_states(27755142, config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
+    bot.send_message(275755142, '<b>Подтвердить заказ?</b>', reply_markup=accepting_order())
+    dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
 
 
 @bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(27755142) == config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
+    func=lambda call: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
 def accepting_admin(call: types.CallbackQuery):
     if call.data == 'accept':
         show_order_client(client)
