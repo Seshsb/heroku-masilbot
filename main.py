@@ -408,7 +408,7 @@ def show_order_admin(client):
 def delivery_amount(message: types.Message):
     global amount
     amount = message.text
-    bot.send_message(275755142, '<b>Подтвердить заказ?</b>', reply_markup=accepting_order())
+    bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
     dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
 
 
@@ -438,7 +438,7 @@ def show_order_client(client):
     order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум\n' \
                    'Сумма доставки: {1:,}\n' \
                    'Итого: {2:,}</b>\n\n' \
-                   'Для связи с оператором @seshsb'.format(total, amount, total+int(amount)).replace(',', ' ')
+                   'Для связи с оператором \@seshsb'.format(total, amount, total+int(amount)).replace(',', ' ')
     bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
 
