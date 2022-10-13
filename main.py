@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import telebot.apihelper
+
 import dbworker
 import config
 
@@ -9,6 +11,7 @@ from flask import request
 from keyboards import back_to_menu
 from keyboards.booking.default import register, navigation
 from keyboards.delivery.default.navigations import *
+from keyboards.delivery.inline.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
 from functions.handlers import get_address_from_coords
@@ -35,6 +38,8 @@ def booking_or_delivery(message):
                          reply_markup=show_calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
     elif message.text == 'Доставка':
+        global client
+        client = message.from_user.id
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
@@ -222,12 +227,20 @@ def quantity_dish(message: types.Message):
         global detail
         dish = message.text
         detail = deliveryDB.get_dish(dish)
-        bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'), f'<b>{detail[1]}</b>\n\n'
-                                                                          f'{detail[2]} сум', parse_mode='html',
-                       reply_markup=types.ReplyKeyboardRemove())
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
-                         reply_markup=numbers())
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
+        if detail[-1]:
+            bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'), f'<b>{detail[1]}</b>\n\n'
+                                                                              f'{detail[2]} сум', parse_mode='html',
+                           reply_markup=types.ReplyKeyboardRemove())
+            bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                             reply_markup=numbers())
+            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
+        else:
+            bot.send_message(message.from_user.id, f'<b>{detail[1]}</b>\n\n'
+                                                 f'{detail[2]} сум',
+                           parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+            bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                             reply_markup=numbers())
+            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
     # except:
     #     bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
     #                      reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
@@ -295,7 +308,9 @@ def action_in_basket(message: types.Message):
     content_types=['location', 'text'])
 def takeaway_location_handler(message: types.Message):
     global address
+    global takeaway
     if message.text == 'На вынос 🏃🏻‍♂️':
+        takeaway = message.text
         bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value)
     elif message.content_type == 'location':
@@ -304,7 +319,7 @@ def takeaway_location_handler(message: types.Message):
         address = get_address_from_coords(f'{longitude},{latitude}')
         bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
-    elif message.content_type == 'text':
+    else:
         address = message.text
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
 
@@ -313,35 +328,33 @@ def takeaway_location_handler(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value,
     content_types=['contact'])
 def takeaway_request_contact(message):
+    global phone_number
     phone_number = '+' + message.contact.phone_number
-    deliveryDB.checkout(message.from_user.id, address, phone_number)
-    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
-                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
-                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
-
+    bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+                     parse_mode='html', reply_markup=payment_method())
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
 
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value,
     regexp=r'\+998[0-9]{9}$')
 def takeaway_phone(message):
+    global phone_number
     phone_number = message.text
-    deliveryDB.checkout(message.from_user.id, address, phone_number)
-    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ #<b>{deliveryDB.order_id(message.from_user.id)}</b> '
-                                           f'передан на обработку. Ожидайте подтверждения заказа от бота.',
-                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+                     parse_mode='html', reply_markup=payment_method())
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
 
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
     content_types=['contact'])
 def request_contact(message):
+    global phone_number
     phone_number = '+' + message.contact.phone_number
-    deliveryDB.checkout(message.from_user.id, address, phone_number)
-    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
-                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
-                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
-
+    bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+                     parse_mode='html', reply_markup=payment_method())
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
 
 
 @bot.message_handler(
@@ -350,10 +363,95 @@ def request_contact(message):
 def phone(message):
     global phone_number
     phone_number = message.text
-    deliveryDB.checkout(message.from_user.id, address, phone_number)
-    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
-                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
+    bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+                     parse_mode='html', reply_markup=payment_method())
+    dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_DELIVERY_PAYMENT_METHOD.value)
+def inline_payment_method(call: types.CallbackQuery):
+    global method_pay
+    if call.data == 'cash':
+        method_pay = 'Наличными 💵'
+    elif call.data == 'payme':
+        method_pay = 'PayMe 💵'
+    deliveryDB.checkout(call.from_user.id, address, phone_number)
+    bot.send_message(call.from_user.id,
+                     f'Спасибо, ваш заказ <b>#{deliveryDB.order_id(call.from_user.id)}</b> '
+                     f'передан на обработку. Ожидайте подтверждения заказа от бота.',
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+
+
+def show_order_admin(message: types.Message):
+    goods = deliveryDB.get_order(message.from_user.id)
+    order_admin = f'<b>Заказ #{deliveryDB.order_id(message.from_user.id)}</b>\n' \
+            f'Тип заказа: {takeaway if takeaway else "Доставка 🚘"}\n' \
+            f'Адрес: {takeaway if takeaway else address}\n' \
+            f'Номер телефона: {phone_number}\n' \
+            f'Метод оплаты: {method_pay}\n\n\n'
+    total = 0
+    for good in goods:
+        total += int(good[-1])
+        order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
+    bot.send_message(275755142, order_admin, parse_mode='html')
+    bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
+    dbworker.set_states(275755142, config.States.S_DELIVERY_AMOUNT.value)
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_AMOUNT.value)
+def delivery_amount(message: types.Message):
+    global amount
+    amount = message.text
+    bot.send_message(27755142, '<b>Подтвердить заказ?</b>', reply_markup=accepting_order())
+    dbworker.set_states(27755142, config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(27755142) == config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
+def accepting_admin(call: types.CallbackQuery):
+    if call.data == 'accept':
+        show_order_client(client)
+    elif call.data == 'cancel':
+        bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
+                         reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
+        deliveryDB.cancel_order(client)
+
+
+def show_order_client(client):
+    goods = deliveryDB.get_order(client)
+    order_admin = f'<b>Заказ #{deliveryDB.order_id(client)}</b>\n' \
+            f'Тип заказа: {takeaway if takeaway else "Доставка 🚘"}\n' \
+            f'Адрес: {takeaway if takeaway else address}\n' \
+            f'Номер телефона: {phone_number}\n' \
+            f'Метод оплаты: {method_pay}\n\n\n' \
+            f'Время получения заказа: <b>В ближайшее время</b>\n\n\n'
+    total = 0
+    for good in goods:
+        total += int(good[-1])
+        order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум\n' \
+                   'Сумма доставки: {1:,}\n' \
+                   'Итого: {2:,}</b>\n\n' \
+                   'Для связи с оператором @seshsb'.format(total, amount, total+int(amount)).replace(',', ' ')
+    bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
+    dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
+
+
+@bot.message_handler(
+    func=lambda call: dbworker.get_current_state(client) == config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
+def accepting_client(call):
+    if call.data == 'accept':
+        deliveryDB.accept_order(client)
+        bot.send_message(client, 'Спасибо, мы начали готовить ваш заказ #88527. Ожидайте доставку в течение 60 минут 🚗\n'
+                                 'Доставка может занять около 80 минут на обед и ужин во время пика\n'
+                                 'С вами свяжется оператор ✅')
+    elif call.data == 'cancel':
+        bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
+                         reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
+        deliveryDB.cancel_order(client)
 
 
 @server.route(f'/{BOT_TOKEN}', methods=['POST'])

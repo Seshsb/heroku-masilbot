@@ -153,7 +153,7 @@ class Delivery(DataBase):
             self.cursor.execute(
                 'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s;', (user_id, ))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and order=FALSE;', (user_id, ))
             return self.cursor.fetchall()
 
     def foods_name(self, user_id):
@@ -192,6 +192,25 @@ class Delivery(DataBase):
         with self.connection:
             self.cursor.execute('SELECT id FROM orders WHERE user_id=%s', (user_id, ))
             return self.cursor.fetchone()[0]
+
+    def get_order(self, user_id):
+        with self.connection:
+            self.cursor.execute(
+                'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
+                'FROM basket '
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and order=TRUE;', (user_id,))
+            return self.cursor.fetchall()
+
+    def cancel_order(self, user_id):
+        with self.connection:
+            self.cursor.execute('DELETE FROM orders WHERE user_id=%s', (user_id, ))
+            self.cursor.execute('DELETE FROM basket WHERE user_id=%s', (user_id, ))
+            self.connection.commit()
+
+    def accept_order(self, user_id):
+        with self.connection:
+            self.cursor.execute('UPDATE orders SET confirmed=True WHERE user_id=%s', (user_id, ))
+            self.connection.commit()
 
 
 
