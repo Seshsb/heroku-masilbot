@@ -382,11 +382,12 @@ def inline_payment_method(call: types.CallbackQuery):
                      f'Спасибо, ваш заказ <b>#{deliveryDB.order_id(call.from_user.id)}</b> '
                      f'передан на обработку. Ожидайте подтверждения заказа от бота.',
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+    show_order_admin(client)
 
 
-def show_order_admin(message: types.Message):
-    goods = deliveryDB.get_order(message.from_user.id)
-    order_admin = f'<b>Заказ #{deliveryDB.order_id(message.from_user.id)}</b>\n' \
+def show_order_admin(client):
+    goods = deliveryDB.get_order(client)
+    order_admin = f'<b>Заказ #{deliveryDB.order_id(client)}</b>\n' \
             f'Тип заказа: {takeaway if takeaway else "Доставка 🚘"}\n' \
             f'Адрес: {takeaway if takeaway else address}\n' \
             f'Номер телефона: {phone_number}\n' \
