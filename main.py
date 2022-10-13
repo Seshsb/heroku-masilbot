@@ -309,6 +309,7 @@ def action_in_basket(message: types.Message):
 def takeaway_location_handler(message: types.Message):
     global address
     global takeaway
+    takeaway = None
     if message.text == 'На вынос 🏃🏻‍♂️':
         takeaway = message.text
         bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
