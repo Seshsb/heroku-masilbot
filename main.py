@@ -361,7 +361,7 @@ def request_contact(message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
     regexp=r'\+998[0-9]{9,9}$')
-def phone(message):
+def delivery_phonenumber(message: types.Message):
     global phone_number
     phone_number = message.text
     bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
