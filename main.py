@@ -443,7 +443,7 @@ def show_order_client(client):
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
 
 
-@bot.message_handler(
+@bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
 def accepting_client(call: types.CallbackQuery):
     if call.data == 'accept':
