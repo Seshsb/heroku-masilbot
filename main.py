@@ -317,11 +317,11 @@ def takeaway_location_handler(message: types.Message):
         latitude = message.location.latitude
         longitude = message.location.longitude
         address = get_address_from_coords(f'{longitude},{latitude}')
-        bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
     else:
         address = message.text
-        bot.send_message(message.from_user.id, GET_PHONE_NUMBER)
+        bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
 
 
