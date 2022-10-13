@@ -153,7 +153,7 @@ class Delivery(DataBase):
             self.cursor.execute(
                 'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and order=FALSE;', (user_id, ))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
             return self.cursor.fetchall()
 
     def foods_name(self, user_id):
@@ -198,7 +198,7 @@ class Delivery(DataBase):
             self.cursor.execute(
                 'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and order=TRUE;', (user_id,))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=TRUE;', (user_id,))
             return self.cursor.fetchall()
 
     def cancel_order(self, user_id):
