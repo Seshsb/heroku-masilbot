@@ -137,11 +137,11 @@ class Delivery(DataBase):
         with self.connection:
             self.cursor.execute('SET TIME ZONE "Asia/Tashkent"')
             self.cursor.execute(
-                'SELECT * FROM basket WHERE user_id=%s and food_id=%s;', (user_id, dish_id, )
+                'SELECT * FROM basket WHERE user_id=%s and food_id=%s and ordered=false;', (user_id, dish_id, )
             )
             if self.cursor.fetchall():
                 self.cursor.execute('UPDATE basket SET quantity = quantity+%s, price = price+%s, created_at=now() '
-                                    'WHERE user_id=%s and food_id=%s;', (int(qnt), int(price), user_id, dish_id, ))
+                                    'WHERE user_id=%s and food_id=%s and ordered=false;', (int(qnt), int(price), user_id, dish_id, ))
             else:
                 self.cursor.execute(
                     'INSERT INTO basket(food_id, quantity, price, user_id, created_at) VALUES (%s, %s, %s, %s, now());',
@@ -198,7 +198,7 @@ class Delivery(DataBase):
             self.cursor.execute(
                 'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=TRUE;', (user_id,))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id,))
             return self.cursor.fetchall()
 
     def cancel_order(self, user_id):
