@@ -327,8 +327,8 @@ def takeaway_request_contact(message):
 def takeaway_phone(message):
     phone_number = message.text
     deliveryDB.checkout(message.from_user.id, address, phone_number)
-    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ <b>{deliveryDB.order_id(message.from_user.id)} '
-                                           f'передан на обработку. Ожидайте подтверждения заказа от бота</b>.',
+    bot.send_message(message.from_user.id, f'Спасибо, ваш заказ #<b>{deliveryDB.order_id(message.from_user.id)}</b> '
+                                           f'передан на обработку. Ожидайте подтверждения заказа от бота.',
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
 
 

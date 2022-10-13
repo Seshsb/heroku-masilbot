@@ -191,7 +191,7 @@ class Delivery(DataBase):
     def order_id(self, user_id):
         with self.connection:
             self.cursor.execute('SELECT id FROM orders WHERE user_id=%s', (user_id, ))
-            return self.cursor.fetchone()
+            return self.cursor.fetchone()[0]
 
 
 
