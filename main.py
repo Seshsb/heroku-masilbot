@@ -405,7 +405,7 @@ def show_order_admin(client):
     for good in goods:
         total += int(good[-1])
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
+    order_admin += '\n\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
     bot.send_message(275755142, order_admin, parse_mode='html')
     bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
     dbworker.set_states(275755142, config.States.S_DELIVERY_AMOUNT.value)
@@ -443,7 +443,7 @@ def show_order_client(client):
     for good in goods:
         total += int(good[-1])
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_admin += '\n\n\n<b>Сумма заказа: {0:,} сум\n' \
+    order_admin += '\n\n<b>Сумма заказа: {0:,} сум\n' \
                    'Сумма доставки: {1:,}\n' \
                    'Итого: {2:,}</b>\n\n' \
                    'Для связи с оператором @seshsb'.format(total, amount, total+amount).replace(',', ' ')
