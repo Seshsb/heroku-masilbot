@@ -179,8 +179,8 @@ class Delivery(DataBase):
     def checkout(self, user_id, address, phone_number):
         with self.connection:
             self.cursor.execute('SET TIME ZONE "Asia/Tashkent";')
-            self.cursor.execute('SELECT price FROM basket WHERE user_id=%s and ordered=false;', (user_id, ))
             self.cursor.execute('UPDATE users SET phone_number=%s WHERE id=%s;', (phone_number, user_id))
+            self.cursor.execute('SELECT price FROM basket WHERE user_id=%s and ordered=false;', (user_id, ))
             total_price = 0
             for price in self.cursor.fetchall():
                 total_price += price[0]
