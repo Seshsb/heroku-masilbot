@@ -136,12 +136,18 @@ class Delivery(DataBase):
     def insert_toBasket(self, dish_id, qnt, price, user_id):
         with self.connection:
             self.cursor.execute('SET TIME ZONE "Asia/Tashkent"')
+            self.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id, ))
+            if not self.cursor.fetchone():
+                self.cursor.execute('INSERT INTO users (id) '
+                                    'VALUES (%s);', (user_id,))
+
             self.cursor.execute(
                 'SELECT * FROM basket WHERE user_id=%s and food_id=%s and ordered=false;', (user_id, dish_id, )
             )
             if self.cursor.fetchall():
                 self.cursor.execute('UPDATE basket SET quantity = quantity+%s, price = price+%s, created_at=now() '
-                                    'WHERE user_id=%s and food_id=%s and ordered=false;', (int(qnt), int(price), user_id, dish_id, ))
+                                    'WHERE user_id=%s and food_id=%s and ordered=false;',
+                                    (int(qnt), int(price), user_id, dish_id, ))
             else:
                 self.cursor.execute(
                     'INSERT INTO basket(food_id, quantity, price, user_id, created_at) VALUES (%s, %s, %s, %s, now());',
