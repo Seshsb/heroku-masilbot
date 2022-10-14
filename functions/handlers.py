@@ -90,7 +90,8 @@ def accept_client(client, phone_number, method_pay, address, takeaway):
     for good in goods:
         total += int(good[-1])
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_admin += '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя отадреса доставки)'.format(total,).replace(',', ' ')
+    order_admin += '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя отадреса доставки)\n\n' \
+                   'Для связи с оператором @seshsb'.format(total,).replace(',', ' ')
     bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
     deliveryDB.checkout(client, address, phone_number)
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPT.value)
@@ -110,8 +111,7 @@ def show_order(client, phone_number, method_pay, address, takeaway, amount):
         order_client += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     order_client += '\n<b>Сумма заказа: {0:,} сум\n' \
                    'Сумма доставки: {1:,}\n' \
-                   'Итого: {2:,}</b>\n\n' \
-                   'Для связи с оператором @seshsb'.format(total, amount, total+amount).replace(',', ' ')
+                   'Итого: {2:,}</b>\n\n'.format(total, amount, total+amount).replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html')
     bot.send_message(client, 'Хотите что-то еще?', reply_markup=general_nav.booking_or_delivery())
     dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)

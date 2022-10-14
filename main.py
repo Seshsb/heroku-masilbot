@@ -37,7 +37,7 @@ def booking_or_delivery(message):
         bot.send_message(message.from_user.id, BOOKING_REQUEST_DATE,
                          reply_markup=show_calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
-    elif message.text == 'Доставка':
+    elif message.text == 'Доставка' and message.text == 'Назад':
         global client
         client = message.from_user.id
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
@@ -195,8 +195,9 @@ def dishes(message: types.Message):
     if message.text == 'Корзина':
         show_basket(message)
     elif message.text == 'Назад':
-        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
-        return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+                         reply_markup=food_categoriesRu())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     else:
         global category
         category = message.text
@@ -218,7 +219,7 @@ def quantity_dish(message: types.Message):
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
                          reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
-        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     elif message.text == 'Вернуться на главную страницу':
         bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
