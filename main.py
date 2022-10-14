@@ -86,7 +86,7 @@ def callback_date(call: CallbackQuery):
             )
             bot.send_message(call.from_user.id, f"{calendar_1}: Отменен")
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 

@@ -115,4 +115,5 @@ def show_order(client, phone_number, method_pay, address, takeaway, amount):
     bot.send_message(client, order_client, parse_mode='html')
     deliveryDB.accept_order(client)
     bot.send_message(client, 'Хотите что-то еще?', reply_markup=general_nav.booking_or_delivery())
+    bot.send_message(client, 'Благодарим за заказ,', reply_markup=general_nav.booking_or_delivery())
     dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)

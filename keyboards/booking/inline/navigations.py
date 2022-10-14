@@ -2,7 +2,7 @@ import datetime
 
 import telebot
 from telebot import types
-from telebot_calendar import CallbackData, Calendar
+from telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
 
 from db import bookingDB
 
@@ -45,9 +45,8 @@ def booking_confirm():
 
 now = datetime.datetime.now()
 calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
-calendar = Calendar()
+calendar = Calendar(language=RUSSIAN_LANGUAGE)
 show_calendar = calendar.create_calendar(
                          name=calendar_1.prefix,
                          year=now.year,
-                         month=now.month
-)
+                         month=now.month)
