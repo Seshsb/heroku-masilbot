@@ -113,5 +113,6 @@ def show_order(client, phone_number, method_pay, address, takeaway, amount):
                    'Сумма доставки: {1:,}\n' \
                    'Итого: {2:,}</b>\n\n'.format(total, amount, total+amount).replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html')
+    deliveryDB.accept_order(client)
     bot.send_message(client, 'Хотите что-то еще?', reply_markup=general_nav.booking_or_delivery())
     dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)

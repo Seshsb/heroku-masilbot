@@ -485,7 +485,6 @@ def delivery_amount(message: types.Message):
 def accepting_admin(call: types.CallbackQuery):
     try:
         if call.data == 'accept':
-            deliveryDB.accept_order(client)
             show_order(client, phone_number, method_pay, address, takeaway, amount)
         elif call.data == 'cancel':
             bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
