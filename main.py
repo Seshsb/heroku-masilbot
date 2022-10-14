@@ -35,7 +35,7 @@ def back_to_menu(message: types.Message):
 def booking_or_delivery(message: types.Message):
     if message.text == 'Бронирование':
         booking(message)
-    elif message.text == 'Доставка' or message.text == 'Назад':
+    elif message.text == 'Доставка':
         delivery(message)
 
 
@@ -224,10 +224,7 @@ def quantity_dish(message: types.Message):
     if message.text == 'Корзина':
         show_basket(message)
     elif message.text == 'Назад':
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
-                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
-
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+        delivery(message)
     elif message.text == 'Вернуться на главную страницу':
         bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
