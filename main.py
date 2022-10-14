@@ -37,7 +37,7 @@ def booking_or_delivery(message):
         bot.send_message(message.from_user.id, BOOKING_REQUEST_DATE,
                          reply_markup=show_calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
-    elif message.text == 'Доставка' and message.text == 'Назад':
+    elif message.text == 'Доставка' or message.text == 'Назад':
         global client
         client = message.from_user.id
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
