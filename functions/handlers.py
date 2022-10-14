@@ -81,7 +81,7 @@ def accept_admin(client, phone_number, method_pay, address, takeaway):
 
 def accept_client(client, phone_number, method_pay, address, takeaway):
     goods = deliveryDB.get_order(client)
-    order_admin = f'<b>Ваш заказ</b>\n' \
+    order_client = f'<b>Ваш заказ</b>\n' \
             f'Тип заказа: <b>{takeaway if takeaway else "Доставка 🚘"}</b>\n' \
             f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
             f'Номер телефона: <b>{phone_number}</b>\n' \
@@ -89,10 +89,10 @@ def accept_client(client, phone_number, method_pay, address, takeaway):
     total = 0
     for good in goods:
         total += int(good[-1])
-        order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_admin += '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя отадреса доставки)\n\n' \
+        order_client += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_client += '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя отадреса доставки)</b>\n\n' \
                    'Для связи с оператором @seshsb'.format(total,).replace(',', ' ')
-    bot.send_message(client, order_admin, parse_mode='html', reply_markup=accepting_order())
+    bot.send_message(client, order_client, parse_mode='html', reply_markup=accepting_order())
     deliveryDB.checkout(client, address, phone_number)
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPT.value)
 
