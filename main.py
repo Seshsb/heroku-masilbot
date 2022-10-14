@@ -29,7 +29,7 @@ def back_to_menu(message: types.Message):
         bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -42,7 +42,7 @@ def booking_or_delivery(message: types.Message):
         elif message.text == 'Доставка':
             delivery(message)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -54,7 +54,7 @@ def booking(message: types.Message):
                          reply_markup=show_calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -86,7 +86,7 @@ def callback_date(call: CallbackQuery):
             )
             bot.send_message(call.from_user.id, f"{calendar_1}: Отменен")
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -109,7 +109,7 @@ def reserve_time(message: types.Message):
         else:
             bot.send_message(message.from_user.id, BOOKING_FAILED_TIME)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 @bot.callback_query_handler(
@@ -127,7 +127,7 @@ def inline_seating_category(call: types.CallbackQuery):
                            reply_markup=choice_cabins(date_time))
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -142,7 +142,7 @@ def inline_choice_table(call: types.CallbackQuery):
         bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE, reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -157,7 +157,7 @@ def request_people(message: types.Message):
             bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -171,7 +171,7 @@ def request_contact(message):
         bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -185,7 +185,7 @@ def phone(message):
         bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -204,7 +204,7 @@ def get_first_name(message):
                                                f'Количество человек: {people}', reply_markup=booking_confirm())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -221,7 +221,7 @@ def inline_confirmation(call: types.CallbackQuery):
             bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -238,7 +238,7 @@ def delivery(message):
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -260,7 +260,7 @@ def dishes(message: types.Message):
                              reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -296,7 +296,7 @@ def quantity_dish(message: types.Message):
                                  reply_markup=numbers())
                 dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -323,7 +323,7 @@ def basket(message: types.Message):
 
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -345,7 +345,7 @@ def action_in_basket(message: types.Message):
             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
             dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -373,7 +373,7 @@ def takeaway_location_handler(message: types.Message):
             bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -388,7 +388,7 @@ def takeaway_request_contact(message):
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -404,7 +404,7 @@ def takeaway_phone(message):
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
 
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -419,7 +419,7 @@ def request_contact(message):
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -434,7 +434,7 @@ def delivery_phonenumber(message: types.Message):
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -449,7 +449,7 @@ def inline_payment_method(call: types.CallbackQuery):
             method_pay = 'PayMe 💵'
         accept_client(client, phone_number, method_pay, address, takeaway)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -458,14 +458,13 @@ def inline_payment_method(call: types.CallbackQuery):
 def accepting_client(call: types.CallbackQuery):
     try:
         if call.data == 'accept':
-            deliveryDB.accept_order(client)
             accept_admin(client, phone_number, method_pay, address, takeaway)
         elif call.data == 'cancel':
             bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
             deliveryDB.cancel_order(client)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 @bot.message_handler(
@@ -477,7 +476,7 @@ def delivery_amount(message: types.Message):
         bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
         dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
@@ -486,13 +485,14 @@ def delivery_amount(message: types.Message):
 def accepting_admin(call: types.CallbackQuery):
     try:
         if call.data == 'accept':
+            deliveryDB.accept_order(client)
             show_order(client, phone_number, method_pay, address, takeaway, amount)
         elif call.data == 'cancel':
             bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
             deliveryDB.cancel_order(client)
     except Exception as err:
-        bot.send_message(275755142, f'Ошибка:\n'
+        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
