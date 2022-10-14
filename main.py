@@ -14,19 +14,19 @@ from keyboards.delivery.default.navigations import *
 from keyboards.delivery.inline.navigations import *
 from data.config import *
 from keyboards.booking.inline.navigations import *
-from functions.handlers import get_address_from_coords, show_basket, show_order_admin, show_order_client
+from functions.handlers import get_address_from_coords, show_basket, accept_admin, show_order, accept_client
 
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+    bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_START.value)
 def back_to_menu(message: types.Message):
-    bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+    bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
     dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
@@ -173,13 +173,13 @@ def inline_confirmation(call: types.CallbackQuery):
         if call.data == 'confirm':
             bookingDB.start_booking(call.from_user.id, table_id, datetime_start, datetime_end, phone_number,
                                     first_name, people)
-            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=back_to_menu())
+            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=general_nav.main_page())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:
             bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=back_to_menu())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
-    except:
-        bot.send_message(call.from_user.id, '')
+    except Exception as err:
+        bot.send_message(call.from_user.id, err)
 
 
 ############################################################################################
@@ -195,7 +195,7 @@ def dishes(message: types.Message):
     if message.text == 'Корзина':
         show_basket(message)
     elif message.text == 'Назад':
-        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     else:
         global category
@@ -220,7 +220,7 @@ def quantity_dish(message: types.Message):
 
         return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     elif message.text == 'Вернуться на главную страницу':
-        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     else:
         global dish
@@ -228,15 +228,16 @@ def quantity_dish(message: types.Message):
         dish = message.text
         detail = deliveryDB.get_dish(dish)
         if detail[-1]:
-            bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'), f'<b>{detail[1]}</b>\n\n'
-                                                                              f'{detail[2]} сум', parse_mode='html',
+            bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'),
+                           '<b>{0}</b>\n\n'
+                           '{1:,} сум'.format(detail[1], detail[2]).replace(",", " "), parse_mode='html',
                            reply_markup=types.ReplyKeyboardRemove())
             bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                              reply_markup=numbers())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
         else:
-            bot.send_message(message.from_user.id, f'<b>{detail[1]}</b>\n\n'
-                                                 f'{detail[2]} сум',
+            bot.send_message(message.from_user.id, '<b>{0}</b>\n\n'
+                                                   '{1:,} сум'.format(detail[1], detail[2]).replace(",", " "),
                            parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
             bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
                              reply_markup=numbers())
@@ -257,7 +258,7 @@ def basket(message: types.Message):
                          reply_markup=numbers())
         return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     elif message.text == 'Вернуться на главную страницу':
-        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     else:
         global quantity
@@ -289,7 +290,7 @@ def action_in_basket(message: types.Message):
                          parse_mode='html', reply_markup=send_location())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
     elif message.text == 'Вернуться на главную страницу':
-        bot.send_message(message.chat.id, START, reply_markup=navigation.booking_or_delivery())
+        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
@@ -369,12 +370,19 @@ def inline_payment_method(call: types.CallbackQuery):
         method_pay = 'Наличными 💵'
     elif call.data == 'payme':
         method_pay = 'PayMe 💵'
-    deliveryDB.checkout(call.from_user.id, address, phone_number)
-    bot.send_message(call.from_user.id,
-                     f'Спасибо, ваш заказ <b>#{deliveryDB.order_id(call.from_user.id)}</b> '
-                     f'передан на обработку. Ожидайте подтверждения заказа от бота.',
-                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
-    show_order_admin(client, phone_number, method_pay, address, takeaway)
+    accept_client(client, phone_number, method_pay, address, takeaway)
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_DELIVERY_CLIENT_ACCEPT.value)
+def accepting_client(call: types.CallbackQuery):
+    if call.data == 'accept':
+        deliveryDB.accept_order(client)
+        accept_admin(client, phone_number, method_pay, address, takeaway)
+    elif call.data == 'cancel':
+        bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
+                         reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
+        deliveryDB.cancel_order(client)
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_AMOUNT.value)
@@ -382,28 +390,14 @@ def delivery_amount(message: types.Message):
     global amount
     amount = int(message.text)
     bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
-    dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
+    dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
 
 
 @bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_ADMIN_ACCEPTING.value)
+    func=lambda call: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_ADMIN_ACCEPT.value)
 def accepting_admin(call: types.CallbackQuery):
     if call.data == 'accept':
-        show_order_client(client, phone_number, method_pay, address, takeaway, amount)
-    elif call.data == 'cancel':
-        bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
-                         reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
-        deliveryDB.cancel_order(client)
-
-
-@bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_DELIVERY_CLIENT_ACCEPTING.value)
-def accepting_client(call: types.CallbackQuery):
-    if call.data == 'accept':
-        deliveryDB.accept_order(client)
-        bot.send_message(client, 'Спасибо, мы начали готовить ваш заказ #88527. Ожидайте доставку в течение 60 минут 🚗\n'
-                                 'Доставка может занять около 80 минут на обед и ужин во время пика\n'
-                                 'С вами свяжется оператор ✅')
+        show_order(client, phone_number, method_pay, address, takeaway, amount)
     elif call.data == 'cancel':
         bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
                          reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))

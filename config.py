@@ -30,5 +30,5 @@ class States(Enum):
     S_DELIVERY_PHONENUMBER = 'delivery phonenumber'
     S_DELIVERY_PAYMENT_METHOD = 'payment method'
     S_DELIVERY_AMOUNT = 'delivery amount'
-    S_DELIVERY_ADMIN_ACCEPTING = 'admin accepting'
-    S_DELIVERY_CLIENT_ACCEPTING = 'client accepting'
+    S_DELIVERY_ADMIN_ACCEPT = 'admin accepting'
+    S_DELIVERY_CLIENT_ACCEPT = 'client accepting'

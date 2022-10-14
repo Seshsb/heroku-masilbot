@@ -178,8 +178,9 @@ class Delivery(DataBase):
 
     def checkout(self, user_id, address, phone_number):
         with self.connection:
-            self.cursor.execute('SET TIME ZONE "Asia/Tashkent"')
+            self.cursor.execute('SET TIME ZONE "Asia/Tashkent";')
             self.cursor.execute('SELECT price FROM basket WHERE user_id=%s and ordered=false;', (user_id, ))
+            self.cursor.execute('UPDATE users SET phone_number=%s WHERE id=%s;', (phone_number, user_id))
             total_price = 0
             for price in self.cursor.fetchall():
                 total_price += price[0]
@@ -189,7 +190,7 @@ class Delivery(DataBase):
                                 ');', (address, total_price, user_id, phone_number))
             self.cursor.execute('select id from basket where user_id=%s and ordered=False;', (user_id, ))
             for basket in self.cursor.fetchall():
-                self.cursor.execute('UPDATE orders SET baskets_id=array_append(baskets_id, %s) where user_id=275755142;', (basket[0], ))
+                self.cursor.execute('UPDATE orders SET baskets_id=array_append(baskets_id, %s) where user_id=%s;', (basket[0], user_id))
             self.connection.commit()
 
     def order_id(self, user_id):
