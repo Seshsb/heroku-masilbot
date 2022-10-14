@@ -1,6 +1,5 @@
-address = 'dsfsdf'
-order = f'<b>Заказ #</b>\n' \
-        f'{"Адрес: ", address if address else ""}\n' \
-        f'Номер'
-
-print(order)
+import traceback
+try:
+    name = int(input())
+except Exception as err:
+    print(traceback.format_exc())
