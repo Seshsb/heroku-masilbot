@@ -157,14 +157,13 @@ def request_people(message: types.Message):
             if seating_category == 2:
                 min_capacity = table_id[1]
                 max_capacity = table_id[2]
-                if min_capacity > int(people) > max_capacity:
+                if not min_capacity > int(people) > max_capacity:
                     bot.send_message(message.from_user.id, 'Извините, но число людей не может превышать допустимого количества\n'
                                                            f'В эту кабинку разрешается от {min_capacity} до {max_capacity}')
                     bot.send_message(message.from_user.id, BOOKING_REQUEST_CATEGORY, reply_markup=inline_category())
                     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-            else:
-                bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-                dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+            bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+            dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
