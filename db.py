@@ -54,7 +54,7 @@ class Booking(DataBase):
         with self.connection:
             self.cursor.execute('SELECT id, min_capacity, max_capacity FROM tables WHERE name=%s and seating_category=%s;',
                                 (table, seating_category))
-            return self.cursor.fetchone()
+            return self.cursor.fetchall()
 
     def seating_category(self, id):
         with self.connection:
