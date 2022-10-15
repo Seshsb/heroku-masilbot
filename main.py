@@ -155,9 +155,10 @@ def request_people(message: types.Message):
         people = message.text
         if people.isdigit():
             if seating_category == 2:
+                bot.send_message(message.from_user.id, table_id)
                 min_capacity = table_id[1]
                 max_capacity = table_id[2]
-                if min_capacity >= int(people) <= max_capacity:
+                if int(people) >= min_capacity and int(people) <= max_capacity:
                     bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
                     dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
                 else:
