@@ -138,7 +138,7 @@ def inline_choice_table(call: types.CallbackQuery):
         global table_id
         global table
         table = call.data
-        table_id = bookingDB.table_id(table, seating_category)
+        table_id = bookingDB.table_id(table, seating_category)[0]
         bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE, reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
     except Exception as err:
