@@ -153,9 +153,17 @@ def request_people(message: types.Message):
     try:
         global people
         people = message.text
-        if people.isdigit():  # Сделать обработку людей
-            bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
-            dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+        if people.isdigit():
+            min_capacity = table_id[1]
+            max_capacity = table_id[2]
+            if min_capacity > int(people) > max_capacity:
+                bot.send_message(message.from_user.id, 'Извините, но число людей не может превышать допустимого количества\n'
+                                                       f'В эту кабинку разрешается от {min_capacity} до {max_capacity}')
+                bot.send_message(message.from_user.id, BOOKING_REQUEST_CATEGORY, reply_markup=inline_category())
+                dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
+            else:
+                bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+                dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
@@ -213,7 +221,7 @@ def get_first_name(message):
 def inline_confirmation(call: types.CallbackQuery):
     try:
         if call.data == 'confirm':
-            bookingDB.start_booking(call.from_user.id, table_id, datetime_start, datetime_end, phone_number,
+            bookingDB.start_booking(call.from_user.id, table_id[0], datetime_start, datetime_end, phone_number,
                                     first_name, people)
             bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=general_nav.main_page())
             dbworker.set_states(call.from_user.id, config.States.S_START.value)

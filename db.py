@@ -52,7 +52,7 @@ class Booking(DataBase):
 
     def table_id(self, table, seating_category):
         with self.connection:
-            self.cursor.execute('SELECT id FROM tables WHERE name=%s and seating_category=%s;',
+            self.cursor.execute('SELECT id, min_capacity, max_capacity FROM tables WHERE name=%s and seating_category=%s;',
                                 (table, seating_category))
             return self.cursor.fetchone()
 
@@ -65,6 +65,10 @@ class Booking(DataBase):
         with self.connection:
             free_tables = []
             busy_tables = []
+            self.cursor.execute('SET TIME ZONE "Asia/Tashkent";')
+            self.cursor.execute('SELECT id FROM booking;')
+            for table in self.cursor.fetchall():
+                self.cursor.execute('DELETE FROM booking WHERE end_at<now() and id=%s', (table,))
             self.cursor.execute('SELECT start_at, end_at, tbl_id FROM booking WHERE date(start_at)=%s;',
                                 (time.date(),))
             if self.cursor.fetchall():
@@ -77,19 +81,21 @@ class Booking(DataBase):
                             range_hours.append(time_hours)
                     if time.hour in range_hours:
                         self.cursor.execute(
-                            'SELECT name FROM tables WHERE seating_category=%s and id=%s ORDER BY id;',
+                            'SELECT name, min_capacity, max_capacity FROM tables WHERE seating_category=%s and id=%s ORDER BY id;',
                             (category, table,))
                         busy_tables.append(self.cursor.fetchone())
                 self.cursor.execute(
-                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
+                    'SELECT name, min_capacity, max_capacity FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
                 result = self.cursor.fetchall()
                 for tbl in result:
                     if tbl not in busy_tables:
                         free_tables.append(tbl)
             else:
                 self.cursor.execute(
-                    'SELECT name FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
+                    'SELECT name, min_capacity, max_capacity FROM tables WHERE seating_category=%s ORDER BY id;', (category,))
                 free_tables = self.cursor.fetchall()
+
+            self.connection.commit()
 
             return free_tables
 
@@ -99,6 +105,11 @@ class Booking(DataBase):
                 'SELECT name FROM tables WHERE seating_category=1 ORDER BY id;')
             result = self.cursor.fetchall()
             return result
+    # def check(self):
+    #     self.cursor.execute('SELECT id FROM booking;')
+    #     for table in self.cursor.fetchall():
+    #         self.cursor.execute('DELETE FROM booking WHERE end_at<now() and id=%s', (table, ))
+    #         self.connection.commit()
 
 
 class Delivery(DataBase):
@@ -224,6 +235,7 @@ class Delivery(DataBase):
 
 bookingDB = Booking()
 deliveryDB = Delivery()
+print(bookingDB.check())
 # print(deliveryDB.test(275755142, 'qweqeqeqwe'))
 # deliveryDB.insert_toBasket(21, 1, 105000, 275755142)
 # deliveryDB.delete_good_from_basket('Каша с полезными продуктами', 275755142)
@@ -231,6 +243,7 @@ deliveryDB = Delivery()
 # deliveryDB.add_image_to_db()
 # print(deliveryDB.foods_name(275755142))
 # print(operations.result())
-# # operations.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2)
+print(bookingDB.check_time_reserve(2, datetime.strptime('2022-09-30 15:00', '%Y-%m-%d %H:%M')))
+# print(bookingDB.start_booking(275755142, 2, '2022-09-30 15:00', '2022-09-30 18:00', '+998900336635', 'Ruslan', 2))
 # operations.potencially_time(datetime.strptime('2022-09-29 15:00', '%Y-%m-%d %H:%M'))
 # operations.tables(datetime.strptime('2022-10-05 18:00', '%Y-%m-%d %H:%M'))
