@@ -1,10 +1,11 @@
 import traceback
 import telebot.apihelper
+from telebot.types import CallbackQuery
+
 import dbworker
 import config
 
 from datetime import datetime
-from telebot_calendar import *
 from connections import *
 from flask import request
 from keyboards import general_nav
@@ -18,6 +19,17 @@ from functions.handlers import get_address_from_coords, show_basket, accept_admi
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
+    try:
+        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+    except Exception as err:
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
+                                    f'{traceback.format_exc()}')
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_END.value)
+def end(message: types.Message):
     try:
         bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
@@ -221,7 +233,7 @@ def inline_confirmation(call: types.CallbackQuery):
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:
             bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=general_nav.main_page())
-            dbworker.set_states(call.from_user.id, config.States.S_START.value)
+            dbworker.set_states(call.from_user.id, config.States.S_END.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
@@ -314,14 +326,19 @@ def basket(message: types.Message):
         elif message.text == 'Вернуться на главную страницу':
             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        global quantity
-        quantity = int(message.text)
-        total_price = int(detail[2]) * quantity
-        deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-        bot.send_message(message.from_user.id, DELIVERY_BASKET,
-                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+        if message.text.isdigit() and int(message.text) > 0:
+            global quantity
+            quantity = int(message.text)
+            total_price = int(detail[2]) * quantity
+            deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
+            bot.send_message(message.from_user.id, DELIVERY_BASKET,
+                             reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
+            return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+        bot.send_message(message.from_user.id, 'Количество порций должны состоять из цифр и не могут быть меньше нуля.\n'
+                                               'Попробуйте снова.')
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
@@ -415,42 +432,6 @@ def request_phone(message):
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
-
-
-# @bot.message_handler(
-#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
-#     content_types=['contact'])
-# def request_contact(message):
-#     try:
-#         if message.text == 'Вернуться на главную страницу':
-#             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
-#             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-#         global phone_number
-#         phone_number = '+' + message.contact.phone_number
-#         bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
-#                          parse_mode='html', reply_markup=payment_method())
-#         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
-#     except Exception as err:
-#         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-#                                     f'{traceback.format_exc()}')
-
-
-# @bot.message_handler(
-#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
-#     regexp=r'\+998[0-9]{9,9}$')
-# def delivery_phonenumber(message: types.Message):
-#     try:
-#         if message.text == 'Вернуться на главную страницу':
-#             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
-#             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-#         global phone_number
-#         phone_number = message.text
-#         bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
-#                          parse_mode='html', reply_markup=payment_method())
-#         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
-#     except Exception as err:
-#         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-#                                     f'{traceback.format_exc()}')
 
 
 @bot.callback_query_handler(

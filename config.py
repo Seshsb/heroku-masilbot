@@ -9,6 +9,7 @@ class States(Enum):
     """
     S_START = 'start'  # Начало нового диалога
     S_ACTION_CHOICE = "choice"
+    S_END = 'end'
 
     # Бронирование
     S_BOOKING = 'booking'

@@ -2,7 +2,7 @@ import datetime
 
 import telebot
 from telebot import types
-from telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
+from functions.telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
 
 from db import bookingDB
 
