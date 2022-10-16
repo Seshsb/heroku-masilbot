@@ -337,7 +337,6 @@ def basket(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
         bot.send_message(message.from_user.id, 'Количество порций должны состоять из цифр и не могут быть меньше нуля.\n'
                                                'Попробуйте снова.')
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
 
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
