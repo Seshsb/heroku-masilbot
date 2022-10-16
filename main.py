@@ -481,8 +481,9 @@ def accepting_client(call: types.CallbackQuery):
     func=lambda message: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_AMOUNT.value)
 def delivery_amount(message: types.Message):
     try:
-        global amount
-        amount = int(message.text)
+        if not takeaway:
+            global amount
+            amount = int(message.text)
         bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
         dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
     except Exception as err:

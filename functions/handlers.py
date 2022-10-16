@@ -71,7 +71,8 @@ def accept_admin(client, phone_number, method_pay, address, takeaway):
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     order_admin += '\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
     bot.send_message(275755142, order_admin, parse_mode='html')
-    bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
+    if takeaway:
+        bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
     bot.send_message(client,
                      f'Спасибо за ожидание, ваш заказ <b>#{deliveryDB.order_id(client)}</b> '
                      f'передан на обработку. С вами свяжется оператор.',
@@ -81,6 +82,12 @@ def accept_admin(client, phone_number, method_pay, address, takeaway):
 
 def accept_client(client, phone_number, method_pay, address, takeaway):
     goods = deliveryDB.get_order(client)
+    if takeaway:
+        order_client = f'<b>Ваш заказ</b>\n' \
+                       f'Тип заказа: <b>{takeaway}</b>\n' \
+                       f'Адрес ресторана: <b>Мирабад, 41</b>\n' \
+                       f'Номер телефона: <b>{phone_number}</b>\n' \
+                       f'Метод оплаты: <b>{method_pay}</b>\n\n\n'
     order_client = f'<b>Ваш заказ</b>\n' \
             f'Тип заказа: <b>{takeaway if takeaway else "Доставка 🚘"}</b>\n' \
             f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
