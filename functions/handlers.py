@@ -52,7 +52,7 @@ def show_basket(message: types.Message):
         bot.send_message(message.from_user.id, cart, reply_markup=order(message.from_user.id), parse_mode='html')
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     else:
-        bot.send_message(message.from_user.id, '<b>Корзина пуста</b>', parse_mode='html')
+        bot.send_message(message.from_user.id, '<b>\nКорзина пуста.\n</b>', parse_mode='html')
         bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)

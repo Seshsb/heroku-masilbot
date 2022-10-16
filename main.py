@@ -306,23 +306,22 @@ def quantity_dish(message: types.Message):
 def basket(message: types.Message):
     try:
         if message.text == 'Корзина':
-            show_basket(message)
+            return show_basket(message)
         elif message.text == 'Назад':
-            bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
-                             reply_markup=numbers())
+            bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+                             reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
         elif message.text == 'Вернуться на главную страницу':
             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
-            dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        else:
-            global quantity
-            quantity = int(message.text)
-            total_price = int(detail[2]) * quantity
-            deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-            bot.send_message(message.from_user.id, DELIVERY_BASKET,
-                             reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
+            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+        global quantity
+        quantity = int(message.text)
+        total_price = int(detail[2]) * quantity
+        deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
+        bot.send_message(message.from_user.id, DELIVERY_BASKET,
+                         reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
-            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
+        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
