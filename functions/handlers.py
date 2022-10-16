@@ -70,17 +70,15 @@ def accept_admin(client, phone_number, method_pay, address, takeaway):
         total += int(good[-1])
         order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     order_admin += '\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
-    bot.send_message(275755142, order_admin, parse_mode='html')
-    if takeaway:
-        global amount
-        amount = 0
-        bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
-        return dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
-    bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
     bot.send_message(client,
                      f'Спасибо за ожидание, ваш заказ <b>#{deliveryDB.order_id(client)}</b> '
                      f'передан на обработку. С вами свяжется оператор.',
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(275755142, order_admin, parse_mode='html')
+    if takeaway:
+        bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
+        return dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
+    bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
     return dbworker.set_states(275755142, config.States.S_DELIVERY_AMOUNT.value)
 
 

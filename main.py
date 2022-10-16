@@ -500,7 +500,10 @@ def delivery_amount(message: types.Message):
 def accepting_admin(call: types.CallbackQuery):
     try:
         if call.data == 'accept':
-            show_order(client, phone_number, method_pay, address, takeaway, amount)
+            if takeaway:
+                show_order(client, phone_number, method_pay, address, takeaway, amount=0)
+            else:
+                show_order(client, phone_number, method_pay, address, takeaway, amount)
         elif call.data == 'cancel':
             bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
