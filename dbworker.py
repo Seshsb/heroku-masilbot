@@ -10,10 +10,12 @@ def get_current_state(user_id):
             return config.States.S_ACTION_CHOICE.value
 
 
-def set_states(user_id, value=config.States.S_START.value):
+def set_states(user_id, value):
     with Vedis(config.vdb_file) as db:
         try:
             db[user_id] = value
             return True
         except:
             raise Exception
+
+print(get_current_state(275755142))
