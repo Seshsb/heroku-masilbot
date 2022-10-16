@@ -109,11 +109,17 @@ def accept_client(client, phone_number, method_pay, address, takeaway):
 def show_order(client, phone_number, method_pay, address, takeaway, amount):
     goods = deliveryDB.get_order(client)
     order_client = f'<b>Заказ #{deliveryDB.order_id(client)}</b>\n' \
-            f'Тип заказа: <b>{takeaway if takeaway else "Доставка 🚘"}</b>\n' \
+            f'Тип заказа: <b> "Доставка 🚘"</b>\n' \
             f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
             f'Номер телефона: <b>{phone_number}</b>\n' \
             f'Метод оплаты: <b>{method_pay}</b>\n' \
             f'Время получения заказа: <b>В ближайшее время</b>\n\n\n'
+    if takeaway:
+        order_client = f'<b>Ваш заказ</b>\n' \
+                       f'Тип заказа: <b>{takeaway}</b>\n' \
+                       f'Адрес ресторана: <b>Мирабад, 41</b>\n' \
+                       f'Номер телефона: <b>{phone_number}</b>\n' \
+                       f'Метод оплаты: <b>{method_pay}</b>\n\n\n'
     total = 0
     for good in goods:
         total += int(good[-1])
