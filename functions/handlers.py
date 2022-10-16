@@ -12,6 +12,13 @@ from keyboards.delivery.default.navigations import *
 from keyboards.delivery.inline.navigations import accepting_order
 
 
+########################################################################################################
+# Бронирование
+# def request_phone_number(message):
+
+
+########################################################################################################
+# Доставка
 def get_address_from_coords(coords):
     #заполняем параметры, которые описывались выже. Впиши в поле apikey свой токен!
     PARAMS = {

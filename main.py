@@ -361,13 +361,16 @@ def takeaway_location_handler(message: types.Message):
         if message.text == 'На вынос 🏃🏻‍♂️':
             takeaway = message.text
             bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
-            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value)
+            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
         elif message.content_type == 'location':
             latitude = message.location.latitude
             longitude = message.location.longitude
             address = get_address_from_coords(f'{longitude},{latitude}')
             bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
+        elif message.text == 'Вернуться на главную страницу':
+            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             address = message.text
             bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
@@ -378,41 +381,13 @@ def takeaway_location_handler(message: types.Message):
 
 
 @bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value,
-    content_types=['contact'])
-def takeaway_request_contact(message):
-    try:
-        global phone_number
-        phone_number = '+' + message.contact.phone_number
-        bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
-                         parse_mode='html', reply_markup=payment_method())
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
-    except Exception as err:
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-                                    f'{traceback.format_exc()}')
-
-
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_TAKEAWAY_PHONENUMBER.value,
-    regexp=r'\+998[0-9]{9}$')
-def takeaway_phone(message):
-    try:
-        global phone_number
-        phone_number = message.text
-        bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
-                         parse_mode='html', reply_markup=payment_method())
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
-
-    except Exception as err:
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-                                    f'{traceback.format_exc()}')
-
-
-@bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
     content_types=['contact'])
 def request_contact(message):
     try:
+        if message.text == 'Вернуться на главную страницу':
+            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global phone_number
         phone_number = '+' + message.contact.phone_number
         bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
@@ -425,17 +400,57 @@ def request_contact(message):
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
-    regexp=r'\+998[0-9]{9,9}$')
-def delivery_phonenumber(message: types.Message):
+    regexp=r'\+998[0-9]{9}$')
+def request_phone(message):
     try:
+        if message.text == 'Вернуться на главную страницу':
+            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global phone_number
         phone_number = message.text
         bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
+
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
+
+
+# @bot.message_handler(
+#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
+#     content_types=['contact'])
+# def request_contact(message):
+#     try:
+#         if message.text == 'Вернуться на главную страницу':
+#             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+#             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+#         global phone_number
+#         phone_number = '+' + message.contact.phone_number
+#         bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+#                          parse_mode='html', reply_markup=payment_method())
+#         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
+#     except Exception as err:
+#         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
+#                                     f'{traceback.format_exc()}')
+
+
+# @bot.message_handler(
+#     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
+#     regexp=r'\+998[0-9]{9,9}$')
+# def delivery_phonenumber(message: types.Message):
+#     try:
+#         if message.text == 'Вернуться на главную страницу':
+#             bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+#             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+#         global phone_number
+#         phone_number = message.text
+#         bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+#                          parse_mode='html', reply_markup=payment_method())
+#         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
+#     except Exception as err:
+#         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
+#                                     f'{traceback.format_exc()}')
 
 
 @bot.callback_query_handler(
