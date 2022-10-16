@@ -357,9 +357,8 @@ def action_in_basket(message: types.Message):
             bot.send_message(message.from_user.id, '<b>Введите адрес доставки</b>',
                              parse_mode='html', reply_markup=send_location())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
-        elif message.text == 'Вернуться на главную страницу':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
-            dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+        elif message.text == 'Вернуться в меню доставки':
+            delivery(message)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')

@@ -42,7 +42,7 @@ def numbers():
 def order(user_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
     cancel = [types.KeyboardButton(text=f'❌ Удалить {food[0]}') for food in deliveryDB.foods_name(int(user_id))]
-    main_page = types.KeyboardButton('Вернуться на главную страницу')
+    main_page = types.KeyboardButton('Вернуться в меню доставки')
     markup.add(types.KeyboardButton('Оформить заказ'))
     markup.add(*cancel)
     markup.add(main_page)
