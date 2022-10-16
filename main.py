@@ -18,8 +18,12 @@ from functions.handlers import get_address_from_coords, show_basket, accept_admi
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
-    bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
-    dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+    try:
+        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+    except Exception as err:
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
+                                    f'{traceback.format_exc()}')
 
 
 @bot.message_handler(
