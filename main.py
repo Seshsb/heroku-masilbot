@@ -481,6 +481,7 @@ def accepting_client(call: types.CallbackQuery):
     func=lambda message: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_AMOUNT.value)
 def delivery_amount(message: types.Message):
     try:
+        amount = 0
         if not takeaway:
             global amount
             amount = int(message.text)

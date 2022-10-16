@@ -72,7 +72,9 @@ def accept_admin(client, phone_number, method_pay, address, takeaway):
     order_admin += '\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
     bot.send_message(275755142, order_admin, parse_mode='html')
     if takeaway:
-        bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
+        bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
+        dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
+    bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
     bot.send_message(client,
                      f'Спасибо за ожидание, ваш заказ <b>#{deliveryDB.order_id(client)}</b> '
                      f'передан на обработку. С вами свяжется оператор.',
