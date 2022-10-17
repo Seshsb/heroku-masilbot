@@ -7,6 +7,7 @@ class States(Enum):
     Мы используем БД Vedis, в которой хранимые значения всегда строки,
     поэтому и тут будем использовать тоже строки (str)
     """
+    S_CHOICE_LANGUAGE = 'choice language'
     S_START = 'start'  # Начало нового диалога
     S_ACTION_CHOICE = "choice"
     S_END = 'end'

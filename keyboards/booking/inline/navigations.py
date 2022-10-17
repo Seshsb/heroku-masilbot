@@ -2,15 +2,19 @@ import datetime
 
 import telebot
 from telebot import types
+
+from data.config import trans
 from functions.telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
 
 from db import bookingDB
 
 
-def inline_category():
+def inline_category(lang):
     markup = types.InlineKeyboardMarkup(row_width=2)
-    tables = types.InlineKeyboardButton(text='Столы', callback_data='Столы')
-    cabins = types.InlineKeyboardButton(text='Кабинки', callback_data='Кабинки')
+    tables = types.InlineKeyboardButton(text=trans['booking'][f'TABLES_{lang}'],
+                                        callback_data=trans['booking'][f'TABLES_{lang}'])
+    cabins = types.InlineKeyboardButton(text=trans['booking'][f'CABINS_{lang}'],
+                                        callback_data=trans['booking'][f'CABINS_{lang}'])
     markup.add(tables, cabins)
 
     return markup
@@ -25,19 +29,20 @@ def choice_table(reserve_time):
     return markup
 
 
-def choice_cabins(reserve_time):
+def choice_cabins(reserve_time, lang):
     markup = types.InlineKeyboardMarkup(row_width=2, )
-    tables = [types.InlineKeyboardButton(text=f'{table[0]} (вмс.{table[1]}~{table[2]})', callback_data=str(table[0])) for table in
-              bookingDB.cabins(reserve_time)]
+    tables = [types.InlineKeyboardButton(text=f'{table[0]} '
+                                              f'({trans["booking"][f"PEOPLE_{lang}"]}{table[1]}~{table[2]})',
+                                         callback_data=str(table[0])) for table in bookingDB.cabins(reserve_time)]
     markup.add(*tables)
 
     return markup
 
 
-def booking_confirm():
+def booking_confirm(lang):
     markup = types.InlineKeyboardMarkup(row_width=2)
-    confirm = types.InlineKeyboardButton('Подтвердить', callback_data='confirm')
-    cancel = types.InlineKeyboardButton('Отменить', callback_data='cancel')
+    confirm = types.InlineKeyboardButton(trans['booking'][f'ACCEPT_{lang}'], callback_data='confirm')
+    cancel = types.InlineKeyboardButton(trans['booking'][f'CANCEL_{lang}'], callback_data='cancel')
     markup.add(confirm, cancel)
 
     return markup

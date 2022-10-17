@@ -44,98 +44,87 @@ def get_address_from_coords(coords):
         return "error"
 
 
-def show_basket(message: types.Message):
+def show_basket(message: types.Message, lang):
 
     '''Вывод корзины'''
 
     goods = deliveryDB.show_basket(message.from_user.id)
-    cart = f'<b>Корзина:</b>\n\n\n'
+    cart = trans['delivery']['DELIVERY_CART_{}'.format(lang)]
+    detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
+    sum_total = trans['delivery']['DELIVERY_CART_TOTAL_{}'.format(lang)]
     total = 0
     if goods:
         for good in goods:
             total += int(good[-1])
-            cart += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-        cart += '\n<b>Итого: {0:,} сум</b>'.format(total).replace(',', ' ')
+            cart += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+        cart += sum_total.format(total).replace(',', ' ')
         bot.send_message(message.from_user.id, cart, reply_markup=order(message.from_user.id), parse_mode='html')
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     else:
-        bot.send_message(message.from_user.id, '<b>\nКорзина пуста.\n</b>', parse_mode='html')
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+        bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_CART_EMPTY_{}'.format(lang)], parse_mode='html')
+        bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_REQUEST_CATEGORY_{}'.format(lang)],
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
 
 
-def accept_admin(client, phone_number, method_pay, address, takeaway):
+def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
     goods = deliveryDB.get_order(client)
-    order_admin = f'<b>Заказ #{deliveryDB.order_id(client)}</b>\n' \
-            f'Тип заказа: {takeaway if takeaway else "Доставка 🚘"}\n' \
-            f'Адрес: {takeaway if takeaway else address}\n' \
-            f'Номер телефона: {phone_number}\n' \
-            f'Метод оплаты: {method_pay}\n\n\n'
+    order_admin = trans['delivery']['DELIVERY_ORDER_ACCEPT_ADMIN_{}'.format(lang)]\
+        .format(deliveryDB.order_id(client), address, phone_number, method_pay)
+    detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
+    sum_total = trans['delivery']['DELIVERY_ORDER_ADMIN_TOTAL_{}'.format(lang)]
+    if takeaway:
+        order_admin = trans['delivery']['DELIVERY_ORDER_ACCEPT_ADMIN_TAKEAWAY_{}'.format(lang)]\
+            .format(deliveryDB.order_id(client), phone_number, method_pay)
     total = 0
     for good in goods:
         total += int(good[-1])
-        order_admin += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_admin += '\n<b>Сумма заказа: {0:,} сум</b>'.format(total).replace(',', ' ')
-    bot.send_message(client,
-                     f'Спасибо за ожидание, ваш заказ <b>#{deliveryDB.order_id(client)}</b> '
-                     f'передан на обработку. С вами свяжется оператор.',
+        order_admin += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_admin += sum_total.format(total).replace(',', ' ')
+    bot.send_message(client, trans['delivery']['DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_{}'.format(lang)].format(deliveryDB.order_id(client)),
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
     bot.send_message(275755142, order_admin, parse_mode='html')
     if takeaway:
-        bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
+        bot.send_message(275755142, trans['delivery']['DELIVERY_QUESTION_ACCEPT_{}'.format(lang)],
+                         parse_mode='html', reply_markup=accepting_order())
         return dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
-    bot.send_message(275755142, "<b>Введите сумму доставки</b>", parse_mode='html')
+    bot.send_message(275755142, trans['delivery']['DELIVERY_COST_{}'.format(lang)], parse_mode='html')
     return dbworker.set_states(275755142, config.States.S_DELIVERY_AMOUNT.value)
 
 
-def accept_client(client, phone_number, method_pay, address, takeaway):
+def accept_client(client, phone_number, method_pay, address, takeaway, lang):
     goods = deliveryDB.get_order(client)
-    order_client = f'<b>Ваш заказ</b>\n' \
-                   f'Тип заказа: <b>{takeaway if takeaway else "Доставка 🚘"}</b>\n' \
-                   f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
-                   f'Номер телефона: <b>{phone_number}</b>\n' \
-                   f'Метод оплаты: <b>{method_pay}</b>\n\n\n'
+    order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_{}'.format(lang)]\
+        .format(deliveryDB.order_id(client), address, phone_number, method_pay)
+    detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
     if takeaway:
-        order_client = f'<b>Ваш заказ</b>\n' \
-                       f'Тип заказа: <b>{takeaway}</b>\n' \
-                       f'Адрес ресторана: <b>Мирабад, 41</b>\n' \
-                       f'Номер телефона: <b>{phone_number}</b>\n' \
-                       f'Метод оплаты: <b>{method_pay}</b>\n\n\n'
+        order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_TAKEAWAY_{}'.format(lang)]\
+            .format(deliveryDB.order_id(client), phone_number, method_pay)
     total = 0
     for good in goods:
         total += int(good[-1])
-        order_client += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_client += '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя отадреса доставки)</b>\n\n' \
-                   'Для связи с оператором @seshsb'.format(total,).replace(',', ' ')
+        order_client += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_client += trans['delivery']['DELIVERY_ORDER_CLIENT_TOTAL_{}'.format(lang)].format(total,).replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html', reply_markup=accepting_order())
     deliveryDB.checkout(client, address, phone_number)
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPT.value)
 
 
-def show_order(client, phone_number, method_pay, address, takeaway, amount):
+def show_order(client, phone_number, method_pay, address, takeaway, lang, amount):
     goods = deliveryDB.get_order(client)
-    order_client = f'<b>Заказ #{deliveryDB.order_id(client)}</b>\n' \
-            f'Тип заказа: <b> "Доставка 🚘"</b>\n' \
-            f'Адрес: <b>{takeaway if takeaway else address}</b>\n' \
-            f'Номер телефона: <b>{phone_number}</b>\n' \
-            f'Метод оплаты: <b>{method_pay}</b>\n' \
-            f'Время получения заказа: <b>В ближайшее время</b>\n\n\n'
+    order_client = trans['delivery']['DELIVERY_ORDER_{}'.format(lang)]\
+        .format(deliveryDB.order_id(client), address, phone_number, method_pay)
+    detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
     if takeaway:
-        order_client = f'<b>Ваш заказ</b>\n' \
-                       f'Тип заказа: <b>{takeaway}</b>\n' \
-                       f'Адрес ресторана: <b>Мирабад, 41</b>\n' \
-                       f'Номер телефона: <b>{phone_number}</b>\n' \
-                       f'Метод оплаты: <b>{method_pay}</b>\n\n\n'
+        order_client = trans['delivery']['DELIVERY_ORDER_TAKEAWAY_{}'.format(lang)]\
+            .format(deliveryDB.order_id(client), phone_number, method_pay)
     total = 0
     for good in goods:
         total += int(good[-1])
-        order_client += '<b>{0}</b>\n{1} x {2:,} = {3:,}\n\n'.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_client += '\n<b>Сумма заказа: {0:,} сум\n' \
-                   'Сумма доставки: {1:,}\n' \
-                   'Итого: {2:,}</b>\n\n'.format(total, amount, total+amount).replace(',', ' ')
+        order_client += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_client += trans['delivery']['DELIVERY_SUM_TOTAL_{}'.format(lang)].format(total, amount, total+amount).replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html')
     deliveryDB.accept_order(client)
-    bot.send_message(client, 'Хотите что-то еще?', reply_markup=general_nav.booking_or_delivery())
-    bot.send_message(client, 'Благодарим за заказ,', reply_markup=general_nav.booking_or_delivery())
+    bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)], reply_markup=general_nav.booking_or_delivery())
+    bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)], reply_markup=general_nav.booking_or_delivery())
     dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)

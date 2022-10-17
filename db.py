@@ -22,10 +22,36 @@ cursor = connection.cursor()
 
 
 class DataBase:
-    def __init__(self):
-        self.connection = psycopg2.connect(dbname=DATABASE_NAME, user=DATABASE_USERNAME,
-                                           password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
-        self.cursor = self.connection.cursor()
+    cursor = connection.cursor()
+    connection = psycopg2.connect(dbname=DATABASE_NAME, user=DATABASE_USERNAME,
+                                       password=DATABASE_PASSWORD, host=DATABASE_HOST, port=DATABASE_PORT)
+
+    @classmethod
+    def get_user(cls, user_id):
+        with cls.connection:
+            cls.cursor.execute('SELECT * FROM users WHERE id=%s;', (user_id,))
+            if cls.cursor.fetchone():
+                return True
+            return False
+
+    @classmethod
+    def get_user_lang(cls, user_id):
+        with cls.connection:
+            cls.cursor.execute('SELECT lang FROM users WHERE id=%s;', (user_id, ))
+            return cls.cursor.fetchone()
+
+    @classmethod
+    def register(cls, user_id, lang):
+        with cls.connection:
+            cls.cursor.execute('INSERT INTO users (id, lang) '
+                                    'VALUES (%s, %s);', (user_id, lang))
+            cls.connection.commit()
+
+    @classmethod
+    def change_lang(cls, user_id, lang):
+        with cls.connection:
+            cls.cursor.execute('UPDATE users SET lang=%s WHERE id=%s;', (lang, user_id))
+            cls.connection.commit()
 
 
 class Booking(DataBase):
@@ -113,35 +139,35 @@ class Booking(DataBase):
 
 
 class Delivery(DataBase):
-    def get_categories(self):
+    def get_categories(self, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT name_rus, name_kor FROM food_categories ORDER BY id;'
-            )
+                'SELECT name_%s FROM food_categories ORDER BY id;',
+                (lang, ))
             return self.cursor.fetchall()
 
-    def get_categoryId(self, name):
+    def get_categoryId(self, name, lang):
         with self.connection:
             try:
                 self.cursor.execute(
-                    'SELECT id FROM food_categories WHERE name_rus=%s;',
-                    (name,))
+                    'SELECT id FROM food_categories WHERE name_%s=%s;',
+                    (lang, name))
                 return self.cursor.fetchone()
             except:
                 raise ValueError
 
-    def get_dishes(self, cat_id):
+    def get_dishes(self, cat_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT name_rus, name_kor FROM foods WHERE category_id=%s ORDER BY id;',
-                (cat_id,))
+                'SELECT name_%s FROM foods WHERE category_id=%s ORDER BY id;',
+                (lang, cat_id))
             return self.cursor.fetchall()
 
-    def get_dish(self, name):
+    def get_dish(self, name, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT id, name_rus, price, image FROM foods WHERE name_rus=%s',
-                (name, ))
+                'SELECT id, name_%s, price, image FROM foods WHERE name_%s=%s',
+                (lang, lang, name))
             return self.cursor.fetchone()
 
     def insert_toBasket(self, dish_id, qnt, price, user_id):
@@ -165,26 +191,27 @@ class Delivery(DataBase):
                     (dish_id, qnt, price, user_id))
             self.connection.commit()
 
-    def show_basket(self, user_id):
+    def show_basket(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
+                'SELECT foods.name_%s, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (lang, user_id))
             return self.cursor.fetchall()
 
-    def foods_name(self, user_id):
+    def foods_name(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_rus '
+                'SELECT foods.name_%s '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (lang, user_id))
             return self.cursor.fetchall()
 
-    def delete_good_from_basket(self, name, user_id):
+    def delete_good_from_basket(self, name, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_rus=%s) and user_id=%s and ordered=false;', (name, user_id))
+                'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_%s=%s) and user_id=%s and ordered=false;',
+                (lang, name, user_id))
             self.connection.commit()
 
     def checkout(self, user_id, address, phone_number):
@@ -209,12 +236,12 @@ class Delivery(DataBase):
             self.cursor.execute('SELECT id FROM orders WHERE user_id=%s', (user_id, ))
             return self.cursor.fetchone()[0]
 
-    def get_order(self, user_id):
+    def get_order(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_rus, foods.price, basket.quantity, basket.price '
+                'SELECT foods.name_%s, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id,))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (lang, user_id))
             return self.cursor.fetchall()
 
     def cancel_order(self, user_id):
@@ -234,6 +261,7 @@ class Delivery(DataBase):
 
 
 bookingDB = Booking()
+bookingDB.table_id('2', 2)
 deliveryDB = Delivery()
 # print(bookingDB.check())
 # print(deliveryDB.test(275755142, 'qweqeqeqwe'))

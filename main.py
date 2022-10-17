@@ -1,15 +1,16 @@
 import traceback
 import telebot.apihelper
+import telebot.storage
 from telebot.types import CallbackQuery
 
 import dbworker
 import config
 
+from db import DataBase
 from datetime import datetime
 from connections import *
 from flask import request
 from keyboards import general_nav
-from keyboards.booking.default import register, navigation
 from keyboards.delivery.default.navigations import *
 from keyboards.delivery.inline.navigations import *
 from data.config import *
@@ -20,7 +21,37 @@ from functions.handlers import get_address_from_coords, show_basket, accept_admi
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     try:
-        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+        if not DataBase.get_user(message.from_user.id):
+            global lang
+            lang = DataBase.get_user_lang(message.from_user.id)
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'],
+                             reply_markup=general_nav.main_page(lang))
+            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
+                         reply_markup=general_nav.choice_lang())
+        dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
+    except Exception as err:
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
+                                    f'{traceback.format_exc()}')
+
+
+@bot.message_handler(
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_LANGUAGE.value)
+def action_choice(message: types.Message):
+    try:
+        global lang
+        if message.text == 'Русский 🇷🇺':
+            lang = trans['general']['LANGUAGE_RU']
+        elif message.text == '(Корейский) 🇰🇷':
+            lang = trans['general']['LANGUAGE_KO']
+
+        if DataBase.get_user(message.from_user.id):
+            DataBase.change_lang(message.from_user.id, lang)
+            bot.send_message(message.from_user.id, trans['general'][f'CHANGE_LANG_SUCCESS_{lang}'])
+        else:
+            DataBase.register(message.from_user.id, lang)
+        bot.send_message(message.chat.id, trans['general'][f'START_{lang}'],
+                         reply_markup=general_nav.main_page(lang))
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -31,7 +62,7 @@ def start(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_END.value)
 def end(message: types.Message):
     try:
-        bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+        bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
         dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -41,10 +72,14 @@ def end(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_ACTION_CHOICE.value)
 def booking_or_delivery(message: types.Message):
     try:
-        if message.text == 'Бронирование':
+        if message.text == trans['general'][f'BOOKING_{lang}']:
             booking(message)
-        elif message.text == 'Доставка':
+        elif message.text == trans['general'][f'DELIVERY_{lang}']:
             delivery(message)
+        elif message.text == trans['general'][f'CHANGE_LANG_{lang}']:
+            bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
+                             reply_markup=general_nav.choice_lang())
+            dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
@@ -54,7 +89,7 @@ def booking_or_delivery(message: types.Message):
 ############################################################################################
 def booking(message: types.Message):
     try:
-        bot.send_message(message.from_user.id, BOOKING_REQUEST_DATE,
+        bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
                          reply_markup=show_calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
     except Exception as err:
@@ -78,9 +113,10 @@ def callback_date(call: CallbackQuery):
             today_month = datetime.date.today().strftime('%m')
             today_day = datetime.date.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
-                bot.send_message(call.from_user.id, BOOKING_FAILED_DATE, reply_markup=show_calendar)
+                bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_FAILED_DATE_{lang}'],
+                                 reply_markup=show_calendar)
                 return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
-            bot.send_message(call.from_user.id, BOOKING_REQUEST_TIME, reply_markup=types.ReplyKeyboardRemove())
+            bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'], reply_markup=types.ReplyKeyboardRemove())
             dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
         elif action == "CANCEL":
             bot.send_message(
@@ -106,12 +142,13 @@ def reserve_time(message: types.Message):
                 date_time = datetime.datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + datetime.timedelta(hours=2)}'
-                bot.send_message(message.from_user.id, BOOKING_REQUEST_CATEGORY, reply_markup=inline_category())
+                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
+                                 reply_markup=inline_category(lang))
                 dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
             else:
-                bot.send_message(message.from_user.id, BOOKING_FAILED_TIME)
+                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
         else:
-            bot.send_message(message.from_user.id, BOOKING_FAILED_TIME)
+            bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
@@ -121,14 +158,16 @@ def reserve_time(message: types.Message):
 def inline_seating_category(call: types.CallbackQuery):
     try:
         global seating_category
-        if call.data == 'Столы':
+        if call.data == trans['booking'][f'TABLES_{lang}']:
             seating_category = 1
-            bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'), BOOKING_GET_TABLEID,
+            bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
+                           trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
                            reply_markup=choice_table(date_time))
-        elif call.data == 'Кабинки':
+        elif call.data == trans['booking'][f'CABINS_{lang}']:
             seating_category = 2
-            bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'), BOOKING_GET_TABLEID,
-                           reply_markup=choice_cabins(date_time))
+            bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
+                           trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
+                           reply_markup=choice_cabins(date_time, lang))
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
@@ -143,7 +182,7 @@ def inline_choice_table(call: types.CallbackQuery):
         global table
         table = call.data
         table_id = bookingDB.table_id(table, seating_category)[0]
-        bot.send_message(call.from_user.id, BOOKING_REQUEST_PEOPLE, reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_PEOPLE_{lang}'], reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
@@ -163,11 +202,13 @@ def request_people(message: types.Message):
                 max_capacity = table_id[2]
                 if not min_capacity <= int(people) <= max_capacity:
                     bot.send_message(message.from_user.id,
-                                     'Извините, но число людей не может превышать допустимого количества\n'
-                                     f'В эту кабинку разрешается от {min_capacity} до {max_capacity} человек')
-                    bot.send_message(message.from_user.id, BOOKING_REQUEST_CATEGORY, reply_markup=inline_category())
+                                     trans['booking'][f'BOOKING_FAILED_PEOPLE_{lang}'].format(min_capacity, max_capacity))
+                    bot.send_message(message.from_user.id,
+                                     trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
+                                     reply_markup=inline_category(lang))
                     return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-        bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=register.send_contact())
+        bot.send_message(message.from_user.id, trans['booking']['GET_PHONE_NUMBER_{lang}'],
+                         reply_markup=general_nav.send_contact(lang))
         return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
     except Exception as err:
@@ -182,7 +223,8 @@ def request_contact(message):
     try:
         global phone_number
         phone_number = '+' + message.contact.phone_number
-        bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.from_user.id, trans['booking']['GET_FIRST_NAME_{lang}'],
+                         reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -196,7 +238,8 @@ def phone(message):
     try:
         global phone_number
         phone_number = message.text
-        bot.send_message(message.from_user.id, GET_FIRST_NAME, reply_markup=types.ReplyKeyboardRemove())
+        bot.send_message(message.from_user.id, trans['booking']['GET_FIRST_NAME_{lang}'],
+                         reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -209,13 +252,10 @@ def get_first_name(message):
     try:
         global first_name
         first_name = message.text
-        bot.send_message(message.from_user.id, 'Детали бронирования:\n\n'
-                                               f'Имя: {first_name}\n'
-                                               f'Телефон: {phone_number}\n'
-                                               f'Дата и время: {datetime_start.replace("-", ".")}\n'
-                                               f'Посадочное место: {bookingDB.seating_category(seating_category)[0]}\n'
-                                               f'Стол: {table}\n'
-                                               f'Количество человек: {people}', reply_markup=booking_confirm())
+        bot.send_message(message.from_user.id, trans['booking']['BOOKING_DETAIL_{lang}']
+                         .format(first_name, phone_number, datetime_start.replace("-", "."),
+                                 bookingDB.seating_category(seating_category)[0], table, people),
+                         reply_markup=booking_confirm(lang))
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -229,10 +269,12 @@ def inline_confirmation(call: types.CallbackQuery):
         if call.data == 'confirm':
             bookingDB.start_booking(call.from_user.id, table_id[0], datetime_start, datetime_end, phone_number,
                                     first_name, people)
-            bot.send_message(call.from_user.id, BOOKING_CONFIRMED, reply_markup=general_nav.main_page())
+            bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
+                             reply_markup=general_nav.back_to_main_page(lang))
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:
-            bot.send_message(call.from_user.id, BOOKING_CANCELED, reply_markup=general_nav.main_page())
+            bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CANCELED_{lang}'],
+                             reply_markup=general_nav.back_to_main_page(lang))
             dbworker.set_states(call.from_user.id, config.States.S_END.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
@@ -248,7 +290,7 @@ def delivery(message: types.Message):
     try:
         global client
         client = message.from_user.id
-        bot.send_message(message.from_user.id, DELIVERY_REQUEST_CATEGORY,
+        bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_REQUEST_CATEGORY_{lang}'],
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     except Exception as err:
@@ -262,14 +304,14 @@ def delivery(message: types.Message):
 def dishes(message: types.Message):
     try:
         if message.text == 'Корзина':
-            show_basket(message)
+            show_basket(message, lang)
         elif message.text == 'Назад':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             global category
             category = message.text
-            bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_DISH_{lang}'],
                              reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except Exception as err:
@@ -282,11 +324,11 @@ def dishes(message: types.Message):
 def quantity_dish(message: types.Message):
     try:
         if message.text == 'Корзина':
-            show_basket(message)
+            show_basket(message, lang)
         elif message.text == 'Назад':
             delivery(message)
         elif message.text == 'Вернуться на главную страницу':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             global dish
@@ -298,14 +340,14 @@ def quantity_dish(message: types.Message):
                                '<b>{0}</b>\n\n'
                                '{1:,} сум'.format(detail[1], detail[2]).replace(",", " "), parse_mode='html',
                                reply_markup=types.ReplyKeyboardRemove())
-                bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_QUANTITY_{lang}'],
                                  reply_markup=numbers())
                 dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
             else:
                 bot.send_message(message.from_user.id, '<b>{0}</b>\n\n'
                                                        '{1:,} сум'.format(detail[1], detail[2]).replace(",", " "),
                                parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
-                bot.send_message(message.from_user.id, DELIVERY_REQUEST_QUANTITY,
+                bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_QUANTITY_{lang}'],
                                  reply_markup=numbers())
                 dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_QUANTITY.value)
     except Exception as err:
@@ -318,25 +360,24 @@ def quantity_dish(message: types.Message):
 def basket(message: types.Message):
     try:
         if message.text == 'Корзина':
-            return show_basket(message)
+            return show_basket(message, lang)
         elif message.text == 'Назад':
-            bot.send_message(message.from_user.id, DELIVERY_REQUEST_DISH,
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_DISH_{lang}'],
                              reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
         elif message.text == 'Вернуться на главную страницу':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         if message.text.isdigit() and int(message.text) > 0:
             global quantity
             quantity = int(message.text)
             total_price = int(detail[2]) * quantity
             deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
-            bot.send_message(message.from_user.id, DELIVERY_BASKET,
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_BASKET_{lang}'],
                              reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0]))
 
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
-        bot.send_message(message.from_user.id, 'Количество порций должны состоять из цифр и не могут быть меньше нуля.\n'
-                                               'Попробуйте снова.')
+        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_INCORRECT_QUANTITY_{lang}'])
 
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -352,7 +393,7 @@ def action_in_basket(message: types.Message):
         del_good = message.text[10:]
         if del_good in goods:
             deliveryDB.delete_good_from_basket(del_good, message.from_user.id)
-            show_basket(message)
+            show_basket(message, lang)
         elif message.text == 'Оформить заказ':
             bot.send_message(message.from_user.id, '<b>Введите адрес доставки</b>',
                              parse_mode='html', reply_markup=send_location())
@@ -375,20 +416,21 @@ def takeaway_location_handler(message: types.Message):
         address = None
         if message.text == 'На вынос 🏃🏻‍♂️':
             takeaway = message.text
-            bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
+            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
+                             reply_markup=general_nav.send_contact())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
         elif message.content_type == 'location':
             latitude = message.location.latitude
             longitude = message.location.longitude
             address = get_address_from_coords(f'{longitude},{latitude}')
-            bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
+            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'], reply_markup=general_nav.send_contact())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
         elif message.text == 'Вернуться на главную страницу':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             address = message.text
-            bot.send_message(message.from_user.id, GET_PHONE_NUMBER, reply_markup=general_nav.send_contact())
+            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'], reply_markup=general_nav.send_contact())
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -401,11 +443,11 @@ def takeaway_location_handler(message: types.Message):
 def request_contact(message):
     try:
         if message.text == 'Вернуться на главную страницу':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global phone_number
         phone_number = '+' + message.contact.phone_number
-        bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
     except Exception as err:
@@ -419,11 +461,11 @@ def request_contact(message):
 def request_phone(message):
     try:
         if message.text == 'Вернуться на главную страницу':
-            bot.send_message(message.chat.id, START, reply_markup=general_nav.booking_or_delivery())
+            bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))#
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global phone_number
         phone_number = message.text
-        bot.send_message(message.from_user.id, "<b>Выберите способ оплаты:</b>",
+        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],#
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
 
@@ -438,10 +480,10 @@ def inline_payment_method(call: types.CallbackQuery):
     try:
         global method_pay
         if call.data == 'cash':
-            method_pay = 'Наличными 💵'
+            method_pay = trans['delivery'][f'DELIVERY_CASH_METHOD_{lang}']
         elif call.data == 'payme':
-            method_pay = 'PayMe 💵'
-        accept_client(client, phone_number, method_pay, address, takeaway)
+            method_pay = trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}']
+        accept_client(client, phone_number, method_pay, address, takeaway, lang)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
@@ -452,9 +494,9 @@ def inline_payment_method(call: types.CallbackQuery):
 def accepting_client(call: types.CallbackQuery):
     try:
         if call.data == 'accept':
-            accept_admin(client, phone_number, method_pay, address, takeaway)
+            accept_admin(client, phone_number, method_pay, address, takeaway,lang)
         elif call.data == 'cancel':
-            bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
+            bot.send_message(client, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
             deliveryDB.cancel_order(client)
     except Exception as err:
@@ -468,7 +510,7 @@ def delivery_amount(message: types.Message):
         global amount
         if not takeaway:
             amount = int(message.text)
-            bot.send_message(275755142, '<b>Подтвердить заказ?</b>', parse_mode='html', reply_markup=accepting_order())
+            bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html', reply_markup=accepting_order())
         dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -481,11 +523,11 @@ def accepting_admin(call: types.CallbackQuery):
     try:
         if call.data == 'accept':
             if takeaway:
-                show_order(client, phone_number, method_pay, address, takeaway, amount=0)
+                show_order(client, phone_number, method_pay, address, takeaway, lang, amount=0)
             else:
-                show_order(client, phone_number, method_pay, address, takeaway, amount)
+                show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
         elif call.data == 'cancel':
-            bot.send_message(client, 'Сожалеем, но Ваш заказ отменен, нажмите на /start чтобы попробовать снова',
+            bot.send_message(client, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
             deliveryDB.cancel_order(client)
     except Exception as err:
