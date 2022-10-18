@@ -207,7 +207,7 @@ def request_people(message: types.Message):
                                      trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                      reply_markup=inline_category(lang))
                     return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-        bot.send_message(message.from_user.id, trans['booking'][f'GET_PHONE_NUMBER_{lang}'],
+        bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
                          reply_markup=general_nav.send_contact(lang))
         return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
