@@ -23,7 +23,7 @@ def start(message: types.Message):
     try:
         if DataBase.get_user(message.from_user.id):
             global lang
-            lang = DataBase.get_user_lang(message.from_user.id)
+            lang = DataBase.get_user_lang(message.from_user.id)[0]
             bot.send_message(message.chat.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
