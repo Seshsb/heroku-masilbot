@@ -42,6 +42,12 @@ class DataBase:
             cls.cursor.execute('UPDATE users SET lang=%s WHERE id=%s;', (lang, user_id))
             cls.connection.commit()
 
+    @classmethod
+    def register(cls, user_id, lang):
+        with cls.connection:
+            cls.cursor.execute('INSERT INTO users(id, lang) VALUES (%s, %s)', (user_id, lang))
+            cls.connection.commit()
+
 
 class Booking(DataBase):
     def start_booking(self, user_id, table_id, start_at, end_at, phone_number, name, people):
@@ -57,10 +63,10 @@ class Booking(DataBase):
                                 'VALUES (%s, %s, %s, %s, %s);', (table_id, start_at, end_at, user_id, people))
             self.connection.commit()
 
-    def register(self, user_id, lang):
-        with self.connection:
-            self.cursor.execute('INSERT INTO users(id, lang) VALUES (%s, %s)', (user_id, lang))
-            self.connection.commit()
+    def register(cls, user_id, lang):
+        with cls.connection:
+            cls.cursor.execute('INSERT INTO users(id, lang) VALUES (%s, %s)', (user_id, lang))
+            cls.connection.commit()
 
     def tables(self, reserve_time):
 
