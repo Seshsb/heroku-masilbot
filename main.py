@@ -223,7 +223,7 @@ def request_contact(message):
     try:
         global phone_number
         phone_number = '+' + message.contact.phone_number
-        bot.send_message(message.from_user.id, trans['booking']['GET_FIRST_NAME_{lang}'],
+        bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
@@ -238,7 +238,7 @@ def phone(message):
     try:
         global phone_number
         phone_number = message.text
-        bot.send_message(message.from_user.id, trans['booking']['GET_FIRST_NAME_{lang}'],
+        bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
@@ -252,7 +252,7 @@ def get_first_name(message):
     try:
         global first_name
         first_name = message.text
-        bot.send_message(message.from_user.id, trans['booking']['BOOKING_DETAIL_{lang}']
+        bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_DETAIL_{lang}']
                          .format(first_name, phone_number, datetime_start.replace("-", "."),
                                  bookingDB.seating_category(seating_category)[0], table, people),
                          reply_markup=booking_confirm(lang))

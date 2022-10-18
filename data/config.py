@@ -265,6 +265,7 @@ trans = {
             'GET_PHONE_NUMBER_RU': GET_PHONE_NUMBER_RU,
             'GET_PHONE_NUMBER_KO': GET_PHONE_NUMBER_KO,
             'GET_FIRST_NAME_RU': GET_FIRST_NAME_RU,
+            'GET_FIRST_NAME_KO': GET_FIRST_NAME_KO,
             'BOOKING_RU': BOOKING_RU,
             'BOOKING_KO': BOOKING_KO,
             'DELIVERY_RU': DELIVERY_RU,
