@@ -421,20 +421,20 @@ def takeaway_location_handler(message: types.Message):
         if message.text == 'На вынос 🏃🏻‍♂️':
             takeaway = message.text
             bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
-                             reply_markup=general_nav.send_contact())
+                             reply_markup=general_nav.send_contact(lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
         elif message.content_type == 'location':
             latitude = message.location.latitude
             longitude = message.location.longitude
             address = get_address_from_coords(f'{longitude},{latitude}')
-            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'], reply_markup=general_nav.send_contact())
+            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'], reply_markup=general_nav.send_contact(lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
         elif message.text == 'Вернуться на главную страницу':
             bot.send_message(message.chat.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             address = message.text
-            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'], reply_markup=general_nav.send_contact())
+            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'], reply_markup=general_nav.send_contact(lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -469,7 +469,7 @@ def request_phone(message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         global phone_number
         phone_number = message.text
-        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],#
+        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],
                          parse_mode='html', reply_markup=payment_method())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
 
