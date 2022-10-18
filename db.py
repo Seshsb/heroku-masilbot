@@ -244,9 +244,9 @@ class Delivery(DataBase):
     def get_order(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_{lang.lower()}, foods.price, basket.quantity, basket.price '
-                'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
+                f'SELECT foods.name_{lang.lower()}, foods.price, basket.quantity, basket.price '
+                f'FROM basket '
+                f'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
             return self.cursor.fetchall()
 
     def cancel_order(self, user_id):
@@ -268,6 +268,7 @@ generalDB = DataBase()
 bookingDB = Booking()
 deliveryDB = Delivery()
 
+print(deliveryDB.get_order(275755142, 'KO'))
 # print(bookingDB.check())
 # print(deliveryDB.test(275755142, 'qweqeqeqwe'))
 # deliveryDB.insert_toBasket(21, 1, 105000, 275755142)
