@@ -393,7 +393,7 @@ def basket(message: types.Message):
             total_price = int(detail[2]) * quantity
             deliveryDB.insert_toBasket(detail[0], quantity, total_price, message.from_user.id)
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_BASKET_{lang}'],
-                             reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0], lang))
+                             reply_markup=dishesRu(deliveryDB.get_categoryId(category, lang)[0], lang))
 
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_INCORRECT_QUANTITY_{lang}'])
