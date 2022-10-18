@@ -143,10 +143,11 @@ class Booking(DataBase):
 
 class Delivery(DataBase):
     def get_categories(self, lang):
+        delete_quotes = [lang]
         with self.connection:
             self.cursor.execute(
                 'SELECT name_%s FROM food_categories ORDER BY id;',
-                (lang.translate({39: None}),))
+                (*delete_quotes,))
             return self.cursor.fetchall()
 
     def get_categoryId(self, name, lang):
