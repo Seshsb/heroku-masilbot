@@ -34,7 +34,8 @@ class DataBase:
     def get_user_lang(cls, user_id):
         with cls.connection:
             cls.cursor.execute('SELECT lang FROM users WHERE id=%s;', (user_id,))
-            return cls.cursor.fetchone()
+            lang = cls.cursor.fetchone()
+            return lang
 
     @classmethod
     def change_lang(cls, user_id, lang):
