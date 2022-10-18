@@ -408,10 +408,10 @@ def basket(message: types.Message):
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CART.value)
 def action_in_basket(message: types.Message):
     try:
-        goods = [good[0] for good in deliveryDB.foods_name(message.from_user.id)]
+        goods = [good[0] for good in deliveryDB.foods_name(message.from_user.id, lang)]
         del_good = message.text[10:]
         if del_good in goods:
-            deliveryDB.delete_good_from_basket(del_good, message.from_user.id)
+            deliveryDB.delete_good_from_basket(del_good, message.from_user.id, lang)
             show_basket(message, lang)
         elif message.text == trans['delivery'][f'ORDER_{lang}']:
             bot.send_message(message.from_user.id, '<b>Введите адрес доставки</b>',
@@ -529,7 +529,8 @@ def delivery_amount(message: types.Message):
         global amount
         if not takeaway:
             amount = int(message.text)
-            bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html', reply_markup=accepting_order())
+            bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
+                             reply_markup=accepting_order(lang))
         dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
