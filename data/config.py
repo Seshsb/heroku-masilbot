@@ -38,6 +38,15 @@ BACK_TO_MAIN_PAGE_KO = 'Вернуться на главную страницу 
 SEND_CONTACT_RU = 'Отправить контакт 📱'
 SEND_CONTACT_KO = 'Отправить контакт 📱'
 
+BACK_RU = 'Назад 🔙'
+BACK_KO = 'Назад 🔙'
+
+ACCEPT_RU = 'Подтвердить ✅'
+ACCEPT_KO = 'Подтвердить ✅'
+
+CANCEL_RU = 'Отменить ❌'
+CANCEL_KO = 'Отменить ❌'
+
 ########################################################################################################################
 # Бронирование
 BOOKING_REQUEST_CATEGORY_RU = 'Пожалуйста, выберите категорию посадочных мест'
@@ -99,12 +108,6 @@ CABINS_KO = '2️⃣ Кабинки'
 
 PEOPLE_RU = 'чел.'
 PEOPLE_KO = 'чел.'
-
-ACCEPT_RU = 'Подтвердить ✅'
-ACCEPT_KO = 'Подтвердить ✅'
-
-CANCEL_RU = 'Отменить ❌'
-CANCEL_KO = 'Отменить ❌'
 
 ########################################################################################################################
 # Доставка
@@ -250,6 +253,25 @@ DELIVERY_SOMETHING_ELSE_KO = 'Хотите что-то еще?'
 DELIVERY_THANKS_RU = 'Благодарим за заказ. Спасибо, что выбрали нас!'
 DELIVERY_THANKS_KO = 'Благодарим за заказ. Спасибо, что выбрали нас!'
 
+# Кнопки
+BASKET_RU = 'Корзина 🛒'
+BASKET_KO = 'Корзина 🛒'
+
+DELETE_RU = '❌ Удалить {}'
+DELETE_KO = '❌ Удалить {}'
+
+ORDER_RU = 'Оформить заказ 🧾'
+ORDER_KO = 'Оформить заказ 🧾'
+
+SEND_LOCATION_RU = 'Поделиться локацией 🌐'
+SEND_LOCATION_KO = 'Поделиться локацией 🌐'
+
+BACK_TO_MENU_RU = 'Вернуться в меню доставки ⏪'
+BACK_TO_MENU_KO = 'Вернуться в меню доставки ⏪'
+
+TAKEAWAY_RU = 'На вынос 🏃🏻‍♂️'
+TAKEAWAY_KO = 'На вынос 🏃🏻‍♂️'
+
 
 ########################################################################################################################
 trans = {
@@ -278,6 +300,12 @@ trans = {
             'BACK_TO_MAIN_PAGE_KO': BACK_TO_MAIN_PAGE_KO,
             'SEND_CONTACT_RU': SEND_CONTACT_RU,
             'SEND_CONTACT_KO': SEND_CONTACT_KO,
+            'BACK_RU': BACK_RU,
+            'BACK_KO': BACK_KO,
+            'ACCEPT_RU': ACCEPT_RU,
+            'ACCEPT_KO': ACCEPT_KO,
+            'CANCEL_RU': CANCEL_RU,
+            'CANCEL_KO': CANCEL_KO,
         },
     'booking':
         {
@@ -309,10 +337,6 @@ trans = {
             'CABINS_KO': CABINS_KO,
             'PEOPLE_RU': PEOPLE_RU,
             'PEOPLE_KO': PEOPLE_KO,
-            'ACCEPT_RU': ACCEPT_RU,
-            'ACCEPT_KO': ACCEPT_KO,
-            'CANCEL_RU': CANCEL_RU,
-            'CANCEL_KO': CANCEL_KO,
         },
     'delivery':
         {
@@ -369,6 +393,16 @@ trans = {
             'DELIVERY_SOMETHING_ELSE_KO': DELIVERY_SOMETHING_ELSE_KO,
             'DELIVERY_THANKS_RU': DELIVERY_THANKS_RU,
             'DELIVERY_THANKS_KO': DELIVERY_THANKS_KO,
+            'BASKET_RU': BASKET_RU,
+            'BASKET_KO': BASKET_KO,
+            'DELETE_RU': DELETE_RU,
+            'DELETE_KO': DELETE_KO,
+            'ORDER_RU': ORDER_RU,
+            'ORDER_KO': ORDER_KO,
+            'SEND_LOCATION_RU': SEND_LOCATION_RU,
+            'SEND_LOCATION_KO': SEND_LOCATION_KO,
+            'TAKEAWAY_RU': TAKEAWAY_RU,
+            'TAKEAWAY_KO': TAKEAWAY_KO,
 
         }
 }
