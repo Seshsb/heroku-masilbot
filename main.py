@@ -89,6 +89,8 @@ def booking_or_delivery(message: types.Message):
 ############################################################################################
 def booking(message: types.Message):
     try:
+        if not DataBase.get_user(message.from_user.id):
+            DataBase.register(message.from_user.id, lang)
         bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
                          reply_markup=show_calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
@@ -290,7 +292,9 @@ def delivery(message: types.Message):
     try:
         global client
         client = message.from_user.id
-        bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_REQUEST_CATEGORY_{lang}'],
+        if not DataBase.get_user(message.from_user.id):
+            DataBase.register(message.from_user.id, lang)
+        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
                          reply_markup=food_categoriesRu())
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     except Exception as err:
