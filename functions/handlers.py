@@ -93,7 +93,7 @@ def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
 
 
 def accept_client(client, phone_number, method_pay, address, takeaway, lang):
-    goods = deliveryDB.get_order(client)
+    goods = deliveryDB.get_order(client, lang)
     order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_{}'.format(lang)]\
         .format(deliveryDB.order_id(client), address, phone_number, method_pay)
     detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
@@ -111,7 +111,7 @@ def accept_client(client, phone_number, method_pay, address, takeaway, lang):
 
 
 def show_order(client, phone_number, method_pay, address, takeaway, lang, amount):
-    goods = deliveryDB.get_order(client)
+    goods = deliveryDB.get_order(client, lang)
     order_client = trans['delivery']['DELIVERY_ORDER_{}'.format(lang)]\
         .format(deliveryDB.order_id(client), address, phone_number, method_pay)
     detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
