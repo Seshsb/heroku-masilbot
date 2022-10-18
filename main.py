@@ -331,7 +331,7 @@ def dishes(message: types.Message):
             global category
             category = message.text
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_DISH_{lang}'],
-                             reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0], lang=lang))
+                             reply_markup=dishesRu(deliveryDB.get_categoryId(category, lang)[0], lang=lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
