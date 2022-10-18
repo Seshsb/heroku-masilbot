@@ -143,19 +143,17 @@ class Booking(DataBase):
 
 class Delivery(DataBase):
     def get_categories(self, lang):
-        delete_quotes = [lang]
         with self.connection:
             self.cursor.execute(
-                'SELECT name_%s FROM food_categories ORDER BY id;',
-                (*delete_quotes,))
+                f'SELECT name_{lang.lower()} FROM food_categories;')
             return self.cursor.fetchall()
 
     def get_categoryId(self, name, lang):
         with self.connection:
             try:
                 self.cursor.execute(
-                    'SELECT id FROM food_categories WHERE name_%s=%s;',
-                    (lang, name))
+                    f'SELECT id FROM food_categories WHERE name_{lang.lower()}=%s;',
+                    (name, ))
                 return self.cursor.fetchone()
             except:
                 raise ValueError
@@ -163,15 +161,15 @@ class Delivery(DataBase):
     def get_dishes(self, cat_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT name_%s FROM foods WHERE category_id=%s ORDER BY id;',
-                (lang, cat_id))
+                f'SELECT name_{lang.lower()} FROM foods WHERE category_id=%s ORDER BY id;',
+                (cat_id, ))
             return self.cursor.fetchall()
 
     def get_dish(self, name, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT id, name_%s, price, image FROM foods WHERE name_%s=%s',
-                (lang, lang, name))
+                f'SELECT id, name_{lang.lower()}, price, image FROM foods WHERE name_{lang.lower()}=%s',
+                (name, ))
             return self.cursor.fetchone()
 
     def insert_toBasket(self, dish_id, qnt, price, user_id):
@@ -198,24 +196,24 @@ class Delivery(DataBase):
     def show_basket(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_%s, foods.price, basket.quantity, basket.price '
-                'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (lang, user_id))
+                f'SELECT foods.name_{lang.lower()}, foods.price, basket.quantity, basket.price '
+                f'FROM basket '
+                f'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
             return self.cursor.fetchall()
 
     def foods_name(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_%s '
-                'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (lang, user_id))
+                f'SELECT foods.name_{lang.lower()} '
+                f'FROM basket '
+                f'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
             return self.cursor.fetchall()
 
     def delete_good_from_basket(self, name, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_%s=%s) and user_id=%s and ordered=false;',
-                (lang, name, user_id))
+                f'DELETE FROM basket WHERE food_id in (SELECT id FROM foods WHERE name_{lang.lower()}=%s) and user_id=%s and ordered=false;',
+                (name, user_id))
             self.connection.commit()
 
     def checkout(self, user_id, address, phone_number):
@@ -246,9 +244,9 @@ class Delivery(DataBase):
     def get_order(self, user_id, lang):
         with self.connection:
             self.cursor.execute(
-                'SELECT foods.name_%s, foods.price, basket.quantity, basket.price '
+                'SELECT foods.name_{lang.lower()}, foods.price, basket.quantity, basket.price '
                 'FROM basket '
-                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (lang, user_id))
+                'JOIN foods ON basket.food_id=foods.id WHERE user_id=%s and ordered=false;', (user_id, ))
             return self.cursor.fetchall()
 
     def cancel_order(self, user_id):
@@ -274,7 +272,6 @@ deliveryDB = Delivery()
 # print(deliveryDB.test(275755142, 'qweqeqeqwe'))
 # deliveryDB.insert_toBasket(21, 1, 105000, 275755142)
 # deliveryDB.delete_good_from_basket('Каша с полезными продуктами', 275755142)
-# print(deliveryDB.show_basket(275755142))
 # deliveryDB.add_image_to_db()
 # print(deliveryDB.foods_name(275755142))
 # print(operations.result())
