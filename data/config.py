@@ -275,6 +275,8 @@ trans = {
             'CHANGE_LANG_SUCCESS_KO': CHANGE_LANG_SUCCESS_KO,
             'BACK_TO_MAIN_PAGE_RU': BACK_TO_MAIN_PAGE_RU,
             'BACK_TO_MAIN_PAGE_KO': BACK_TO_MAIN_PAGE_KO,
+            'SEND_CONTACT_RU': SEND_CONTACT_RU,
+            'SEND_CONTACT_KO': SEND_CONTACT_KO,
         },
     'booking':
         {
