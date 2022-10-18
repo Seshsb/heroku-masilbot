@@ -95,11 +95,11 @@ def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
 def accept_client(client, phone_number, method_pay, address, takeaway, lang):
     goods = deliveryDB.get_order(client, lang)
     order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_{}'.format(lang)]\
-        .format(deliveryDB.order_id(client), address, phone_number, method_pay)
+        .format(address, phone_number, method_pay)
     detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
     if takeaway:
         order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_TAKEAWAY_{}'.format(lang)]\
-            .format(deliveryDB.order_id(client), phone_number, method_pay)
+            .format(phone_number, method_pay)
     total = 0
     for good in goods:
         total += int(good[-1])
