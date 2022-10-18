@@ -68,7 +68,7 @@ def show_basket(message: types.Message, lang):
 
 
 def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
-    goods = deliveryDB.get_order(client)
+    goods = deliveryDB.get_order(client, lang)
     order_admin = trans['delivery']['DELIVERY_ORDER_ACCEPT_ADMIN_{}'.format(lang)]\
         .format(deliveryDB.order_id(client), address, phone_number, method_pay)
     detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
