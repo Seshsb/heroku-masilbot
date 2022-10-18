@@ -45,8 +45,8 @@ def choice_cabins(reserve_time, lang):
 
 def booking_confirm(lang):
     markup = types.InlineKeyboardMarkup(row_width=2)
-    confirm = types.InlineKeyboardButton(trans['booking'][f'ACCEPT_{lang}'], callback_data='confirm')
-    cancel = types.InlineKeyboardButton(trans['booking'][f'CANCEL_{lang}'], callback_data='cancel')
+    confirm = types.InlineKeyboardButton(trans['general'][f'ACCEPT_{lang}'], callback_data='confirm')
+    cancel = types.InlineKeyboardButton(trans['general'][f'CANCEL_{lang}'], callback_data='cancel')
     markup.add(confirm, cancel)
 
     return markup
