@@ -48,7 +48,7 @@ def show_basket(message: types.Message, lang):
 
     '''Вывод корзины'''
 
-    goods = deliveryDB.show_basket(message.from_user.id)
+    goods = deliveryDB.show_basket(message.from_user.id, lang)
     cart = trans['delivery']['DELIVERY_CART_{}'.format(lang)]
     detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
     sum_total = trans['delivery']['DELIVERY_CART_TOTAL_{}'.format(lang)]
