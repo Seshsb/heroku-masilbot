@@ -58,12 +58,12 @@ def show_basket(message: types.Message, lang):
             total += int(good[-1])
             cart += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
         cart += sum_total.format(total).replace(',', ' ')
-        bot.send_message(message.from_user.id, cart, reply_markup=order(message.from_user.id), parse_mode='html')
+        bot.send_message(message.from_user.id, cart, reply_markup=order(message.from_user.id, lang), parse_mode='html')
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     else:
         bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_CART_EMPTY_{}'.format(lang)], parse_mode='html')
         bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_REQUEST_CATEGORY_{}'.format(lang)],
-                         reply_markup=food_categoriesRu())
+                         reply_markup=food_categoriesRu(lang))
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
 
 
@@ -86,7 +86,7 @@ def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
     bot.send_message(275755142, order_admin, parse_mode='html')
     if takeaway:
         bot.send_message(275755142, trans['delivery']['DELIVERY_QUESTION_ACCEPT_{}'.format(lang)],
-                         parse_mode='html', reply_markup=accepting_order())
+                         parse_mode='html', reply_markup=accepting_order(lang))
         return dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
     bot.send_message(275755142, trans['delivery']['DELIVERY_COST_{}'.format(lang)], parse_mode='html')
     return dbworker.set_states(275755142, config.States.S_DELIVERY_AMOUNT.value)
@@ -105,7 +105,7 @@ def accept_client(client, phone_number, method_pay, address, takeaway, lang):
         total += int(good[-1])
         order_client += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
     order_client += trans['delivery']['DELIVERY_ORDER_CLIENT_TOTAL_{}'.format(lang)].format(total,).replace(',', ' ')
-    bot.send_message(client, order_client, parse_mode='html', reply_markup=accepting_order())
+    bot.send_message(client, order_client, parse_mode='html', reply_markup=accepting_order(lang))
     deliveryDB.checkout(client, address, phone_number)
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPT.value)
 
@@ -125,6 +125,6 @@ def show_order(client, phone_number, method_pay, address, takeaway, lang, amount
     order_client += trans['delivery']['DELIVERY_SUM_TOTAL_{}'.format(lang)].format(total, amount, total+amount).replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html')
     deliveryDB.accept_order(client)
-    bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)], reply_markup=general_nav.booking_or_delivery())
-    bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)], reply_markup=general_nav.booking_or_delivery())
+    bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)], reply_markup=general_nav.main_page(lang))
+    bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)], reply_markup=general_nav.main_page(lang))
     dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)

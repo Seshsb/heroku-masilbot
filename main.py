@@ -353,7 +353,7 @@ def quantity_dish(message: types.Message):
             global dish
             global detail
             dish = message.text
-            detail = deliveryDB.get_dish(dish)
+            detail = deliveryDB.get_dish(dish, lang)
             if detail[-1]:
                 bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'),
                                '<b>{0}</b>\n\n'
@@ -382,7 +382,7 @@ def basket(message: types.Message):
             return show_basket(message, lang)
         elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_DISH_{lang}'],
-                             reply_markup=dishesRu(deliveryDB.get_categoryId(category)[0], lang))
+                             reply_markup=dishesRu(deliveryDB.get_categoryId(category, lang)[0], lang))
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
