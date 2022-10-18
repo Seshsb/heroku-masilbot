@@ -45,7 +45,7 @@ class DataBase:
     @classmethod
     def register(cls, user_id, lang):
         with cls.connection:
-            cls.cursor.execute('INSERT INTO users(id, lang) VALUES (%s, %s)', (user_id, lang))
+            cls.cursor.execute('INSERT INTO users(id, lang) VALUES (%s, %s);', (user_id, lang))
             cls.connection.commit()
 
 
