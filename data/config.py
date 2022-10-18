@@ -404,6 +404,8 @@ trans = {
             'SEND_LOCATION_KO': SEND_LOCATION_KO,
             'TAKEAWAY_RU': TAKEAWAY_RU,
             'TAKEAWAY_KO': TAKEAWAY_KO,
+            'BACK_TO_MENU_RU': BACK_TO_MENU_RU,
+            'BACK_TO_MENU_KO': BACK_TO_MENU_KO,
 
         }
 }

@@ -45,7 +45,7 @@ def order(user_id, lang):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
     cancel = [types.KeyboardButton(text=trans['delivery'][f'DELETE_{lang}']
                                    .format(food[0])) for food in deliveryDB.foods_name(int(user_id), lang)]
-    main_page = types.KeyboardButton(trans['general'][f'BACK_TO_MENU_{lang}'])
+    main_page = types.KeyboardButton(trans['delivery'][f'BACK_TO_MENU_{lang}'])
     markup.add(types.KeyboardButton(trans['delivery'][f'ORDER_{lang}']))
     markup.add(*cancel)
     markup.add(main_page)
