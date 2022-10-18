@@ -232,7 +232,7 @@ class Delivery(DataBase):
             self.cursor.execute('select id from basket where user_id=%s and ordered=False;', (user_id,))
             for basket in self.cursor.fetchall():
                 self.cursor.execute('UPDATE orders SET baskets_id=array_append(baskets_id, %s) '
-                                    'where user_id=%s and ordered=FALSE ;',
+                                    'where user_id=%s;',
                                     (basket[0], user_id))
             self.connection.commit()
 
