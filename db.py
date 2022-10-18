@@ -146,7 +146,7 @@ class Delivery(DataBase):
         with self.connection:
             self.cursor.execute(
                 'SELECT name_%s FROM food_categories ORDER BY id;',
-                (lang.replace("'", ''),))
+                (lang.translate({39: None}),))
             return self.cursor.fetchall()
 
     def get_categoryId(self, name, lang):
