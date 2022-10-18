@@ -122,7 +122,7 @@ def show_order(client, phone_number, method_pay, address, takeaway, lang, amount
     for good in goods:
         total += int(good[-1])
         order_client += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_client += trans['delivery']['DELIVERY_SUM_TOTAL_{}'.format(lang)].format(total, amount, total+amount).replace(',', ' ')
+    order_client += trans['delivery']['DELIVERY_ORDER_SUM_TOTAL_{}'.format(lang)].format(total, amount, total+amount).replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html')
     deliveryDB.accept_order(client)
     bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)], reply_markup=general_nav.main_page(lang))
