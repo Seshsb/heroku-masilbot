@@ -21,7 +21,7 @@ from functions.handlers import get_address_from_coords, show_basket, accept_admi
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     try:
-        if not DataBase.get_user(message.from_user.id):
+        if DataBase.get_user(message.from_user.id):
             global lang
             lang = DataBase.get_user_lang(message.from_user.id)
             bot.send_message(message.chat.id, trans['general'][f'START_{lang}'],
@@ -207,7 +207,7 @@ def request_people(message: types.Message):
                                      trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                      reply_markup=inline_category(lang))
                     return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-        bot.send_message(message.from_user.id, trans['booking']['GET_PHONE_NUMBER_{lang}'],
+        bot.send_message(message.from_user.id, trans['booking'][f'GET_PHONE_NUMBER_{lang}'],
                          reply_markup=general_nav.send_contact(lang))
         return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
 
