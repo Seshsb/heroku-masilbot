@@ -109,11 +109,11 @@ def callback_date(call: CallbackQuery):
     try:
         global date
         name, action, year, month, day = call.data.split(calendar_1.sep)
-        date = calendar.calendar_query_handler(
-            bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
-        ).strftime('%Y-%m-%d')
 
         if action == "DAY":
+            date = calendar.calendar_query_handler(  ###
+                bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
+            ).strftime('%Y-%m-%d')
             today_month = datetime.date.today().strftime('%m')
             today_day = datetime.date.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -171,7 +171,7 @@ def inline_seating_category(call: types.CallbackQuery):
             seating_category = 1
             bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_table(date_time))
+                           reply_markup=choice_table(date_time, lang))
         elif call.data == trans['booking'][f'CABINS_{lang}']:
             seating_category = 2
             bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'),

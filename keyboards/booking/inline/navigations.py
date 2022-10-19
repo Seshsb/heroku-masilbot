@@ -22,11 +22,13 @@ def inline_category(lang):
     return markup
 
 
-def choice_table(reserve_time):
+def choice_table(reserve_time, lang):
     markup = types.InlineKeyboardMarkup(row_width=2, )
     tables = [types.InlineKeyboardButton(text=str(table[0]),
                                          callback_data=str(table[0])) for table in bookingDB.tables(reserve_time)]
+    cancel = types.InlineKeyboardButton(text=trans['general'][f'CANCEL_{lang}'], callback_data='cancel')
     markup.add(*tables)
+    markup.add(cancel)
 
     return markup
 
