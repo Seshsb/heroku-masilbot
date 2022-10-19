@@ -180,7 +180,7 @@ def inline_seating_category(call: types.CallbackQuery):
         elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
-            dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
+            return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
@@ -194,6 +194,7 @@ def inline_choice_table(call: types.CallbackQuery):
         if call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                              reply_markup=inline_category(lang))
+            return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         global table_id
         global table
         table = call.data
