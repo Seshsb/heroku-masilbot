@@ -18,10 +18,13 @@ from keyboards.booking.inline.navigations import *
 from keyboards.booking.default import *
 from functions.handlers import get_address_from_coords, show_basket, accept_admin, show_order, accept_client
 
+lang = DataBase.get_user_lang(client)[0]
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     try:
+        global client
+        client = message.from_user.id
         if DataBase.get_user(message.from_user.id):
             global lang
             lang = DataBase.get_user_lang(message.from_user.id)[0]
@@ -306,8 +309,6 @@ def inline_confirmation(call: types.CallbackQuery):
 ############################################################################################
 def delivery(message: types.Message):
     try:
-        global client
-        client = message.from_user.id
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
