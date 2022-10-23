@@ -763,7 +763,6 @@ def delivery_amount(message: types.Message, client):
 
 
 def accepting_admin(message, client):
-    bot.send_message(client, message)
     lang = DataBase.get_user_lang(client)[0]
     if not lang:
         bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],
@@ -772,9 +771,9 @@ def accepting_admin(message, client):
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
             if takeaway:
-                show_order(client, phone_number, method_pay, address, takeaway, lang, amount=0)
+                show_order(message.from_user.id, phone_number, method_pay, address, takeaway, lang, amount=0)
             else:
-                show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
+                show_order(message.from_user.id, phone_number, method_pay, address, takeaway, lang, amount)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(client, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
