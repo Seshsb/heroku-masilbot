@@ -129,11 +129,3 @@ def show_order(client, phone_number, method_pay, address, takeaway, lang, amount
     bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)], reply_markup=general_nav.main_page(lang))
     bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)], reply_markup=general_nav.main_page(lang))
     dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)
-
-
-def language(message):
-    lang = DataBase.get_user_lang(message.from_user.id)[0]
-    if not lang:
-        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
-                         reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
