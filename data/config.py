@@ -18,7 +18,7 @@ GET_FIRST_NAME_KO = '성함을 입력해주세요'
 
 # Кнопки
 RUSSIAN = 'Русский 🇷🇺'
-KOREAN = '(한국어) 🇰🇷'
+KOREAN = '한국어 🇰🇷'
 
 BOOKING_RU = 'Бронирование 🕐'
 BOOKING_KO = '예약 🕐'

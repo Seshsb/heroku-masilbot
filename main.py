@@ -6,6 +6,7 @@ from telebot.types import CallbackQuery
 import dbworker
 import config
 
+from datetime import datetime
 from db import DataBase
 from connections import *
 from flask import request
@@ -41,7 +42,7 @@ def action_choice(message: types.Message):
         lang = ''
         if message.text == 'Русский 🇷🇺':
             lang = trans['general']['LANGUAGE_RU']
-        elif message.text == '(Корейский) 🇰🇷':
+        elif message.text == '한국어 🇰🇷':
             lang = trans['general']['LANGUAGE_KO']
 
         if DataBase.get_user(message.from_user.id):
@@ -133,7 +134,6 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            # today_month = datetime.date.today().strftime('%m')
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -161,12 +161,13 @@ def reserve_time(message: types.Message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
+        today_time = datetime.today().time()
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
             if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
                 global date_time
                 global datetime_start
                 global datetime_end
-                date_time = datetime.datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
+                date_time = datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + datetime.timedelta(hours=2)}'
                 bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
