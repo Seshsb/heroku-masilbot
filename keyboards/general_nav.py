@@ -39,5 +39,5 @@ def send_contact(lang):
 
 
 def error():
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width= 1)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
     markup.add(types.KeyboardButton('\start'))
