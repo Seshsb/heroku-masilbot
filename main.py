@@ -6,7 +6,7 @@ from telebot.types import CallbackQuery
 import dbworker
 import config
 
-from datetime import datetime
+from datetime import timedelta
 from db import DataBase
 from connections import *
 from flask import request
@@ -169,7 +169,7 @@ def reserve_time(message: types.Message):
                 global datetime_end
                 date_time = datetime.strptime(f'{date} {message.text}', '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
-                datetime_end = f'{date_time + datetime.timedelta(hours=2)}'
+                datetime_end = f'{date_time + timedelta(hours=2)}'
                 bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                  reply_markup=inline_category(lang))
                 dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
