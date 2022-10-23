@@ -268,7 +268,6 @@ generalDB = DataBase()
 bookingDB = Booking()
 deliveryDB = Delivery()
 
-print(deliveryDB.get_order(275755142, 'KO'))
 # print(bookingDB.check())
 # print(deliveryDB.test(275755142, 'qweqeqeqwe'))
 # deliveryDB.insert_toBasket(21, 1, 105000, 275755142)

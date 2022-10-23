@@ -36,7 +36,6 @@ def start(message: types.Message):
                                     f'{traceback.format_exc()}')
 
 
-@functions.handlers.language
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_LANGUAGE.value)
 def action_choice(message: types.Message):
