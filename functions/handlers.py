@@ -15,7 +15,13 @@ from keyboards.delivery.inline.navigations import accepting_order
 
 ########################################################################################################
 # Бронирование
-# def request_phone_number(message):
+def confirm_admin(call, first_name, phone_number, datetime_start, seating_category, table, people, lang):
+    bot.send_message(275755142, trans['booking'][f'BOOKING_DETAIL_{lang}']
+                     .format(first_name, phone_number, datetime_start.replace("-", "."),
+                             bookingDB.seating_category(seating_category)[0], table, people),
+                     reply_markup=types.ReplyKeyboardRemove())
+
+    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_CONFIRMATION_ADMIN.value)
 
 
 ########################################################################################################

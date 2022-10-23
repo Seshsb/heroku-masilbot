@@ -22,6 +22,7 @@ class States(Enum):
     S_BOOKING_PHONE_NUMBER = "phone number"
     S_BOOKING_FIRSTNAME = "first name"
     S_BOOKING_CONFIRMATION = "booking confirmation"
+    S_BOOKING_CONFIRMATION_ADMIN = "booking confirmation admin"
 
     # Доставка
     S_DELIVERY = 'delivery'

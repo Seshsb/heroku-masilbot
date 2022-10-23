@@ -47,6 +47,9 @@ ACCEPT_KO = '확인 ✅'
 CANCEL_RU = 'Отменить ❌'
 CANCEL_KO = '취소 ❌'
 
+ERROR_RU = 'Упс, что-то пошло не так, нажмите на кнопку и перезапустите бот'
+ERROR_KO = 'Упс, что-то пошло не так, нажмите на кнопку и перезапустите бот'
+
 ########################################################################################################################
 # Бронирование
 BOOKING_REQUEST_CATEGORY_RU = 'Пожалуйста, выберите категорию посадочных мест'
@@ -101,6 +104,11 @@ BOOKING_CONFIRMED_KO = '성공적으로 예약 되었습니다'
 
 BOOKING_CANCELED_RU = 'Бронирование отменено'
 BOOKING_CANCELED_KO = '예약이 취소되었습니다'
+
+BOOKING_ADMIN_CANCEL_RU = 'Сожалеем, но бронирование отменено, нажмите на /start чтобы попробовать снова'
+BOOKING_ADMIN_CANCEL_KO = 'Сожалеем, но бронирование отменено, нажмите на /start чтобы попробовать снова'
+
+
 
 # Кнопки
 TABLES_RU = '1️⃣ Столы'
@@ -309,6 +317,8 @@ trans = {
             'ACCEPT_KO': ACCEPT_KO,
             'CANCEL_RU': CANCEL_RU,
             'CANCEL_KO': CANCEL_KO,
+            'ERROR_RU': ERROR_RU,
+            'ERROR_KO': ERROR_KO,
         },
     'booking':
         {
@@ -336,6 +346,8 @@ trans = {
             'BOOKING_CONFIRMED_KO': BOOKING_CONFIRMED_KO,
             'BOOKING_CANCELED_RU': BOOKING_CANCELED_RU,
             'BOOKING_CANCELED_KO': BOOKING_CANCELED_KO,
+            'BOOKING_ADMIN_CANCEL_RU': BOOKING_ADMIN_CANCEL_RU,
+            'BOOKING_ADMIN_CANCEL_KO': BOOKING_ADMIN_CANCEL_KO,
             'TABLES_RU': TABLES_RU,
             'TABLES_KO': TABLES_KO,
             'CABINS_RU': CABINS_RU,
