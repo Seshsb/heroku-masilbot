@@ -60,8 +60,6 @@ def action_choice(message: types.Message):
                                     f'{traceback.format_exc()}')
 
 
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_END.value)
 def end(message: types.Message):
     try:
         lang = DataBase.get_user_lang(message.from_user.id)[0]
@@ -138,7 +136,7 @@ def callback_date(call: CallbackQuery):
         name, action, year, month, day = call.data.split(calendar_1.sep)
 
         if action == "DAY":
-            date = calendar.calendar_query_handler(  ###
+            date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
             today_month = datetime.date.today().strftime('%m')
@@ -277,7 +275,7 @@ def request_people(message: types.Message):
             return bot.send_photo(message.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
                            reply_markup=choice_cabins(date_time, lang))
-        if people.isdigit():
+        if people.isdigit() and int(people) != 0:
             if seating_category == 2:
                 min_capacity = table_id[1]
                 max_capacity = table_id[2]
@@ -379,7 +377,11 @@ def inline_confirmation(call: types.CallbackQuery):
         if call.data == 'confirm':
             bookingDB.start_booking(call.from_user.id, table_id[0], datetime_start, datetime_end, phone_number,
                                     first_name, people)
-            bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
+            bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_DETAIL_{lang}']
+                             .format(first_name, phone_number, datetime_start.replace("-", "."),
+                                     bookingDB.seating_category(seating_category)[0], table, people),
+                             reply_markup=types.ReplyKeyboardRemove())
+            bot.send_message(275755142, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
             dbworker.set_states(call.from_user.id, config.States.S_START.value)
         else:
