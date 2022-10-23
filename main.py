@@ -133,7 +133,7 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            user_dict[call.from_user.id] = {'delivery': {'date': date}}
+            user_dict[call.from_user.id] = {'booking': {'date': date}}
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -168,9 +168,9 @@ def reserve_time(message: types.Message):
                                               '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
-                user_dict[message.from_user.id]['booking']['date_time'] = date_time
-                user_dict[message.from_user.id]['booking']['datetime_start'] = datetime_start
-                user_dict[message.from_user.id]['booking']['datetime_end'] = datetime_end
+                user_dict[message.from_user.id] = {'booking': {'date_time': date_time}}
+                user_dict[message.from_user.id] = {'booking': {'datetime_start': datetime_start}}
+                user_dict[message.from_user.id] = {'booking': {'datetime_end': datetime_end}}
                 bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                  reply_markup=inline_category(lang))
                 dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
@@ -215,7 +215,8 @@ def inline_seating_category(call: types.CallbackQuery):
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
-        user_dict[call.from_user.id]['booking']['seating_category'] = seating_category
+        user_dict[call.from_user.id] = {'booking': {'seating_category': seating_category}}
+
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
     except Exception as err:
         bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
@@ -238,8 +239,8 @@ def inline_choice_table(call: types.CallbackQuery):
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         table = call.data
         table_id = bookingDB.table_id(table, user_dict[call.from_user.id]['booking']['seating_category'])[0]
-        user_dict[call.from_user.id]['booking']['table'] = table
-        user_dict[call.from_user.id]['booking']['table_id'] = table_id
+        user_dict[call.from_user.id] = {'booking': {'table': table}}
+        user_dict[call.from_user.id] = {'booking': {'table_id': table_id}}
         bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_PEOPLE_{lang}'],
                          reply_markup=quantity_people(lang))
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
@@ -261,6 +262,7 @@ def request_people(message: types.Message):
     try:
         people = message.text
         user_dict[message.from_user.id]['booking']['people'] = people
+        user_dict[message.from_user.id] = {'booking': {'people': people}}
         if message.text == trans['general'][f'BACK_{lang}']:
             if user_dict[message.from_user.id]['booking']['seating_category'] == 1:
                 return bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
@@ -320,7 +322,7 @@ def request_contact(message):
         phone_number = '+' + message.contact.phone_number
         if ' ' in phone_number:
             phone_number = phone_number.replace(' ', '')
-        user_dict[message.from_user.id]['booking']['phone_number'] = phone_number
+        user_dict[message.from_user.id] = {'booking': {'phone_number': phone_number}}
         bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
@@ -353,7 +355,7 @@ def phone(message):
         phone_number = message.text
         if ' ' in phone_number:
             phone_number = phone_number.replace(' ', '')
-        user_dict[message.from_user.id]['booking']['phone_number'] = phone_number
+        user_dict[message.from_user.id] = {'booking': {'phone_number': phone_number}}
         bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
@@ -383,7 +385,7 @@ def get_first_name(message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
         first_name = message.text
-        user_dict[message.from_user.id]['booking']['first_name'] = first_name
+        user_dict[message.from_user.id] = {'booking': {'first_name': first_name}}
         bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_DETAIL_{lang}']
                          .format(first_name, user_dict[message.from_user.id]['booking']['phone_number'],
                                  user_dict['booking']['datetime_start'].replace("-", "."),
@@ -493,7 +495,7 @@ def dishes(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             category = message.text
-            user_dict[message.from_user.id]['delivery']['category'] = category
+            user_dict[message.from_user.id] = {'delivery': {'category': category}}
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_DISH_{lang}'],
                              reply_markup=dishesRu(deliveryDB.get_categoryId(category, lang)[0], lang=lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
@@ -522,8 +524,8 @@ def quantity_dish(message: types.Message):
         else:
             dish = message.text
             detail = deliveryDB.get_dish(dish, lang)
-            user_dict[message.from_user.id]['delivery']['dish'] = dish
-            user_dict[message.from_user.id]['delivery']['detail'] = detail
+            user_dict[message.from_user.id] = {'delivery': {'dish': dish}}
+            user_dict[message.from_user.id] = {'delivery': {'detail': detail}}
             if detail[-1]:
                 bot.send_photo(message.from_user.id, open(f'{detail[-1]}', 'rb'),
                                '<b>{0}</b>\n\n'
@@ -566,7 +568,7 @@ def basket(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         if message.text.isdigit() and int(message.text) > 0:
             quantity = int(message.text)
-            user_dict[message.from_user.id]['delivery']['quantity'] = quantity
+            user_dict[message.from_user.id] = {'delivery': {'quantity': quantity}}
             total_price = int(user_dict[message.from_user.id]['delivery']['detail'][2]) * quantity
             deliveryDB.insert_toBasket(user_dict[message.from_user.id]['delivery']['detail'][0], quantity, total_price,
                                        message.from_user.id)
@@ -635,8 +637,8 @@ def takeaway_location_handler(message: types.Message):
         else:
             address = message.text
 
-        user_dict[message.from_user.id]['delivery']['takeaway'] = takeaway
-        user_dict[message.from_user.id]['delivery']['address'] = address
+        user_dict[message.from_user.id] = {'delivery': {'takeaway': takeaway}}
+        user_dict[message.from_user.id] = {'delivery': {'address': address}}
         bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
                          reply_markup=general_nav.send_contact(lang))
         return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
@@ -662,7 +664,7 @@ def request_contact(message):
         phone_number = '+' + message.contact.phone_number
         if ' ' in phone_number:
             phone_number = phone_number.replace(' ', '')
-        user_dict[message.from_user.id]['delivery']['phone_number'] = phone_number
+        user_dict[message.from_user.id] = {'delivery': {'phone_number': phone_number}}
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],
                          parse_mode='html', reply_markup=payment_method(lang))
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
@@ -688,7 +690,7 @@ def request_phone(message):
         phone_number = '+' + message.contact.phone_number
         if ' ' in phone_number:
             phone_number = phone_number.replace(' ', '')
-        user_dict[message.from_user.id]['delivery']['phone_number'] = phone_number
+        user_dict[message.from_user.id] = {'delivery': {'phone_number': phone_number}}
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],
                          parse_mode='html', reply_markup=payment_method(lang))
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
@@ -713,7 +715,7 @@ def inline_payment_method(call: types.CallbackQuery):
             method_pay = trans['delivery'][f'DELIVERY_CASH_METHOD_{lang}']
         elif call.data == 'payme':
             method_pay = trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}']
-        user_dict[call.from_user.id]['delivery']['method_pay'] = method_pay
+        user_dict[call.from_user.id] = {'delivery': {'method_pay': method_pay}}
         accept_client(call.from_user.id,
                       user_dict[call.from_user.id]['delivery']['phone_number'],
                       method_pay, user_dict[call.from_user.id]['delivery']['address'],
@@ -783,7 +785,7 @@ def delivery_amount(message: types.Message, client):
     try:
         if not user_dict[message.from_user.id]['delivery']['takeaway']:
             amount = int(message.text)
-            user_dict[message.from_user.id]['delivery']['amount'] = amount
+            user_dict[message.from_user.id] = {'delivery': {'amount': amount}}
             bot.send_message(client, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                              reply_markup=accepting_order(lang))
         bot.register_next_step_handler(message, accepting_admin, client)
