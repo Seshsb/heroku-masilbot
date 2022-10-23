@@ -569,6 +569,7 @@ def basket(message: types.Message):
         if message.text.isdigit() and int(message.text) > 0:
             quantity = int(message.text)
             user_dict[message.from_user.id] = {'delivery': {'quantity': quantity}}
+            bot.send_message(message.from_user.id, user_dict)
             total_price = int(user_dict[message.from_user.id]['delivery']['detail'][2]) * quantity
             deliveryDB.insert_toBasket(user_dict[message.from_user.id]['delivery']['detail'][0], quantity, total_price,
                                        message.from_user.id)
