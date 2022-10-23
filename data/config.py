@@ -69,9 +69,12 @@ BOOKING_FAILED_TIME_KO = '시간을 다시 한번 입력해주세요'
 BOOKING_REQUEST_PEOPLE_RU = 'Пожалуйста, введите количество человек'
 BOOKING_REQUEST_PEOPLE_KO = '몇 분인지 입력해주세요'
 
-BOOKING_FAILED_PEOPLE_RU = 'Извините, но число людей не может превышать допустимого количества\n' \
+BOOKING_FAILED_REQUEST_PEOPLE_RU = 'Некорректный ввод, попробуйте заново'
+BOOKING_FAILED_REQUEST_PEOPLE_KO = 'Некорректный ввод, попробуйте заново'
+
+BOOKING_FAILED_PEOPLE_QUANTITY_RU = 'Извините, но число людей не может превышать допустимого количества\n' \
                            'В эту кабинку разрешается от {0} до {1} человек'
-BOOKING_FAILED_PEOPLE_KO = '죄송합니다, 인원 수를 초과하셨습니다. 여기는 0-4명까지 가능합니다'
+BOOKING_FAILED_PEOPLE_QUANTITY_KO = '죄송합니다, 인원 수를 초과하셨습니다. 여기는 0-4명까지 가능합니다'
 
 BOOKING_GET_TABLEID_RU = 'Выберите номер столика\n' \
                          'P.S. Столики которые не отображаются в кнопках, либо заняты, \n' \
@@ -321,8 +324,10 @@ trans = {
             'BOOKING_FAILED_TIME_KO': BOOKING_FAILED_TIME_KO,
             'BOOKING_REQUEST_PEOPLE_RU': BOOKING_REQUEST_PEOPLE_RU,
             'BOOKING_REQUEST_PEOPLE_KO': BOOKING_REQUEST_PEOPLE_KO,
-            'BOOKING_FAILED_PEOPLE_RU': BOOKING_FAILED_PEOPLE_RU,
-            'BOOKING_FAILED_PEOPLE_KO': BOOKING_FAILED_PEOPLE_KO,
+            'BOOKING_FAILED_REQUEST_PEOPLE_RU': BOOKING_FAILED_REQUEST_PEOPLE_RU,
+            'BOOKING_FAILED_REQUEST_PEOPLE_KO': BOOKING_FAILED_REQUEST_PEOPLE_KO,
+            'BOOKING_FAILED_PEOPLE_QUANTITY_RU': BOOKING_FAILED_PEOPLE_QUANTITY_RU,
+            'BOOKING_FAILED_PEOPLE_QUANTITY_KO': BOOKING_FAILED_PEOPLE_QUANTITY_KO,
             'BOOKING_GET_TABLEID_RU': BOOKING_GET_TABLEID_RU,
             'BOOKING_GET_TABLEID_KO': BOOKING_GET_TABLEID_KO,
             'BOOKING_DETAIL_RU': BOOKING_DETAIL_RU,

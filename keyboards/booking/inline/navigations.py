@@ -34,7 +34,7 @@ def choice_table(reserve_time, lang):
 
 
 def choice_cabins(reserve_time, lang):
-    markup = types.InlineKeyboardMarkup(row_width=2, )
+    markup = types.InlineKeyboardMarkup(row_width=2)
     tables = [types.InlineKeyboardButton(text=f'{table[0]} '
                                               f'({trans["booking"][f"PEOPLE_{lang}"]}{table[1]}~{table[2]})',
                                          callback_data=str(table[0])) for table in bookingDB.cabins(reserve_time)]

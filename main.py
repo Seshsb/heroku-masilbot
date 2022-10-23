@@ -269,20 +269,29 @@ def request_people(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
         global people
         people = message.text
+        if message.text == trans['general'][f'BACK_{lang}']:
+            if seating_category == 1:
+                return bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
+                               trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
+                               reply_markup=choice_table(date_time, lang))
+            return bot.send_photo(message.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
+                           trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
+                           reply_markup=choice_cabins(date_time, lang))
         if people.isdigit():
             if seating_category == 2:
                 min_capacity = table_id[1]
                 max_capacity = table_id[2]
                 if not min_capacity <= int(people) <= max_capacity:
                     bot.send_message(message.from_user.id,
-                                     trans['booking'][f'BOOKING_FAILED_PEOPLE_{lang}'].format(min_capacity, max_capacity))
+                                     trans['booking'][f'BOOKING_FAILED_PEOPLE_QUANTITY_{lang}'].format(min_capacity, max_capacity))
                     bot.send_message(message.from_user.id,
                                      trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                      reply_markup=inline_category(lang))
                     return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-        bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
-                         reply_markup=general_nav.send_contact(lang))
-        return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+            bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
+                             reply_markup=general_nav.send_contact(lang))
+            return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_PHONE_NUMBER.value)
+        bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_REQUEST_PEOPLE_{lang}'])
 
     except Exception as err:
         bot.send_message(message.from_user.id, 'Упс, что-то пошло не так, нажмите на кнопку и перезапустите бот',
