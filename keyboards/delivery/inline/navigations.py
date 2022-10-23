@@ -13,9 +13,9 @@ def payment_method(lang):
 
 
 def accepting_order(lang):
-    markup = types.InlineKeyboardMarkup(row_width=2)
-    accept = types.InlineKeyboardButton(text=trans['general'][f'ACCEPT_{lang}'], callback_data='accept')
-    cancel = types.InlineKeyboardButton(text=trans['general'][f'CANCEL_{lang}'], callback_data='cancel')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    accept = types.KeyboardButton(text=trans['general'][f'ACCEPT_{lang}'])
+    cancel = types.KeyboardButton(text=trans['general'][f'CANCEL_{lang}'])
     markup.add(accept, cancel)
 
     return markup

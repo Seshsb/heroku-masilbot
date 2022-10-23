@@ -447,8 +447,6 @@ def delivery(message: types.Message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        global client
-        client = message.from_user.id
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
@@ -692,7 +690,7 @@ def inline_payment_method(call: types.CallbackQuery):
             method_pay = trans['delivery'][f'DELIVERY_CASH_METHOD_{lang}']
         elif call.data == 'payme':
             method_pay = trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}']
-        accept_client(client, phone_number, method_pay, address, takeaway, lang)
+        accept_client(call.from_user.id, phone_number, method_pay, address, takeaway, lang)
     except Exception as err:
         bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
@@ -709,24 +707,48 @@ def accepting_client(call: types.CallbackQuery):
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if call.data == 'accept':
-            accept_admin(client, phone_number, method_pay, address, takeaway,lang)
+            accept_admin(call.message, call.from_user.id, phone_number, method_pay, address, takeaway, lang)
         elif call.data == 'cancel':
-            bot.send_message(client, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
+            bot.send_message(call.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
-            deliveryDB.cancel_order(client)
+            deliveryDB.cancel_order(call.from_user.id)
     except Exception as err:
         bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_AMOUNT.value)
-def delivery_amount(message: types.Message):
+
+def accept_admin(message, client, phone_number, method_pay, address, takeaway, lang):
+    goods = deliveryDB.get_order(client, lang)
+    order_admin = trans['delivery']['DELIVERY_ORDER_ACCEPT_ADMIN_{}'.format(lang)]\
+        .format(deliveryDB.order_id(client), address, phone_number, method_pay)
+    detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
+    sum_total = trans['delivery']['DELIVERY_ORDER_ADMIN_TOTAL_{}'.format(lang)]
+    if takeaway:
+        order_admin = trans['delivery']['DELIVERY_ORDER_ACCEPT_ADMIN_TAKEAWAY_{}'.format(lang)]\
+            .format(deliveryDB.order_id(client), phone_number, method_pay)
+    total = 0
+    for good in goods:
+        total += int(good[-1])
+        order_admin += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_admin += sum_total.format(total).replace(',', ' ')
+    bot.send_message(client, trans['delivery']['DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_{}'.format(lang)].format(deliveryDB.order_id(client)),
+                     parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(275755142, order_admin, parse_mode='html')
+    if takeaway:
+        bot.send_message(275755142, trans['delivery']['DELIVERY_QUESTION_ACCEPT_{}'.format(lang)],
+                         parse_mode='html', reply_markup=accepting_order(lang))
+        return dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
+    bot.send_message(275755142, trans['delivery']['DELIVERY_COST_{}'.format(lang)], parse_mode='html')
+    bot.register_next_step_handler(message, delivery_amount, client)
+
+
+def delivery_amount(message: types.Message, client):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
-        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
+        bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
+        return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
         global amount
         if not takeaway:
@@ -735,32 +757,31 @@ def delivery_amount(message: types.Message):
                              reply_markup=accepting_order(lang))
         dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
     except Exception as err:
-        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
+        bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
+        bot.register_next_step_handler(message, accepting_admin, client)
 
 
-@bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(275755142) == config.States.S_DELIVERY_ADMIN_ACCEPT.value)
-def accepting_admin(call: types.CallbackQuery):
-    lang = DataBase.get_user_lang(call.from_user.id)[0]
+def accepting_admin(message, client):
+    lang = DataBase.get_user_lang(client)[0]
     if not lang:
-        bot.send_message(call.from_user.id, trans['general']['CHOICE_LANGUAGE'],
+        bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
+        return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        if call.data == 'accept':
+        if message.text == trans['general'][f'ACCEPT_{lang}']:
             if takeaway:
                 show_order(client, phone_number, method_pay, address, takeaway, lang, amount=0)
             else:
                 show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
-        elif call.data == 'cancel':
+        elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(client, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
             deliveryDB.cancel_order(client)
     except Exception as err:
-        bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
+        bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
+        bot.send_message(275755142, f'Ошибка юзера {client.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
