@@ -38,8 +38,8 @@ def start(message: types.Message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_CHOICE_LANGUAGE.value)
 def action_choice(message: types.Message):
+    lang = ''
     try:
-        lang = ''
         if message.text == 'Русский 🇷🇺':
             lang = trans['general']['LANGUAGE_RU']
         elif message.text == '한국어 🇰🇷':
@@ -133,7 +133,7 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            user_dict[call.from_user.id]['booking']['date'] = date
+            user_dict[str(call.from_user.id)]['booking']['date'] = date
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
