@@ -755,7 +755,7 @@ def delivery_amount(message: types.Message, client):
             amount = int(message.text)
             bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                              reply_markup=accepting_order(lang))
-        dbworker.set_states(275755142, config.States.S_DELIVERY_ADMIN_ACCEPT.value)
+        bot.register_next_step_handler(message, accepting_admin, client)
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
