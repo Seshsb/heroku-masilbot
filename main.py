@@ -7,7 +7,6 @@ import dbworker
 import config
 
 from db import DataBase
-from datetime import datetime
 from connections import *
 from flask import request
 from keyboards import general_nav
@@ -134,8 +133,8 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            today_month = datetime.date.strftime('%m')
-            today_day = datetime.date.strftime('%d')
+            today_month = datetime.date.today().strftime('%m')
+            today_day = datetime.date.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
                 bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_FAILED_DATE_{lang}'],
                                  reply_markup=show_calendar)
