@@ -698,23 +698,23 @@ def inline_payment_method(call: types.CallbackQuery):
 
 
 @bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_DELIVERY_CLIENT_ACCEPT.value)
-def accepting_client(call: types.CallbackQuery):
-    lang = DataBase.get_user_lang(call.from_user.id)[0]
+    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CLIENT_ACCEPT.value)
+def accepting_client(message: types.Message):
+    lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
-        bot.send_message(call.from_user.id, trans['general']['CHOICE_LANGUAGE'],
+        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
+        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        if call.data == 'accept':
-            accept_admin(call.message, call.from_user.id, phone_number, method_pay, address, takeaway, lang)
-        elif call.data == 'cancel':
-            bot.send_message(call.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
+        if message.text == trans['general'][f'ACCEPT_{lang}']:
+            accept_admin(message, message.from_user.id, phone_number, method_pay, address, takeaway, lang)
+        elif message.text == trans['general'][f'CANCEL_{lang}']:
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
-            deliveryDB.cancel_order(call.from_user.id)
+            deliveryDB.cancel_order(message.from_user.id)
     except Exception as err:
-        bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
+        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
