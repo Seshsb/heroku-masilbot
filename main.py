@@ -697,7 +697,7 @@ def inline_payment_method(call: types.CallbackQuery):
                                     f'{traceback.format_exc()}')
 
 
-@bot.callback_query_handler(
+@bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_CLIENT_ACCEPT.value)
 def accepting_client(message: types.Message):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
