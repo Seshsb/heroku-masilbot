@@ -763,6 +763,7 @@ def delivery_amount(message: types.Message, client):
 
 
 def accepting_admin(message, client):
+    bot.send_message(client, message)
     lang = DataBase.get_user_lang(client)[0]
     if not lang:
         bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],
