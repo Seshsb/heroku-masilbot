@@ -22,7 +22,6 @@ user_dict = {}
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     try:
-        user_dict = str(message.from_user.id)
         if DataBase.get_user(message.from_user.id):
             lang = DataBase.get_user_lang(message.from_user.id)[0]
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
