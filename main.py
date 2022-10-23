@@ -133,8 +133,9 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            today_month = datetime.date.today().strftime('%m')
-            today_day = datetime.date.today().strftime('%d')
+            # today_month = datetime.date.today().strftime('%m')
+            today_month = datetime.today().strftime('%m')
+            today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
                 bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_FAILED_DATE_{lang}'],
                                  reply_markup=show_calendar)
