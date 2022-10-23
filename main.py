@@ -387,7 +387,7 @@ def inline_confirmation(call: types.CallbackQuery):
         else:
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CANCELED_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
-            dbworker.set_states(call.from_user.id, config.States.S_END.value)
+            end(call.message)
     except Exception as err:
         bot.send_message(call.from_user.id, 'Упс, что-то пошло не так, нажмите на кнопку и перезапустите бот',
                          reply_markup=general_nav.error())
