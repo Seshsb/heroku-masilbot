@@ -760,7 +760,6 @@ def delivery_amount(message: types.Message, client):
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
-        bot.register_next_step_handler(message, accepting_admin, client)
 
 
 def accepting_admin(message, client):
