@@ -133,7 +133,7 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            user_dict[str(call.from_user.id)]['booking']['date'] = date
+            user_dict[call.from_user.id] = {'delivery': {'date': date}}
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
