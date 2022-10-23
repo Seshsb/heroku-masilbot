@@ -755,19 +755,19 @@ def delivery_amount(message: types.Message, client):
             amount = int(message.text)
             bot.send_message(client, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                              reply_markup=accepting_order(lang))
-        bot.register_next_step_handler(message, accepting_admin, client)
+        bot.register_next_step_handler(message, accepting_admin)
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
-def accepting_admin(message, client):
-    lang = DataBase.get_user_lang(client)[0]
+def accepting_admin(message: types.Message):
+    lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
-        bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],
+        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
+        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
             if takeaway:
@@ -775,12 +775,12 @@ def accepting_admin(message, client):
             else:
                 show_order(message.from_user.id, phone_number, method_pay, address, takeaway, lang, amount)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
-            bot.send_message(client, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
                              reply_markup=types.ReplyKeyboardMarkup(True, True).add(types.KeyboardButton('/start')))
-            deliveryDB.cancel_order(client)
+            deliveryDB.cancel_order(message.from_user.id)
     except Exception as err:
-        bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {client.from_user.id}:\n'
+        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
+        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
