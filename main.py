@@ -796,7 +796,7 @@ def delivery_amount(message: types.Message, client):
         if not user_dict[str(message.from_user.id)]['takeaway']:
             amount = int(message.text)
             user_dict[str(message.from_user.id)].update({'amount': amount})
-            bot.send_message(client, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
+            bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                              reply_markup=accepting_order(lang))
         bot.register_next_step_handler(message, accepting_admin, client)
     except Exception as err:
