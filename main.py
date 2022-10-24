@@ -29,6 +29,7 @@ def start(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
+        user_dict.update({str(message.from_user.id): {}})
         dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
