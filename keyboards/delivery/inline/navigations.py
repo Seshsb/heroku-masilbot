@@ -4,9 +4,9 @@ from data.config import trans
 
 
 def payment_method(lang):
-    markup = types.InlineKeyboardMarkup(row_width=2)
-    cash = types.InlineKeyboardButton(text=trans['delivery'][f'DELIVERY_CASH_METHOD_{lang}'], callback_data='cash')
-    payme = types.InlineKeyboardButton(text=trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}'], callback_data='payme')
+    markup = types.ReplyKeyboardMarkup(row_width=2)
+    cash = types.KeyboardButton(text=trans['delivery'][f'DELIVERY_CASH_METHOD_{lang}'])
+    payme = types.KeyboardButton(text=trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}'])
     markup.add(cash, payme)
 
     return markup
