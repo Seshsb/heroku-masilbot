@@ -134,7 +134,7 @@ def callback_date(call: CallbackQuery):
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
             user_dict.update({str(call.from_user.id): {'date': date}})
-            bot.send_message(call.from_user.id, user_dict.items())
+            bot.send_message(call.from_user.id, user_dict[str(call.from_user.id)])
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -169,9 +169,9 @@ def reserve_time(message: types.Message):
                                               '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
-                user_dict[str(message.from_user.id)]['date_time'] = date_time
-                user_dict[str(message.from_user.id)]['datetime_start'] = datetime_start
-                user_dict[str(message.from_user.id)]['datetime_end'] = datetime_end
+                user_dict[str(message.from_user.id)].update({'date_time': date_time})
+                user_dict[str(message.from_user.id)].update({'datetime_start': datetime_start})
+                user_dict[str(message.from_user.id)].update({'datetime_end': datetime_end})
                 bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                  reply_markup=inline_category(lang))
                 dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
@@ -216,7 +216,7 @@ def inline_seating_category(call: types.CallbackQuery):
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
-        user_dict[str(call.from_user.id)]['seating_category'] = seating_category
+        user_dict[str(call.from_user.id)].update({'seating_category': seating_category})
 
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
     except Exception as err:
