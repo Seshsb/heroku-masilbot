@@ -646,9 +646,8 @@ def takeaway_location_handler(message: types.Message):
         else:
             address = message.text
 
-        user_dict.update({str(message.from_user.id): {}})
         user_dict[str(message.from_user.id)].update({'address': address})
-        user_dict.update({str(message.from_user.id): {'takeaway': takeaway}})
+        user_dict[str(message.from_user.id)].update({'takeaway': takeaway})
 
         bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
                          reply_markup=general_nav.send_contact(lang))
