@@ -165,7 +165,7 @@ def reserve_time(message: types.Message):
         today_time = datetime.today().time()
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
             if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
-                date_time = datetime.strptime(f'{user_dict[message.from_user.id]["date"]} {message.text}',
+                date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
