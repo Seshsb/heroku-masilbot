@@ -633,20 +633,21 @@ def takeaway_location_handler(message: types.Message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        address = ''
+        address = None
         if message.text == trans['delivery'][f'TAKEAWAY_{lang}']:
             user_dict[str(message.from_user.id)].update({'takeaway': message.text})
         elif message.content_type == 'location':
             latitude = message.location.latitude
             longitude = message.location.longitude
             address = get_address_from_coords(f'{longitude},{latitude}')
+            user_dict[str(message.from_user.id)].update({'address': address})
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             address = message.text
+            user_dict[str(message.from_user.id)].update({'address': address})
 
-        user_dict[str(message.from_user.id)].update({'address': address})
         bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
                          reply_markup=general_nav.send_contact(lang))
         return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PHONENUMBER.value)
