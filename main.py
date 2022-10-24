@@ -206,12 +206,12 @@ def inline_seating_category(call: types.CallbackQuery):
             seating_category = 1
             bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_table(user_dict[call.from_user.id]['booking']['date_time'], lang))
+                           reply_markup=choice_table(user_dict[str(call.from_user.id)]['date_time'], lang))
         elif call.data == trans['booking'][f'CABINS_{lang}']:
             seating_category = 2
             bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_cabins(user_dict[call.from_user.id]['booking']['date_time'], lang))
+                           reply_markup=choice_cabins(user_dict[str(call.from_user.id)]['booking']['date_time'], lang))
         elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
@@ -239,9 +239,9 @@ def inline_choice_table(call: types.CallbackQuery):
                              reply_markup=inline_category(lang))
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
         table = call.data
-        table_id = bookingDB.table_id(table, user_dict[call.from_user.id]['booking']['seating_category'])[0]
-        user_dict[str(call.from_user.id)]['table'] = table
-        user_dict[str(call.from_user.id)]['table_id'] = table_id
+        table_id = bookingDB.table_id(table, user_dict[str(call.from_user.id)]['seating_category'])[0]
+        user_dict[str(call.from_user.id)].update({'table': table})
+        user_dict[str(call.from_user.id)].update({'table_id': table_id})
         bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_PEOPLE_{lang}'],
                          reply_markup=quantity_people(lang))
         dbworker.set_states(call.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
@@ -262,23 +262,23 @@ def request_people(message: types.Message):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         people = message.text
-        user_dict[str(message.from_user.id)]['people'] = people
+        user_dict[str(message.from_user.id)].update({'people': people})
         if message.text == trans['general'][f'BACK_{lang}']:
-            if user_dict[message.from_user.id]['booking']['seating_category'] == 1:
+            if user_dict[str(message.from_user.id)]['seating_category'] == 1:
                 return bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
                                trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                               reply_markup=choice_table(user_dict[message.from_user.id]['booking']['date_time'], lang))
+                               reply_markup=choice_table(user_dict[str(message.from_user.id)]['date_time'], lang))
             return bot.send_photo(message.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_cabins(user_dict[message.from_user.id]['booking']['date_time'], lang))
+                           reply_markup=choice_cabins(user_dict[str(message.from_user.id)]['date_time'], lang))
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         if people.isdigit() and int(people) != 0:
-            if user_dict[message.from_user.id]['booking']['seating_category'] == 2:
-                min_capacity = user_dict[message.from_user.id]['booking']['table_id'][1]
-                max_capacity = user_dict[message.from_user.id]['booking']['table_id'][2]
+            if user_dict[str(message.from_user.id)]['seating_category'] == 2:
+                min_capacity = user_dict[str(message.from_user.id)]['table_id'][1]
+                max_capacity = user_dict[str(message.from_user.id)]['table_id'][2]
                 if not min_capacity <= int(people) <= max_capacity:
                     bot.send_message(message.from_user.id,
                                      trans['booking'][f'BOOKING_FAILED_PEOPLE_QUANTITY_{lang}'].
@@ -322,7 +322,7 @@ def request_contact(message):
         phone_number = '+' + message.contact.phone_number
         if ' ' in phone_number:
             phone_number = phone_number.replace(' ', '')
-        user_dict[str(message.from_user.id)]['phone_number'] = phone_number
+        user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
         bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
@@ -355,7 +355,7 @@ def phone(message):
         phone_number = message.text
         if ' ' in phone_number:
             phone_number = phone_number.replace(' ', '')
-        user_dict[str(message.from_user.id)]['phone_number'] = phone_number
+        user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
         bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
@@ -385,11 +385,11 @@ def get_first_name(message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
         first_name = message.text
-        user_dict[str(message.from_user.id)]['first_name'] = first_name
+        user_dict[str(message.from_user.id)].update({'first_name': first_name})
         bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_DETAIL_{lang}']
                          .format(first_name, user_dict[str(message.from_user.id)]['phone_number'],
                                  user_dict[str(message.from_user.id)]['datetime_start'].replace("-", "."),
-                                 bookingDB.seating_category(user_dict[message.from_user.id]['booking']['seating_category'])[0],
+                                 bookingDB.seating_category(user_dict[str(message.from_user.id)]['seating_category'])[0],
                                  user_dict[str(message.from_user.id)]['table'], user_dict[str(message.from_user.id)]['people']),
                          reply_markup=booking_confirm(lang))
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_CONFIRMATION.value)
