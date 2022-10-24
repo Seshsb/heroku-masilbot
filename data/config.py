@@ -108,6 +108,9 @@ BOOKING_CANCELED_KO = '예약이 취소되었습니다'
 BOOKING_ADMIN_CANCEL_RU = 'Сожалеем, но бронирование отменено, нажмите на /start чтобы попробовать снова'
 BOOKING_ADMIN_CANCEL_KO = '죄송합니다, 예약이 취소되었습니다, /start를 눌러서 다시 한번 시도해주세요'
 
+BOOKING_WAIT_CONFIRM_RU = 'Ожидайте подтверждение бронирования от оператора, это займет немного времени'
+BOOKING_WAIT_CONFIRM_KO = 'Ожидайте подтверждение бронирования от оператора, это займет немного времени'
+
 
 
 # Кнопки
@@ -355,6 +358,8 @@ trans = {
             'BOOKING_CANCELED_KO': BOOKING_CANCELED_KO,
             'BOOKING_ADMIN_CANCEL_RU': BOOKING_ADMIN_CANCEL_RU,
             'BOOKING_ADMIN_CANCEL_KO': BOOKING_ADMIN_CANCEL_KO,
+            'BOOKING_WAIT_CONFIRM_RU': BOOKING_WAIT_CONFIRM_RU,
+            'BOOKING_WAIT_CONFIRM_KO': BOOKING_WAIT_CONFIRM_KO,
             'TABLES_RU': TABLES_RU,
             'TABLES_KO': TABLES_KO,
             'CABINS_RU': CABINS_RU,

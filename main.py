@@ -409,7 +409,8 @@ def inline_confirmation(call: types.CallbackQuery):
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if call.data == 'confirm':
-            confirm_admin(call, user_dict[str(call.from_user.id)]['first_name'],
+            user = call.from_user.id
+            confirm_admin(call, user, user_dict[str(call.from_user.id)]['first_name'],
                           user_dict[str(call.from_user.id)]['phone_number'],
                           user_dict[str(call.from_user.id)]['datetime_start'],
                           user_dict[str(call.from_user.id)]['seating_category'],
@@ -425,18 +426,16 @@ def inline_confirmation(call: types.CallbackQuery):
                                     f'{traceback.format_exc()}')
 
 
-def confirm_admin(call, first_name, phone_number, datetime_start, seating_category, table, people, lang):
+def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_category, table, people, lang):
+    bot.send_message(user, 'Ожидайте подтверждение бронирование от оператора, это займет немного времени')
     bot.send_message(275755142, trans['booking'][f'BOOKING_DETAIL_{lang}']
                      .format(first_name, phone_number, datetime_start.replace("-", "."),
                              bookingDB.seating_category(seating_category)[0], table, people),
                      reply_markup=confirm_keybord(lang))
+    return bot.register_next_step_handler(call.message, confirmation_admin, user)
 
-    dbworker.set_states(call.from_user.id, config.States.S_BOOKING_CONFIRMATION_ADMIN.value)
 
-
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_CONFIRMATION_ADMIN.value)
-def confirmation_admin(message):
+def confirmation_admin(message, user):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
         bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
@@ -451,9 +450,9 @@ def confirmation_admin(message):
                                     user_dict[str(message.from_user.id)]['phone_number'],
                                     user_dict[str(message.from_user.id)]['first_name'],
                                     user_dict[str(message.from_user.id)]['people'])
-            bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
+            bot.send_message(user, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
-            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
+            return dbworker.set_states(user, config.States.S_ACTION_CHOICE.value)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_ADMIN_CANCEL_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
