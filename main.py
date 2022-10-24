@@ -27,7 +27,6 @@ def start(message: types.Message):
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        user_dict.update({str(message.from_user.id): {}})
         bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
         dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
@@ -640,7 +639,7 @@ def takeaway_location_handler(message: types.Message):
             latitude = message.location.latitude
             longitude = message.location.longitude
             address = get_address_from_coords(f'{longitude},{latitude}')
-            user_dict[str(message.from_user.id)].update({'address': address})
+            user_dict.update({str(message.from_user.id): {'address': address}})
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'], reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
