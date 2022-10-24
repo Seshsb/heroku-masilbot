@@ -134,6 +134,7 @@ def callback_date(call: CallbackQuery):
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
             user_dict[str(call.from_user.id)]['date'] = date
+            bot.send_message(call.from_user.id, user_dict)
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
