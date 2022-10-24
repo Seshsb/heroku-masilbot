@@ -727,6 +727,7 @@ def inline_payment_method(call: types.CallbackQuery):
         elif call.data == 'payme':
             method_pay = trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}']
         user_dict[str(call.from_user.id)].update({'method_pay': method_pay})
+        bot.send_message(call.from_user.id, user_dict[str(call.from_user.id)])
         accept_client(call.from_user.id,
                       user_dict[str(call.from_user.id)]['phone_number'],
                       method_pay, user_dict[str(call.from_user.id)]['address'],
