@@ -17,7 +17,7 @@ from keyboards.booking.inline.navigations import *
 from keyboards.booking.default import *
 from functions.handlers import *
 
-user_dict = {}
+user_dict = dict()
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -133,6 +133,7 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
+            user_dict[str(call.from_user.id)]['date'] = date
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -140,7 +141,7 @@ def callback_date(call: CallbackQuery):
                                  reply_markup=show_calendar)
                 return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'], reply_markup=base(lang))
-            return bot.register_next_step_handler(call.message, reserve_time, date)
+            dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
         elif action == "CANCEL":
             bot.send_message(call.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
@@ -151,7 +152,9 @@ def callback_date(call: CallbackQuery):
                                     f'{traceback.format_exc()}')
 
 
-def reserve_time(message: types.Message, date):
+@bot.message_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_TIME.value)
+def reserve_time(message: types.Message):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
         bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
@@ -161,14 +164,16 @@ def reserve_time(message: types.Message, date):
         today_time = datetime.today().time()
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
             if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
-                date_time = datetime.strptime(f'{date} {message.text}',
+                date_time = datetime.strptime(f'{user_dict[message.from_user.id]["delivery"]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
+                user_dict[str(message.from_user.id)]['date_time'] = date_time
+                user_dict[str(message.from_user.id)]['datetime_start'] = datetime_start
+                user_dict[str(message.from_user.id)]['datetime_end'] = datetime_end
                 bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                                  reply_markup=inline_category(lang))
-                bot.register_next_step_handler(message, inline_category, date_time, datetime_start, datetime_end)
-                # dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
+                dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
             else:
                 bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
         elif message.text == trans['general'][f'BACK_{lang}']:
@@ -188,7 +193,7 @@ def reserve_time(message: types.Message, date):
 
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_SEATING_CATEGORY.value)
-def inline_seating_category(call: types.CallbackQuery, date_time, datetime_start, datetime_end):
+def inline_seating_category(call: types.CallbackQuery):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
     if not lang:
         bot.send_message(call.from_user.id, trans['general']['CHOICE_LANGUAGE'],
@@ -200,17 +205,17 @@ def inline_seating_category(call: types.CallbackQuery, date_time, datetime_start
             seating_category = 1
             bot.send_photo(call.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_table(date_time, lang))
+                           reply_markup=choice_table(user_dict[call.from_user.id]['booking']['date_time'], lang))
         elif call.data == trans['booking'][f'CABINS_{lang}']:
             seating_category = 2
             bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_cabins(date_time, lang))
+                           reply_markup=choice_cabins(user_dict[call.from_user.id]['booking']['date_time'], lang))
         elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
             return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
-
+        user_dict[str(call.from_user.id)]['seating_category'] = seating_category
 
         dbworker.set_states(call.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
     except Exception as err:
