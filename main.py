@@ -140,7 +140,7 @@ def callback_date(call: CallbackQuery):
                                  reply_markup=show_calendar)
                 return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'], reply_markup=base(lang))
-            return bot.register_next_step_handler(call, reserve_time, date)
+            return bot.register_next_step_handler(call.message, reserve_time, date)
         elif action == "CANCEL":
             bot.send_message(call.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
