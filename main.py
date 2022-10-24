@@ -211,7 +211,7 @@ def inline_seating_category(call: types.CallbackQuery):
             seating_category = 2
             bot.send_photo(call.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
                            trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                           reply_markup=choice_cabins(user_dict[str(call.from_user.id)]['booking']['date_time'], lang))
+                           reply_markup=choice_cabins(user_dict[str(call.from_user.id)]['date_time'], lang))
         elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
@@ -503,7 +503,7 @@ def dishes(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             category = message.text
-            user_dict[str(message.from_user.id)].update({'category': category})
+            user_dict.update({str(message.from_user.id): {'category': category}})
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_DISH_{lang}'],
                              reply_markup=dishesRu(deliveryDB.get_categoryId(category, lang)[0], lang=lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_DISHES.value)
