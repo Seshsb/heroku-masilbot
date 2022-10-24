@@ -1,6 +1,7 @@
 dict_user = {}
 
-dict_user[1231321] = {"dasd": 'qweq'}
-dict_user[1231321]["daasdd"]["adsfasdf"] = 'sadsad'
+print(dict_user)
 
+dict_user.update({'asdds': {'sadsa': 'sdasd'}})
+dict_user['asdds'].update({'qwe': 'qwe'})
 print(dict_user)

@@ -29,7 +29,6 @@ def start(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
-        user_dict.update({str(message.from_user.id): {}})
         dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     except Exception as err:
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -647,7 +646,7 @@ def takeaway_location_handler(message: types.Message):
         else:
             address = message.text
 
-        user_dict[str(message.from_user.id)].update({'address': address})
+        user_dict.update({str(message.from_user.id): {'address': address}})
         user_dict[str(message.from_user.id)].update({'takeaway': takeaway})
 
         bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
@@ -727,7 +726,6 @@ def inline_payment_method(call: types.CallbackQuery):
         elif call.data == 'payme':
             method_pay = trans['delivery'][f'DELIVERY_PAYME_METHOD_{lang}']
         user_dict[str(call.from_user.id)].update({'method_pay': method_pay})
-        bot.send_message(call.from_user.id, user_dict[str(call.from_user.id)])
         accept_client(call.from_user.id,
                       user_dict[str(call.from_user.id)]['phone_number'],
                       method_pay, user_dict[str(call.from_user.id)]['address'],
