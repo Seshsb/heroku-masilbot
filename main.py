@@ -635,7 +635,7 @@ def takeaway_location_handler(message: types.Message):
         address = None
         takeaway = None
         if message.text == trans['delivery'][f'TAKEAWAY_{lang}']:
-            user_dict[str(message.from_user.id)].update({'takeaway': message.text})
+            takeaway = message.text
         elif message.content_type == 'location':
             latitude = message.location.latitude
             longitude = message.location.longitude
@@ -646,7 +646,9 @@ def takeaway_location_handler(message: types.Message):
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         else:
             address = message.text
-            user_dict[str(message.from_user.id)].update({'address': address})
+
+        user_dict.update({str(message.from_user.id): {'address': address}})
+        user_dict.update({str(message.from_user.id): {'takeaway': takeaway}})
 
         bot.send_message(message.from_user.id, trans['general'][f'GET_PHONE_NUMBER_{lang}'],
                          reply_markup=general_nav.send_contact(lang))
