@@ -106,7 +106,7 @@ BOOKING_CANCELED_RU = 'Бронирование отменено'
 BOOKING_CANCELED_KO = '예약이 취소되었습니다'
 
 BOOKING_ADMIN_CANCEL_RU = 'Сожалеем, но бронирование отменено, нажмите на /start чтобы попробовать снова'
-BOOKING_ADMIN_CANCEL_KO = 'Сожалеем, но бронирование отменено, нажмите на /start чтобы попробовать снова'
+BOOKING_ADMIN_CANCEL_KO = '죄송합니다, 예약이 취소되었습니다, /start를 눌러서 다시 한번 시도해주세요'
 
 
 

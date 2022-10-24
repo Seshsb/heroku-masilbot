@@ -12,6 +12,15 @@ def base(lang):
     return markup
 
 
+def confirm_keybord(lang):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    confirm = types.KeyboardButton(trans['general'][f'ACCEPT_{lang}'])
+    cancel = types.KeyboardButton(trans['general'][f'CANCEL_{lang}'])
+    markup.add(confirm, cancel)
+
+    return markup
+
+
 def quantity_people(lang):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=3, one_time_keyboard=True)
     back = types.KeyboardButton(trans['general'][f'BACK_{lang}'])
