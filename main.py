@@ -795,19 +795,19 @@ def accept_admin(message, client, phone_number, method_pay, address, takeaway, l
     if takeaway:
         bot.send_message(275755142, trans['delivery']['DELIVERY_QUESTION_ACCEPT_{}'.format(lang)],
                          parse_mode='html', reply_markup=accepting_order(lang))
-        return bot.register_next_step_handler(message, accepting_admin, client)
+        return bot.register_next_step_handler(message, delivery_amount, client, takeaway)
     bot.send_message(275755142, trans['delivery']['DELIVERY_COST_{}'.format(lang)], parse_mode='html')
-    return bot.register_next_step_handler(message, delivery_amount, client)
+    return bot.register_next_step_handler(message, delivery_amount, client, takeaway)
 
 
-def delivery_amount(message: types.Message, client):
+def delivery_amount(message: types.Message, client, takeaway):
     lang = DataBase.get_user_lang(client)[0]
     if not lang:
         bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        if not user_dict[str(message.from_user.id)]['takeaway']:
+        if not takeaway:
             amount = int(message.text)
             user_dict[str(message.from_user.id)].update({'amount': amount})
             bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
