@@ -633,6 +633,7 @@ def takeaway_location_handler(message: types.Message):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         address = None
+        takeaway = None
         if message.text == trans['delivery'][f'TAKEAWAY_{lang}']:
             user_dict[str(message.from_user.id)].update({'takeaway': message.text})
         elif message.content_type == 'location':
