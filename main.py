@@ -134,7 +134,7 @@ def callback_date(call: CallbackQuery):
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
             user_dict.update({str(call.from_user.id): {'date': date}})
-            bot.send_message(call.from_user.id, user_dict)
+            bot.send_message(call.from_user.id, user_dict.items())
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -165,7 +165,7 @@ def reserve_time(message: types.Message):
         today_time = datetime.today().time()
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
             if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
-                date_time = datetime.strptime(f'{user_dict[message.from_user.id]["delivery"]["date"]} {message.text}',
+                date_time = datetime.strptime(f'{user_dict[message.from_user.id]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
