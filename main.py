@@ -433,6 +433,7 @@ def confirmation_admin(message, user):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
+            bot.send_message(275755142, trans['delivery'][f'DELIVERY_ACCEPTING_{lang}'])
             bookingDB.start_booking(user,
                                     user_dict[str(user)]['table_id'][0],
                                     user_dict[str(user)]['datetime_start'],
@@ -440,12 +441,14 @@ def confirmation_admin(message, user):
                                     user_dict[str(user)]['phone_number'],
                                     user_dict[str(user)]['first_name'],
                                     user_dict[str(user)]['people'])
-            bot.send_message(user, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
-                             reply_markup=general_nav.back_to_main_page(lang))
+            bot.send_message(user, trans['booking'][f'BOOKING_CONFIRMED_{lang}'])
+            bot.send_message(user, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
+                             reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(user, config.States.S_ACTION_CHOICE.value)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_ADMIN_CANCEL_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
+
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
