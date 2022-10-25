@@ -167,22 +167,22 @@ def reserve_time(message: types.Message):
     try:
         time_now = datetime.now().time()
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
-            if datetime.strptime(message.text, '%H:%M').time() > time_now:
-                if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
-                    date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
-                                                  '%Y-%m-%d %H:%M')
-                    datetime_start = f'{date_time}'
-                    datetime_end = f'{date_time + timedelta(hours=2)}'
-                    user_dict[str(message.from_user.id)].update({'date_time': date_time})
-                    user_dict[str(message.from_user.id)].update({'datetime_start': datetime_start})
-                    user_dict[str(message.from_user.id)].update({'datetime_end': datetime_end})
-                    bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
-                                     reply_markup=inline_category(lang))
-                    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
-                else:
-                    bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
+            # if datetime.strptime(message.text, '%H:%M').time() > time_now:
+            if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
+                date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
+                                              '%Y-%m-%d %H:%M')
+                datetime_start = f'{date_time}'
+                datetime_end = f'{date_time + timedelta(hours=2)}'
+                user_dict[str(message.from_user.id)].update({'date_time': date_time})
+                user_dict[str(message.from_user.id)].update({'datetime_start': datetime_start})
+                user_dict[str(message.from_user.id)].update({'datetime_end': datetime_end})
+                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
+                                 reply_markup=inline_category(lang))
+                dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
             else:
-                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
+                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
+            # else:
+            #     bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
         elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
                              reply_markup=show_calendar)
