@@ -464,13 +464,13 @@ def confirmation_admin(message, user):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bookingDB.start_booking(message.from_user.id,
-                                    user_dict[str(message.from_user.id)]['table_id'][0],
-                                    user_dict[str(message.from_user.id)]['datetime_start'],
-                                    user_dict[str(message.from_user.id)]['datetime_end'],
-                                    user_dict[str(message.from_user.id)]['phone_number'],
-                                    user_dict[str(message.from_user.id)]['first_name'],
-                                    user_dict[str(message.from_user.id)]['people'])
+            bookingDB.start_booking(user,
+                                    user_dict[str(user)]['table_id'][0],
+                                    user_dict[str(user)]['datetime_start'],
+                                    user_dict[str(user)]['datetime_end'],
+                                    user_dict[str(user)]['phone_number'],
+                                    user_dict[str(user)]['first_name'],
+                                    user_dict[str(user)]['people'])
             bot.send_message(user, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
             return dbworker.set_states(user, config.States.S_ACTION_CHOICE.value)
