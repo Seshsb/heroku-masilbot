@@ -310,14 +310,17 @@ def request_people(message: types.Message):
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value,
     content_types=['contact', 'text'])
-def request_contact(message):
+def request_contact(message: types.Message):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
         bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        if message.text == trans['general'][f'BACK_{lang}']:
+        phone_number = ''
+        if message.text.startswith('+998') and len(message.text) == 13:
+            phone_number = message.text
+        elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_PEOPLE_{lang}'],
                              reply_markup=quantity_people(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
@@ -326,47 +329,15 @@ def request_contact(message):
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-
-        phone_number = '+' + message.contact.phone_number
-        if ' ' in phone_number:
-            phone_number = phone_number.replace(' ', '')
+        elif message.content_type == 'contact':
+            if ' ' in phone_number:
+                phone_number = f"+{phone_number.replace(' ', '')}"
+        else:
+            return bot.send_message(message.from_user.id, trans['general'][f'INVALID_PHONE_NUMBER_{lang}'])
         user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
         bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
                          reply_markup=types.ReplyKeyboardRemove())
-        dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
-    except Exception as err:
-        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-                                    f'{traceback.format_exc()}')
-
-
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value,
-    regexp=r'\+998[0-9]{9}$')
-def phone(message):
-    lang = DataBase.get_user_lang(message.from_user.id)[0]
-    if not lang:
-        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
-                         reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
-    try:
-        if message.text == trans['general'][f'BACK_{lang}']:
-            bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_PEOPLE_{lang}'],
-                             reply_markup=quantity_people(lang))
-            return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_QUANTITY_PEOPLE.value)
-
-        elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
-            bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
-                             reply_markup=general_nav.main_page(lang))
-            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-
-        phone_number = message.text
-        if ' ' in phone_number:
-            phone_number = phone_number.replace(' ', '')
-        user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
-        bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
-                         reply_markup=types.ReplyKeyboardRemove())
-        dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
+        return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -681,7 +652,7 @@ def takeaway_location_handler(message: types.Message):
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
-    content_types=['contact'])
+    content_types=['contact', 'text'])
 def request_contact(message):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
@@ -689,45 +660,26 @@ def request_contact(message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        if message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
+        phone_number = ''
+        if message.text.startswith('+998') and len(message.text) == 13:
+            phone_number = message.text
+        elif message.text == trans['general'][f'BACK_{lang}']:
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_ADDRESS_{lang}'],
+                             parse_mode='html', reply_markup=send_location(lang))
+            return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
+        elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        phone_number = '+' + message.contact.phone_number
-        if ' ' in phone_number:
-            phone_number = phone_number.replace(' ', '')
+        elif message.content_type == 'contact':
+            if ' ' in phone_number:
+                phone_number = f"+{phone_number.replace(' ', '')}"
+        else:
+            return bot.send_message(message.from_user.id, trans['general'][f'INVALID_PHONE_NUMBER_{lang}'])
         user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],
                          parse_mode='html', reply_markup=payment_method(lang))
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
-    except Exception as err:
-        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-                                    f'{traceback.format_exc()}')
-
-
-@bot.message_handler(
-    func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_DELIVERY_PHONENUMBER.value,
-    regexp=r'\+998[0-9]{9}$')
-def request_phone(message):
-    lang = DataBase.get_user_lang(message.from_user.id)[0]
-    if not lang:
-        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
-                         reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
-    try:
-        if message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
-            bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
-                             reply_markup=general_nav.main_page(lang))  #
-            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-        phone_number = message.text
-        if ' ' in phone_number:
-            phone_number = phone_number.replace(' ', '')
-        user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
-        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_PAYMENT_METHOD_{lang}'],
-                         parse_mode='html', reply_markup=payment_method(lang))
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
-
+        return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_PAYMENT_METHOD.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'

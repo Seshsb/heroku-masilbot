@@ -13,6 +13,9 @@ GET_PHONE_NUMBER_RU = 'Нажмите на кнопку и отправь ном
                       'напишите его в формате (+998*********)'
 GET_PHONE_NUMBER_KO = '핸드폰 번호를 입력해주세요' '+998*********으로 써주세요'
 
+INVALID_PHONE_NUMBER_RU = 'Неправильный формат номера, попробуйте еще раз'
+INVALID_PHONE_NUMBER_KO = 'Неправильный формат номера, попробуйте еще раз'
+
 GET_FIRST_NAME_RU = 'Введите свое имя'
 GET_FIRST_NAME_KO = '성함을 입력해주세요'
 
@@ -311,6 +314,8 @@ trans = {
             'START_KO': START_KO,
             'GET_PHONE_NUMBER_RU': GET_PHONE_NUMBER_RU,
             'GET_PHONE_NUMBER_KO': GET_PHONE_NUMBER_KO,
+            'INVALID_PHONE_NUMBER_RU': INVALID_PHONE_NUMBER_RU,
+            'INVALID_PHONE_NUMBER_KO': INVALID_PHONE_NUMBER_KO,
             'GET_FIRST_NAME_RU': GET_FIRST_NAME_RU,
             'GET_FIRST_NAME_KO': GET_FIRST_NAME_KO,
             'BOOKING_RU': BOOKING_RU,

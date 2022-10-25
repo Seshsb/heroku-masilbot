@@ -32,8 +32,10 @@ def back_to_main_page(lang):
 def send_contact(lang):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1, one_time_keyboard=True)
     button = types.KeyboardButton(trans['general'][f'SEND_CONTACT_{lang}'], request_contact=True)
+    back = types.KeyboardButton(trans['general'][f'BACK_{lang}'])
     main_page = types.KeyboardButton(trans['general'][f'BACK_TO_MAIN_PAGE_{lang}'])
-    markup.add(button, main_page)
+    markup.add(button)
+    markup.add(back, main_page)
 
     return markup
 
