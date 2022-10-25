@@ -80,7 +80,6 @@ def order(client, phone_number, method_pay, address, takeaway, lang):
         replace(',', ' ') if not takeaway else trans['delivery']['DELIVERY_ORDER_ADMIN_TOTAL_{}'.format(lang)].format(
         total, ). \
         replace(',', ' ')
-
     return order_client
 
 
@@ -89,3 +88,28 @@ def accept_client(client, phone_number, method_pay, address, takeaway, lang):
                      reply_markup=accepting_order(lang))
     deliveryDB.checkout(client, address, phone_number)
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPT.value)
+
+
+def show_order(client, phone_number, method_pay, address, takeaway, lang, amount):
+    goods = deliveryDB.get_order(client, lang)
+    order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_{}'.format(lang)] \
+        .format(address, phone_number, method_pay)
+    detail_product = trans['delivery']['DELIVERY_CART_PRODUCT_{}'.format(lang)]
+    if takeaway:
+        order_client = trans['delivery']['DELIVERY_ORDER_ACCEPT_CLIENT_TAKEAWAY_{}'.format(lang)] \
+            .format(phone_number, method_pay)
+    total = 0
+    for good in goods:
+        total += int(good[-1])
+        order_client += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
+    order_client += trans['delivery']['DELIVERY_ORDER_SUM_TOTAL_{}'.format(lang)].format(total, amount, total+amount). \
+        replace(',', ' ') if not takeaway else trans['delivery']['DELIVERY_ORDER_ADMIN_TOTAL_{}'.format(lang)].format(
+        total, ). \
+        replace(',', ' ')
+
+    bot.send_message(client, )
+    deliveryDB.accept_order(client)
+    bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)])
+    bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
+                     reply_markup=general_nav.main_page(lang))
+    dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)
