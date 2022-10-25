@@ -797,10 +797,14 @@ def accept_admin(message, client, phone_number, method_pay, address, takeaway, l
     #                      parse_mode='html', reply_markup=accepting_order(lang))
     #     return bot.register_next_step_handler(message, delivery_amount, client, takeaway)
     bot.send_message(275755142, trans['delivery']['DELIVERY_COST_{}'.format(lang)], parse_mode='html')
-    bot.register_next_step_handler(message, delivery_amount, client, takeaway)
+    client = message.from_user.id
+    return dbworker.set_states(client, config.States.S_DELIVERY_ADMIN_ACCEPT.value), \
+           bot.register_next_step_handler(message, delivery_amount, client)
 
 
-def delivery_amount(message: types.Message, client, takeaway):
+@bot.message_handler(
+    func=lambda client: dbworker.get_current_state(client) == config.States.S_DELIVERY_ADMIN_ACCEPT.value)
+def delivery_amount(message: types.Message, client):
     lang = DataBase.get_user_lang(client)[0]
     if not lang:
         bot.send_message(client, trans['general']['CHOICE_LANGUAGE'],

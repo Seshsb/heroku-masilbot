@@ -1,7 +1,11 @@
-dict_user = {}
+def id_user(*args, **kwargs):
+    id = args
+    return id
 
-print(dict_user)
+print(id_user(123))
 
-dict_user.update({'asdds': {'sadsa': 'sdasd'}})
-dict_user['asdds'].update({'qwe': 'qwe'})
-print(dict_user)
+def qwe():
+    a = 1
+    return id_user()
+
+print(qwe())
