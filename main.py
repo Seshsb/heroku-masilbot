@@ -839,7 +839,7 @@ def accepting_admin(message: types.Message, client, phone_number, method_pay, ad
         return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(275755142, )
+            bot.send_message(275755142, trans['delivery'][f'DELIVERY_ACCEPTING_{lang}'])
             show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
