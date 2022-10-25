@@ -807,11 +807,10 @@ def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
         bot.send_message(275755142, trans['delivery'][f'DELIVERY_COST_{lang}'], parse_mode='html')
         return bot.register_next_step_handler_by_chat_id(
             275755142, delivery_amount, client, phone_number, method_pay, address, takeaway, lang)
-    deliveryDB.accept_order(client)
-    bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)])
-    bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
-                     reply_markup=general_nav.main_page(lang))
-    dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)
+    bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
+                     reply_markup=accepting_order(lang))
+    return bot.register_next_step_handler_by_chat_id(
+        275755142, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount=0)
 
 
 def delivery_amount(message: types.Message, client, phone_number, method_pay, address, takeaway, lang):
@@ -825,7 +824,7 @@ def delivery_amount(message: types.Message, client, phone_number, method_pay, ad
         bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                          reply_markup=accepting_order(lang))
         return bot.register_next_step_handler_by_chat_id(
-            client, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
+            275755142, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -840,9 +839,6 @@ def accepting_admin(message: types.Message, client, phone_number, method_pay, ad
         return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            if takeaway:
-                show_order(client, phone_number, method_pay, address, takeaway, lang, amount=0)
-            else:
                 show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],

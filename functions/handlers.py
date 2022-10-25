@@ -107,7 +107,7 @@ def show_order(client, phone_number, method_pay, address, takeaway, lang, amount
         total, ). \
         replace(',', ' ')
 
-    bot.send_message(client, )
+    bot.send_message(client, order_client)
     deliveryDB.accept_order(client)
     bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)])
     bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
