@@ -1,5 +1,5 @@
 from telebot import types
-from data.config import *
+from data.config import trans
 
 
 def choice_lang():
