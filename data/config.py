@@ -69,6 +69,9 @@ BOOKING_REQUEST_TIME_KO = '예약 시간을 적어주세요 (18:00/ 19:00) (분 
 BOOKING_FAILED_TIME_RU = 'Не удалось определить время, пожалуйста введите еще раз.'
 BOOKING_FAILED_TIME_KO = '시간을 다시 한번 입력해주세요'
 
+BOOKING_FAILED_TIME_NOW_RU = 'Невозможно забронировать столик на это время, попробуйте выбрать другое время'
+BOOKING_FAILED_TIME_NOW_KO = 'Невозможно забронировать столик на это время, попробуйте выбрать другое время'
+
 BOOKING_REQUEST_PEOPLE_RU = 'Пожалуйста, введите количество человек'
 BOOKING_REQUEST_PEOPLE_KO = '몇 분인지 입력해주세요'
 
@@ -178,12 +181,12 @@ DELIVERY_ORDER_ACCEPT_CLIENT_RU = '<b>Заказ </b>\n' \
                                   'Тип заказа: <b> "Доставка 🚘"</b>\n' \
                                   'Адрес: <b>{0}</b>\n' \
                                   'Номер телефона: <b>{1}</b>\n' \
-                                  'Метод оплаты: <b>{2}</b>\n'
+                                  'Метод оплаты: <b>{2}</b>\n\n\n'
 DELIVERY_ORDER_ACCEPT_CLIENT_KO = '<b> 주문확인 </b>\n' \
                                   '배달 방식: <b> "배달 🚘"</b>\n' \
                                   '주소: <b>{0}</b>\n' \
                                   '전화번호: <b>{1}</b>\n' \
-                                  '결제 방식: <b>{2}</b>\n'
+                                  '결제 방식: <b>{2}</b>\n\n\n'
 
 DELIVERY_ORDER_ACCEPT_CLIENT_TAKEAWAY_RU = '<b>Заказ</b>\n' \
                                            'Тип заказа: <b>На вынос 🏃🏻‍♂️</b>\n' \
@@ -205,12 +208,12 @@ DELIVERY_ORDER_ACCEPT_ADMIN_RU = '<b>Заказ #{0}</b>\n' \
                                  'Тип заказа: <b> "Доставка 🚘"</b>\n' \
                                  'Адрес: <b>{1}</b>\n' \
                                  'Номер телефона: <b>{2}</b>\n' \
-                                 'Метод оплаты: <b>{3}</b>\n'
+                                 'Метод оплаты: <b>{3}</b>\n\n\n'
 DELIVERY_ORDER_ACCEPT_ADMIN_KO = '<b>주문확인 #{0}</b>\n' \
                                  '배달 방식: <b> "배달 🚘"</b>\n' \
                                  '주소: <b>{1}</b>\n' \
                                  '전화번호: <b>{2}</b>\n' \
-                                 '결제방식: <b>{3}</b>\n'
+                                 '결제방식: <b>{3}</b>\n\n\n'
 
 DELIVERY_ORDER_ACCEPT_ADMIN_TAKEAWAY_RU = '<b>Заказ #{0}</b>\n' \
                                           'Тип заказа: <b>На вынос 🏃🏻‍♂️</b>\n' \
@@ -342,6 +345,8 @@ trans = {
             'BOOKING_REQUEST_TIME_KO': BOOKING_REQUEST_TIME_KO,
             'BOOKING_FAILED_TIME_RU': BOOKING_FAILED_TIME_RU,
             'BOOKING_FAILED_TIME_KO': BOOKING_FAILED_TIME_KO,
+            'BOOKING_FAILED_TIME_NOW_RU': BOOKING_FAILED_TIME_NOW_RU,
+            'BOOKING_FAILED_TIME_NOW_KO': BOOKING_FAILED_TIME_NOW_KO,
             'BOOKING_REQUEST_PEOPLE_RU': BOOKING_REQUEST_PEOPLE_RU,
             'BOOKING_REQUEST_PEOPLE_KO': BOOKING_REQUEST_PEOPLE_KO,
             'BOOKING_FAILED_REQUEST_PEOPLE_RU': BOOKING_FAILED_REQUEST_PEOPLE_RU,

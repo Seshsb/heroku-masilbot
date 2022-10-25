@@ -1,11 +1,7 @@
-def id_user(*args, **kwargs):
-    id = args
-    return id
+from datetime import datetime
 
-print(id_user(123))
-
-def qwe():
-    a = 1
-    return id_user()
-
-print(qwe())
+message = '23:00'
+time_now = datetime.now().time()
+if datetime.strptime(message, '%H:%M').time() > time_now:
+    print(True)
+print(False)

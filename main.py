@@ -137,7 +137,6 @@ def callback_date(call: CallbackQuery):
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
             user_dict.update({str(call.from_user.id): {'date': date}})
-            bot.send_message(call.from_user.id, str(user_dict[str(call.from_user.id)]))
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
             if int(month) == int(today_month) and int(day) < int(today_day):
@@ -166,21 +165,24 @@ def reserve_time(message: types.Message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        today_time = datetime.today().time()
+        time_now = datetime.now().time()
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
-            if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
-                date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
-                                              '%Y-%m-%d %H:%M')
-                datetime_start = f'{date_time}'
-                datetime_end = f'{date_time + timedelta(hours=2)}'
-                user_dict[str(message.from_user.id)].update({'date_time': date_time})
-                user_dict[str(message.from_user.id)].update({'datetime_start': datetime_start})
-                user_dict[str(message.from_user.id)].update({'datetime_end': datetime_end})
-                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
-                                 reply_markup=inline_category(lang))
-                dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
+            if datetime.strptime(message.text, '%H:%M').time() > time_now:
+                if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
+                    date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
+                                                  '%Y-%m-%d %H:%M')
+                    datetime_start = f'{date_time}'
+                    datetime_end = f'{date_time + timedelta(hours=2)}'
+                    user_dict[str(message.from_user.id)].update({'date_time': date_time})
+                    user_dict[str(message.from_user.id)].update({'datetime_start': datetime_start})
+                    user_dict[str(message.from_user.id)].update({'datetime_end': datetime_end})
+                    bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
+                                     reply_markup=inline_category(lang))
+                    dbworker.set_states(message.from_user.id, config.States.S_BOOKING_SEATING_CATEGORY.value)
+                else:
+                    bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
             else:
-                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_{lang}'])
+                bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
         elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
                              reply_markup=show_calendar)
@@ -449,6 +451,8 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                             user_dict[str(call.from_user.id)]['people'])
     bot.send_message(user, trans['booking'][f'BOOKING_CONFIRMED_{lang}'],
                      reply_markup=general_nav.back_to_main_page(lang))
+    bot.register_next_step_handler_by_chat_id(275755142, confirmation_admin, user)
+
     return dbworker.set_states(user, config.States.S_ACTION_CHOICE.value)
 
 
@@ -597,7 +601,6 @@ def basket(message: types.Message):
         if message.text.isdigit() and int(message.text) > 0:
             quantity = int(message.text)
             user_dict[str(message.from_user.id)].update({'quantity': quantity})
-            bot.send_message(message.from_user.id, user_dict)
             total_price = int(user_dict[str(message.from_user.id)]['detail'][2]) * quantity
             deliveryDB.insert_toBasket(user_dict[str(message.from_user.id)]['detail'][0], quantity, total_price,
                                        message.from_user.id)
@@ -802,9 +805,11 @@ def accept_admin(message, client, phone_number, method_pay, address, takeaway, l
         deliveryDB.order_id(client)),
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
     bot.send_message(275755142, order_admin, parse_mode='html')
-    show_order(client, phone_number, method_pay, address, takeaway, lang)
     deliveryDB.accept_order(client)
-
+    bot.send_message(client, trans['delivery']['DELIVERY_THANKS_{}'.format(lang)])
+    bot.send_message(client, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
+                     reply_markup=general_nav.main_page(lang))
+    dbworker.set_states(client, config.States.S_ACTION_CHOICE.value)
 
 # def delivery_amount(message: types.Message, client, takeaway):
 #     lang = DataBase.get_user_lang(client)[0]
