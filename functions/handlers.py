@@ -55,7 +55,7 @@ def show_basket(message: types.Message, lang):
             total += int(good[-1])
             cart += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
         cart += sum_total.format(total).replace(',', ' ')
-        bot.send_message(message.from_user.id, cart, reply_markup=order(message.from_user.id, lang), parse_mode='html')
+        bot.send_message(message.from_user.id, cart, reply_markup=order_cart(message.from_user.id, lang), parse_mode='html')
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CART.value)
     else:
         bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_CART_EMPTY_{}'.format(lang)], parse_mode='html')

@@ -824,7 +824,7 @@ def delivery_amount(message: types.Message, client, phone_number, method_pay, ad
         amount = int(message.text)
         bot.send_message(275755142, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                          reply_markup=accepting_order(lang))
-        bot.register_next_step_handler_by_chat_id(
+        return bot.register_next_step_handler_by_chat_id(
             client, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
