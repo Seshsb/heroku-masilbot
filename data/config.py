@@ -196,7 +196,7 @@ DELIVERY_ORDER_ACCEPT_CLIENT_TAKEAWAY_KO = '<b>주문확인 </b>\n' \
                                            '전화번호: <b>{0}</b>\n' \
                                            '결제방식: <b>{1}</b>\n\n\n'
 
-DELIVERY_ORDER_CLIENT_TOTAL_RU = '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя отадреса доставки)</b>\n\n' \
+DELIVERY_ORDER_CLIENT_TOTAL_RU = '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя от адреса доставки)</b>\n\n' \
                                  'Для связи с оператором @seshsb'
 DELIVERY_ORDER_CLIENT_TOTAL_KO = '\n<b>결제 금액: {0:,} сум + 배달비 (배달지에 따라 금액이 달라집니다)</b>\n\n' \
                                  '매니저와 연락을 원하시면 @seshsb'
@@ -224,7 +224,7 @@ DELIVERY_ORDER_ACCEPT_ADMIN_TAKEAWAY_KO = '<b>주문확인 #{0}</b>\n' \
 DELIVERY_ORDER_ADMIN_TOTAL_RU = '\n<b>Сумма заказа: {0:,} сум</b>'
 DELIVERY_ORDER_ADMIN_TOTAL_KO = '\n<b>결제 금액: {0:,} сум</b>'
 
-DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_RU = 'Спасибо за ожидание, ваш заказ <b>#{}</b> ' \
+DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_RU = 'Спасибо, ваш заказ <b>#{}</b> ' \
                                        'передан на обработку. С вами свяжется оператор.'
 DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO = '주문해주셔서 감사합니다 <b>#{}</b> ' \
                                        '곧 매니저로부터 연락이 갈 것입니다.'

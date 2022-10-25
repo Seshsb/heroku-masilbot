@@ -83,7 +83,7 @@ def accept_client(client, phone_number, method_pay, address, takeaway, lang):
     dbworker.set_states(client, config.States.S_DELIVERY_CLIENT_ACCEPT.value)
 
 
-def show_order(client, phone_number, method_pay, address, takeaway, lang, amount):
+def show_order(client, phone_number, method_pay, address, takeaway, lang):
     goods = deliveryDB.get_order(client, lang)
     order_client = trans['delivery']['DELIVERY_ORDER_{}'.format(lang)]\
         .format(deliveryDB.order_id(client), address, phone_number, method_pay)
@@ -95,8 +95,8 @@ def show_order(client, phone_number, method_pay, address, takeaway, lang, amount
     for good in goods:
         total += int(good[-1])
         order_client += detail_product.format(good[0], good[2], good[1], good[-1]).replace(',', ' ')
-    order_client += trans['delivery']['DELIVERY_ORDER_SUM_TOTAL_{}'.format(lang)].format(total, amount, total+amount).\
-        replace(',', ' ') if takeaway else trans['delivery']['DELIVERY_ORDER_CLIENT_TOTAL_{}'.format(lang)].format(total,).\
+        order_client += trans['delivery']['DELIVERY_ORDER_CLIENT_TOTAL_{}'.format(lang)].format(total, ).\
+        replace(',', ' ') if not takeaway else trans['delivery']['DELIVERY_ORDER_ADMIN_TOTAL_{}'.format(lang)].format(total,).\
         replace(',', ' ')
     bot.send_message(client, order_client, parse_mode='html')
     deliveryDB.accept_order(client)
