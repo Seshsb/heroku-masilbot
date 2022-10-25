@@ -631,7 +631,7 @@ def action_in_basket(message: types.Message):
             deliveryDB.delete_good_from_basket(del_good, message.from_user.id, lang)
             show_basket(message, lang)
         elif message.text == trans['delivery'][f'ORDER_{lang}']:
-            bot.send_message(message.from_user.id, '<b>Введите адрес доставки</b>',
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_ADDRESS_{lang}'],
                              parse_mode='html', reply_markup=send_location(lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
         elif message.text == trans['general'][f'BACK_TO_MENU_{lang}']:

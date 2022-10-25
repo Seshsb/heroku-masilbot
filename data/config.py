@@ -228,7 +228,7 @@ DELIVERY_ORDER_ADMIN_TOTAL_RU = '\n<b>Сумма заказа: {0:,} сум</b>'
 DELIVERY_ORDER_ADMIN_TOTAL_KO = '\n<b>결제 금액: {0:,} сум</b>'
 
 DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_RU = 'Спасибо, ваш заказ <b>#{}</b> ' \
-                                       'передан на обработку. С вами свяжется оператор.'
+                                       'передан на обработку. Ждите подтверждения от оператора.' ####
 DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO = '주문해주셔서 감사합니다 <b>#{}</b> ' \
                                        '곧 매니저로부터 연락이 갈 것입니다.'
 
@@ -274,7 +274,7 @@ DELIVERY_ORDER_SUM_TOTAL_KO = '\n<b>결제 금액: {0:,} сум\n' \
 DELIVERY_SOMETHING_ELSE_RU = 'Хотите что-то еще?'
 DELIVERY_SOMETHING_ELSE_KO = '추가로 주문하시겠습니까?'
 
-DELIVERY_THANKS_RU = 'Благодарим за заказ. Спасибо, что выбрали нас!'
+DELIVERY_THANKS_RU = 'Благодарим за заказ, с вами свяжется оператор. Спасибо, что выбрали нас!' ###
 DELIVERY_THANKS_KO = '저희 가게에서 주문해주셔서 감사합니다!'
 
 # Кнопки
