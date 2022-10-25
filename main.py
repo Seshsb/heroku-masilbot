@@ -309,7 +309,7 @@ def request_people(message: types.Message):
 
 @bot.message_handler(
     func=lambda message: dbworker.get_current_state(message.from_user.id) == config.States.S_BOOKING_PHONE_NUMBER.value,
-    content_types=['contact'])
+    content_types=['contact', 'text'])
 def request_contact(message):
     lang = DataBase.get_user_lang(message.from_user.id)[0]
     if not lang:
