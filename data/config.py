@@ -288,6 +288,9 @@ BASKET_KO = '장바구니 🛒'
 DELETE_RU = '❌ Удалить {}'
 DELETE_KO = '❌ 지우기 {}'
 
+CLEAR_BASKET_RU = 'Очистить корзину 🚫'
+CLEAR_BASKET_KO = 'Очистить корзину 🚫'
+
 ORDER_RU = 'Оформить заказ 🧾'
 ORDER_KO = '주문하기 🧾'
 
@@ -442,6 +445,8 @@ trans = {
             'BASKET_KO': BASKET_KO,
             'DELETE_RU': DELETE_RU,
             'DELETE_KO': DELETE_KO,
+            'CLEAR_BASKET_RU': CLEAR_BASKET_RU,
+            'CLEAR_BASKET_KO': CLEAR_BASKET_KO,
             'ORDER_RU': ORDER_RU,
             'ORDER_KO': ORDER_KO,
             'SEND_LOCATION_RU': SEND_LOCATION_RU,

@@ -272,13 +272,15 @@ def request_people(message: types.Message):
         user_dict[str(message.from_user.id)].update({'people': people})
         if message.text == trans['general'][f'BACK_{lang}']:
             if user_dict[str(message.from_user.id)]['seating_category'] == 1:
-                return bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
+                bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
                                       trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
                                       reply_markup=choice_table(user_dict[str(message.from_user.id)]['date_time'],
                                                                 lang))
-            return bot.send_photo(message.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
-                                  trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                                  reply_markup=choice_cabins(user_dict[str(message.from_user.id)]['date_time'], lang))
+            else:
+                bot.send_photo(message.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
+                                      trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
+                                      reply_markup=choice_cabins(user_dict[str(message.from_user.id)]['date_time'], lang))
+            return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
@@ -608,6 +610,13 @@ def action_in_basket(message: types.Message):
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_ADDRESS_{lang}'],
                              parse_mode='html', reply_markup=send_location(lang))
             dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_CHECKOUT.value)
+        elif message.text == trans['delivery'][f'CLEAR_BASKET_{lang}']:
+            deliveryDB.clear_basket(message.from_user.id)
+            bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_CART_EMPTY_{}'.format(lang)],
+                             parse_mode='html')
+            bot.send_message(message.from_user.id, trans['delivery']['DELIVERY_REQUEST_CATEGORY_{}'.format(lang)],
+                             reply_markup=food_categoriesRu(lang))
+            dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
         elif message.text == trans['general'][f'BACK_TO_MENU_{lang}']:
             delivery(message)
     except Exception as err:

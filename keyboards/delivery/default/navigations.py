@@ -48,6 +48,7 @@ def order_cart(user_id, lang):
     main_page = types.KeyboardButton(trans['general'][f'BACK_TO_MAIN_PAGE_{lang}'])
     markup.add(types.KeyboardButton(trans['delivery'][f'ORDER_{lang}']))
     markup.add(*cancel)
+    markup.add(types.KeyboardButton(trans['delivery'][f'CLEAR_BASKET_{lang}']))
     markup.add(main_page)
     return markup
 

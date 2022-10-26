@@ -263,6 +263,10 @@ class Delivery(DataBase):
                 self.cursor.execute('UPDATE basket SET ordered=TRUE where user_id=%s and id=%s;', (user_id, basket))
             self.connection.commit()
 
+    def clear_basket(self, user_id):
+        with self.connection:
+            self.cursor.execute('DELETE FROM basket WHERE user_id=%s', (user_id, ))
+            self.connection.commit()
 
 generalDB = DataBase()
 bookingDB = Booking()
