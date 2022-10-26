@@ -26,6 +26,7 @@ def start(message: types.Message):
     try:
         if DataBase.get_user(message.from_user.id):
             lang = DataBase.get_user_lang(message.from_user.id)[0]
+            deliveryDB.clear_basket(message.from_user.id)
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
@@ -389,10 +390,10 @@ def inline_confirmation(call: types.CallbackQuery):
                           user_dict[str(call.from_user.id)]['seating_category'],
                           user_dict[str(call.from_user.id)]['table'],
                           user_dict[str(call.from_user.id)]['people'], lang)
-        else:
+        elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CANCELED_{lang}'],
-                             reply_markup=general_nav.back_to_main_page(lang))
-            end(call.message, lang)
+                             reply_markup=general_nav.main_page(lang))
+            return dbworker.set_states(call.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
         bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
@@ -413,8 +414,6 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                             user_dict[str(call.from_user.id)]['first_name'],
                             user_dict[str(call.from_user.id)]['people'])
     bot.register_next_step_handler_by_chat_id(275755142, confirmation_admin, user)
-
-    return dbworker.set_states(user, config.States.S_ACTION_CHOICE.value)
 
 
 def confirmation_admin(message, user):

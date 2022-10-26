@@ -265,7 +265,9 @@ class Delivery(DataBase):
 
     def clear_basket(self, user_id):
         with self.connection:
-            self.cursor.execute('DELETE FROM basket WHERE user_id=%s', (user_id, ))
+            self.cursor.execute('SELECT FROM basket WHER user_id=%s', (user_id,))
+            if self.cursor.fetchone():
+                self.cursor.execute('DELETE FROM basket WHERE user_id=%s', (user_id, ))
             self.connection.commit()
 
 generalDB = DataBase()
