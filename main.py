@@ -127,7 +127,7 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            bot.edit_message_reply_markup(call.from_user.id, message_id=call.message.message_id, reply_markup=None)
+            bot.edit_message_reply_markup(call.from_user.id, message_id=call.message.id, reply_markup=None)
             user_dict.update({str(call.from_user.id): {'date': date}})
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
