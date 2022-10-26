@@ -32,11 +32,14 @@ DELIVERY_KO = '배달 🚚'
 CHANGE_LANG_RU = 'Поменять язык'
 CHANGE_LANG_KO = '언어 바꾸기'
 
-CHANGE_LANG_SUCCESS_RU = 'Язык изменен успешно изменен.'
+CHANGE_LANG_SUCCESS_RU = 'Язык успешно изменен.'
 CHANGE_LANG_SUCCESS_KO = '성공적으로 언어가 바뀌었습니다.'
 
 BACK_TO_MAIN_PAGE_RU = 'Вернуться на главную страницу 📃'
 BACK_TO_MAIN_PAGE_KO = '처음으로 돌아가기 📃'
+
+BACK_TO_MENU_RU = 'Вернуться в меню'
+BACK_TO_MENU_KO = 'Вернуться в меню'
 
 SEND_CONTACT_RU = 'Отправить контакт 📱'
 SEND_CONTACT_KO = '전화번호 보내기 📱'
@@ -331,6 +334,8 @@ trans = {
             'CHANGE_LANG_SUCCESS_KO': CHANGE_LANG_SUCCESS_KO,
             'BACK_TO_MAIN_PAGE_RU': BACK_TO_MAIN_PAGE_RU,
             'BACK_TO_MAIN_PAGE_KO': BACK_TO_MAIN_PAGE_KO,
+            'BACK_TO_MENU_RU': BACK_TO_MENU_RU,
+            'BACK_TO_MENU_KO': BACK_TO_MENU_KO,
             'SEND_CONTACT_RU': SEND_CONTACT_RU,
             'SEND_CONTACT_KO': SEND_CONTACT_KO,
             'BACK_RU': BACK_RU,

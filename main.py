@@ -127,6 +127,7 @@ def callback_date(call: CallbackQuery):
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
+            bot.edit_message_reply_markup(call.from_user.id, message_id=call.message.message_id, reply_markup=None)
             user_dict.update({str(call.from_user.id): {'date': date}})
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
@@ -424,7 +425,7 @@ def confirmation_admin(message, user):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(275755142, trans['delivery'][f'DELIVERY_ACCEPTING_{lang}'])
+            bot.send_message(275755142, trans['delivery'][f'DELIVERY_ACCEPTING_{lang}'], reply_markup=None)
             bookingDB.start_booking(user,
                                     user_dict[str(user)]['table_id'][0],
                                     user_dict[str(user)]['datetime_start'],
@@ -594,7 +595,7 @@ def action_in_basket(message: types.Message):
         del_good = message.text[10:]
         if del_good in goods:
             deliveryDB.delete_good_from_basket(del_good, message.from_user.id, lang)
-            show_basket(message, lang)
+            return show_basket(message, lang)
         elif message.text == trans['delivery'][f'ORDER_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_ADDRESS_{lang}'],
                              parse_mode='html', reply_markup=send_location(lang))

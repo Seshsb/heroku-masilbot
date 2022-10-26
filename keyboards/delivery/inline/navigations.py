@@ -13,7 +13,7 @@ def payment_method(lang):
 
 
 def accepting_order(lang):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
     accept = types.KeyboardButton(text=trans['general'][f'ACCEPT_{lang}'])
     cancel = types.KeyboardButton(text=trans['general'][f'CANCEL_{lang}'])
     markup.add(accept, cancel)
