@@ -318,7 +318,7 @@ def request_contact(message: types.Message):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         phone_number = ''
-        if message.text.startswith('+998') and len(message.text) == 13:
+        if message.content_type == 'text' and message.text.startswith('+998') and len(message.text) == 13:
             phone_number = message.text
         elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_PEOPLE_{lang}'],
@@ -664,7 +664,7 @@ def request_contact(message):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         phone_number = ''
-        if message.text.startswith('+998') and len(message.text) == 13:
+        if message.content_type == 'text' and message.text.startswith('+998') and len(message.text) == 13:
             phone_number = message.text
         elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_ADDRESS_{lang}'],
