@@ -61,20 +61,10 @@ def action_choice(message: types.Message):
                                     f'{traceback.format_exc()}')
 
 
-def end(message: types.Message):
-    lang = DataBase.get_user_lang(message.from_user.id)[0]
-    if not lang:
-        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
-                         reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
-    try:
-        bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
-                         reply_markup=general_nav.main_page(lang))
-        dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    except Exception as err:
-        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-                                    f'{traceback.format_exc()}')
+def end(message: types.Message, lang):
+    bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
+                     reply_markup=general_nav.main_page(lang))
+    dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
 @bot.message_handler(
@@ -338,7 +328,7 @@ def request_contact(message: types.Message):
             return bot.send_message(message.from_user.id, trans['general'][f'INVALID_PHONE_NUMBER_{lang}'])
         user_dict[str(message.from_user.id)].update({'phone_number': phone_number})
         bot.send_message(message.from_user.id, trans['general'][f'GET_FIRST_NAME_{lang}'],
-                         reply_markup=types.ReplyKeyboardRemove())
+                         reply_markup=base(lang))
         return dbworker.set_states(message.from_user.id, config.States.S_BOOKING_FIRSTNAME.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
@@ -402,7 +392,7 @@ def inline_confirmation(call: types.CallbackQuery):
         else:
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CANCELED_{lang}'],
                              reply_markup=general_nav.back_to_main_page(lang))
-            end(call.message)
+            end(call.message, lang)
     except Exception as err:
         bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'

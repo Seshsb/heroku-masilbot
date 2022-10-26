@@ -13,7 +13,7 @@ def base(lang):
 
 
 def confirm_keybord(lang):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2, one_time_keyboard=True)
     confirm = types.KeyboardButton(trans['general'][f'ACCEPT_{lang}'])
     cancel = types.KeyboardButton(trans['general'][f'CANCEL_{lang}'])
     markup.add(confirm, cancel)
