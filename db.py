@@ -257,7 +257,7 @@ class Delivery(DataBase):
 
     def accept_order(self, user_id):
         with self.connection:
-            self.cursor.execute('UPDATE orders SET confirmed=True WHERE user_id=%s', (user_id,))
+            self.cursor.execute('UPDATE orders SET confirmed=True WHERE user_id=%s;', (user_id,))
             self.cursor.execute('select id from basket where user_id=%s and ordered=False;', (user_id,))
             for basket in self.cursor.fetchall():
                 self.cursor.execute('UPDATE basket SET ordered=TRUE where user_id=%s and id=%s;', (user_id, basket))
@@ -265,9 +265,9 @@ class Delivery(DataBase):
 
     def clear_basket(self, user_id):
         with self.connection:
-            self.cursor.execute('SELECT * FROM basket WHER user_id=%s', (user_id,))
+            self.cursor.execute('SELECT * FROM basket WHER user_id=%s;', (user_id,))
             if self.cursor.fetchone():
-                self.cursor.execute('DELETE FROM basket WHERE user_id=%s', (user_id, ))
+                self.cursor.execute('DELETE FROM basket WHERE user_id=%s;', (user_id, ))
             self.connection.commit()
 
 generalDB = DataBase()
