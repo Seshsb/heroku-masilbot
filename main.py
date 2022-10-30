@@ -156,8 +156,8 @@ def callback_date(call: CallbackQuery):
 
 
 @bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
-@bot.callback_query_handler(func=lambda call: call.data.startswith('cancel'))
+    func=lambda call: call.data.startswith('cancel') and
+                      dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
 def cancel_date(call):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
     if not lang:
