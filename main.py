@@ -413,7 +413,7 @@ def inline_confirmation(call: types.CallbackQuery):
 
 
 def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_category, table, people, lang):
-    bot.send_message(user, trans['delivery'][f'DEIVERY_WAITING_{lang}'])
+    bot.send_message(user, trans['delivery'][f'DELIVERY_WAITING_{lang}'])
     bot.send_message(275755142, trans['booking'][f'BOOKING_DETAIL_{lang}']
                      .format(first_name, phone_number, datetime_start.replace("-", "."),
                              bookingDB.seating_category(seating_category)[0], table, people),
