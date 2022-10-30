@@ -281,6 +281,9 @@ DELIVERY_ORDER_SUM_TOTAL_KO = '\n<b>결제 금액: {0:,} сум\n' \
 DELIVERY_SOMETHING_ELSE_RU = 'Хотите что-то еще?'
 DELIVERY_SOMETHING_ELSE_KO = '추가로 주문하시겠습니까?'
 
+DELIVERY_WAITING_RU = 'Ожидайте подтверждение бронирование от оператора, это займет немного времени'
+DELIVERY_WAITING_KO = '예약 확인을 위해 곧 매니저로부터 연락이 갈 것입니다, 조금만 기다려주세요'
+
 DELIVERY_THANKS_RU = 'Благодарим за заказ, с вами свяжется оператор. Спасибо, что выбрали нас!' ###
 DELIVERY_THANKS_KO = '주문해주셔서 감사합니다, 매니저로부터 곧 연락이 갈 것입니다. 저희 가게를 선택해주셔서 감사합니다!'
 
