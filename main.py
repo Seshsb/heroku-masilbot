@@ -168,6 +168,7 @@ def reserve_time(message: types.Message):
             if 10 <= int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
                 date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
+                bot.send_message(message.from_user.id, f'{date_time}  {datetime.now()}')
                 if date_time < datetime.now():
                     return bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
                 datetime_start = f'{date_time}'
