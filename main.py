@@ -174,7 +174,7 @@ def reserve_time(message: types.Message):
                 date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
                 bot.send_message(message.from_user.id, f'{date_time}  {datetime.now()}')
-                if date_time < datetime.now(tz=tz).replace(tzinfo=pytz.UTC):
+                if date_time.replace(tzinfo=pytz.UTC) < datetime.now(tz=tz).replace(tzinfo=pytz.UTC):
                     return bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
