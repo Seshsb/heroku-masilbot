@@ -284,6 +284,9 @@ DELIVERY_SOMETHING_ELSE_KO = '추가로 주문하시겠습니까?'
 DELIVERY_THANKS_RU = 'Благодарим за заказ, с вами свяжется оператор. Спасибо, что выбрали нас!' ###
 DELIVERY_THANKS_KO = '주문해주셔서 감사합니다, 매니저로부터 곧 연락이 갈 것입니다. 저희 가게를 선택해주셔서 감사합니다!'
 
+DELIVERY_TIME_INVALID_RU = 'Заказы принимаются с 11:00 до 22:00'
+DELIVERY_TIME_INVALID_KO = 'Заказы принимаются с 11:00 до 22:00'
+
 # Кнопки
 BASKET_RU = 'Корзина 🛒'
 BASKET_KO = '장바구니 🛒'
@@ -339,6 +342,8 @@ trans = {
             'BACK_KO': BACK_KO,
             'ACCEPT_RU': ACCEPT_RU,
             'ACCEPT_KO': ACCEPT_KO,
+            'ACCEPTING_RU': ACCEPTING_RU,
+            'ACCEPTING_KO': ACCEPTING_KO,
             'CANCEL_RU': CANCEL_RU,
             'CANCEL_KO': CANCEL_KO,
             'ERROR_RU': ERROR_RU,
@@ -429,8 +434,6 @@ trans = {
             'DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO': DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO,
             'DELIVERY_QUESTION_ACCEPT_RU': DELIVERY_QUESTION_ACCEPT_RU,
             'DELIVERY_QUESTION_ACCEPT_KO': DELIVERY_QUESTION_ACCEPT_KO,
-            'DELIVERY_ACCEPTING_RU': ACCEPTING_RU,
-            'DELIVERY_ACCEPTING_KO': ACCEPTING_KO,
             'DELIVERY_COST_RU': DELIVERY_COST_RU,
             'DELIVERY_COST_KO': DELIVERY_COST_KO,
             'DELIVERY_ORDER_RU': DELIVERY_ORDER_RU,

@@ -159,10 +159,12 @@ def reserve_time(message: types.Message):
 
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        time_now = datetime.now().time()
+        if datetime.today().date() == datetime.strptime(user_dict[str(message.from_user.id)]['date'], '%Y-%m-%d'):
+            time_now = datetime.now().time()
+            if datetime.strptime(message.text, '%H:%M').time() < time_now:
+                return bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
         if message.text[:2].isdigit() and message.text[3:].isdigit() and message.text[2] == ':':
-            # if datetime.strptime(message.text, '%H:%M').time() > time_now:
-            if int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
+            if 10 <= int(message.text[:2]) <= 21 and int(message.text[3:]) == 00:
                 date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
                 datetime_start = f'{date_time}'
@@ -326,8 +328,8 @@ def request_contact(message: types.Message):
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         elif message.content_type == 'contact':
-            bot.send_message(message.from_user.id, message)
-            if ' ' in phone_number:
+            phone_number = message.contact.phone_number
+            if (' ' in phone_number and phone_number[0] != '+') or ' ' in phone_number or phone_number[0] != '+':
                 phone_number = f"+{phone_number.replace(' ', '')}"
         else:
             return bot.send_message(message.from_user.id, trans['general'][f'INVALID_PHONE_NUMBER_{lang}'])
@@ -428,7 +430,7 @@ def confirmation_admin(message, user):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(275755142, trans['delivery'][f'DELIVERY_ACCEPTING_{lang}'], reply_markup=None)
+            bot.send_message(275755142, trans['general'][f'ACCEPTING_{lang}'], reply_markup=None)
             bookingDB.start_booking(user,
                                     user_dict[str(user)]['table_id'][0],
                                     user_dict[str(user)]['datetime_start'],
@@ -465,6 +467,9 @@ def delivery(message: types.Message):
     try:
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
+        if 10 < int(datetime.now().strftime('%H:%M')[:2]) < 23:
+            return bot.send_message(message.from_user.id, 'Заказы принимаются с 11:00 до 22:00',
+                                    reply_markup=general_nav.error())
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
                          reply_markup=food_categoriesRu(lang))
         dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
@@ -677,7 +682,8 @@ def request_contact(message):
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         elif message.content_type == 'contact':
-            if ' ' in phone_number:
+            phone_number = message.contact.phone_number
+            if (' ' in phone_number and phone_number[0] != '+') or ' ' in phone_number or phone_number[0] != '+':
                 phone_number = f"+{phone_number.replace(' ', '')}"
         else:
             return bot.send_message(message.from_user.id, trans['general'][f'INVALID_PHONE_NUMBER_{lang}'])
@@ -796,7 +802,7 @@ def accepting_admin(message: types.Message, client, phone_number, method_pay, ad
         return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(275755142, trans['delivery'][f'DELIVERY_ACCEPTING_{lang}'])
+            bot.send_message(275755142, trans['general'][f'ACCEPTING_{lang}'])
             show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
