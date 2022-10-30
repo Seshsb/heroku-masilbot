@@ -284,8 +284,8 @@ DELIVERY_SOMETHING_ELSE_KO = '추가로 주문하시겠습니까?'
 DELIVERY_THANKS_RU = 'Благодарим за заказ, с вами свяжется оператор. Спасибо, что выбрали нас!' ###
 DELIVERY_THANKS_KO = '주문해주셔서 감사합니다, 매니저로부터 곧 연락이 갈 것입니다. 저희 가게를 선택해주셔서 감사합니다!'
 
-DELIVERY_TIME_INVALID_RU = 'Заказы принимаются с 11:00 до 22:00'
-DELIVERY_TIME_INVALID_KO = '11:00부터 21:30까지 주문 가능합니다'
+DELIVERY_TIME_INVALID_RU = 'Заказы принимаются с 11:00 до 21:00'
+DELIVERY_TIME_INVALID_KO = '11:00부터 21:00까지 주문 가능합니다'
 
 # Кнопки
 BASKET_RU = 'Корзина 🛒'

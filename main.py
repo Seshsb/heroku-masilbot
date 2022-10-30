@@ -473,7 +473,7 @@ def delivery(message: types.Message):
     try:
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
-        if time(11, 00) < datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() < time(23, 00):
+        if time(11, 00) < datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() < time(21, 00):
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
                              reply_markup=food_categoriesRu(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
