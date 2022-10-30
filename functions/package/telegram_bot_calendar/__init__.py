@@ -1,1 +1,0 @@
-from telegram_bot_calendar.wmonth import WMonthTelegramCalendar
