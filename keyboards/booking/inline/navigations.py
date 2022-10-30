@@ -4,7 +4,7 @@ import telebot
 from telebot import types
 
 from data.config import trans
-from functions.telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
+from telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
 
 from db import bookingDB
 
