@@ -473,7 +473,6 @@ def delivery(message: types.Message):
     try:
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
-        bot.send_message(message.from_user.id, f'{datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time()}')
         if time(11, 00) < datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() < time(23, 00):
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
                              reply_markup=food_categoriesRu(lang))
