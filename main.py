@@ -313,7 +313,6 @@ def request_contact(message: types.Message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        bot.send_message(message.from_user.id, message.from_user.)
         phone_number = ''
         if message.content_type == 'text' and message.text.startswith('+998') and len(message.text) == 13:
             phone_number = message.text
