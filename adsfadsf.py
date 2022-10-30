@@ -1,7 +1,7 @@
-from datetime import datetime
+user_dict = {}
+id = 1231313
+message = input('Vvedi edu ')
+quantity = input('kolvo ')
+user_dict[id] = {message: quantity}
 
-message = '23:00'
-time_now = datetime.now().time()
-if datetime.strptime(message, '%H:%M').time() > time_now:
-    print(True)
-print(False)
+print(user_dict)

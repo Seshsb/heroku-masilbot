@@ -14,7 +14,7 @@ GET_PHONE_NUMBER_RU = 'Нажмите на кнопку и отправь ном
 GET_PHONE_NUMBER_KO = '핸드폰 번호를 입력해주세요' '+998*********으로 써주세요'
 
 INVALID_PHONE_NUMBER_RU = 'Неправильный формат номера, попробуйте еще раз'
-INVALID_PHONE_NUMBER_KO = 'Неправильный формат номера, попробуйте еще раз'
+INVALID_PHONE_NUMBER_KO = '번호를 맞게 다시 한번 적어주세요'
 
 GET_FIRST_NAME_RU = 'Введите свое имя'
 GET_FIRST_NAME_KO = '성함을 입력해주세요'
@@ -33,13 +33,13 @@ CHANGE_LANG_RU = 'Поменять язык'
 CHANGE_LANG_KO = '언어 바꾸기'
 
 CHANGE_LANG_SUCCESS_RU = 'Язык успешно изменен.'
-CHANGE_LANG_SUCCESS_KO = '성공적으로 언어가 바뀌었습니다.'
+CHANGE_LANG_SUCCESS_KO = '언어가 성공적으로 바뀌었습니다'
 
 BACK_TO_MAIN_PAGE_RU = 'Вернуться на главную страницу 📃'
 BACK_TO_MAIN_PAGE_KO = '처음으로 돌아가기 📃'
 
-BACK_TO_MENU_RU = 'Вернуться в меню'
-BACK_TO_MENU_KO = 'Вернуться в меню'
+BACK_TO_MENU_RU = 'Вернуться в меню ⏪'
+BACK_TO_MENU_KO = 'Вернуться в меню ⏪'
 
 SEND_CONTACT_RU = 'Отправить контакт 📱'
 SEND_CONTACT_KO = '전화번호 보내기 📱'
@@ -54,7 +54,7 @@ CANCEL_RU = 'Отменить ❌'
 CANCEL_KO = '취소 ❌'
 
 ERROR_RU = 'Упс, что-то пошло не так, нажмите на кнопку и перезапустите бот'
-ERROR_KO = 'Упс, что-то пошло не так, нажмите на кнопку и перезапустите бот'
+ERROR_KO = '잘못되었습니다, 봇을 재시작해주세요'
 
 ########################################################################################################################
 # Бронирование
@@ -112,7 +112,7 @@ BOOKING_CONFIRMED_RU = 'Бронирование прошло успешно'
 BOOKING_CONFIRMED_KO = '성공적으로 예약 되었습니다'
 
 BOOKING_CANCELED_RU = 'Бронирование отменено'
-BOOKING_CANCELED_KO = '예약이 취소되었습니다'
+BOOKING_CANCELED_KO = '죄송합니다, 예약이 취소되었습니다, /start를 눌러서 다시 한번 시도해주세요'
 
 BOOKING_ADMIN_CANCEL_RU = 'Сожалеем, но бронирование отменено, нажмите на /start чтобы попробовать снова'
 BOOKING_ADMIN_CANCEL_KO = '죄송합니다, 예약이 취소되었습니다, /start를 눌러서 다시 한번 시도해주세요'
@@ -157,8 +157,7 @@ DELIVERY_PAYMENT_METHOD_KO = "<b>결제방식을 선택해주세요:</b>"
 
 DELIVERY_REQUEST_ADDRESS_RU = '<b>Введите свой адрес или нажмите на "Поделиться геолокацией"\n ' \
                               'и телеграм определит ваше местоположение автоматически.</b>'
-DELIVERY_REQUEST_ADDRESS_KO = '<b>Введите свой адрес или нажмите на "Поделиться геолокацией"\n ' \
-                              'и телеграм определит ваше местоположение автоматически.</b>'
+DELIVERY_REQUEST_ADDRESS_KO = '<b>주소를 적어주시거나 ”위치 공유하기“ 를 눌러주시면 저희가 주소를 받을 수 있습니다.</b>'
 
 DELIVERY_CASH_METHOD_RU = 'Наличными 💵'
 DELIVERY_CASH_METHOD_KO = '현금 💵'
@@ -282,7 +281,7 @@ DELIVERY_SOMETHING_ELSE_RU = 'Хотите что-то еще?'
 DELIVERY_SOMETHING_ELSE_KO = '추가로 주문하시겠습니까?'
 
 DELIVERY_THANKS_RU = 'Благодарим за заказ, с вами свяжется оператор. Спасибо, что выбрали нас!' ###
-DELIVERY_THANKS_KO = '저희 가게에서 주문해주셔서 감사합니다!'
+DELIVERY_THANKS_KO = '주문해주셔서 감사합니다, 매니저로부터 곧 연락이 갈 것입니다. 저희 가게를 선택해주셔서 감사합니다!'
 
 # Кнопки
 BASKET_RU = 'Корзина 🛒'
@@ -292,16 +291,13 @@ DELETE_RU = '❌ Удалить {}'
 DELETE_KO = '❌ 지우기 {}'
 
 CLEAR_BASKET_RU = 'Очистить корзину 🚫'
-CLEAR_BASKET_KO = 'Очистить корзину 🚫'
+CLEAR_BASKET_KO = '장바구니 비우기 🚫'
 
 ORDER_RU = 'Оформить заказ 🧾'
 ORDER_KO = '주문하기 🧾'
 
 SEND_LOCATION_RU = 'Поделиться локацией 🌐'
 SEND_LOCATION_KO = '위치 공유하기 🌐'
-
-BACK_TO_MENU_RU = 'Вернуться в меню доставки ⏪'
-BACK_TO_MENU_KO = ' 메뉴로 돌아가기 ⏪'
 
 TAKEAWAY_RU = 'На вынос 🏃🏻‍♂️'
 TAKEAWAY_KO = '픽업 🏃🏻‍♂️'
