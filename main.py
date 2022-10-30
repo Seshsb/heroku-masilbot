@@ -24,7 +24,7 @@ from functions.handlers import *
 
 user_dict = dict()
 
-offset = timedelta(hours=12)
+offset = timedelta(hours=5)
 tz = timezone(offset, name='Tashkent')
 
 
