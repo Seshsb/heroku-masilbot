@@ -27,6 +27,8 @@ user_dict = dict()
 
 offset = timedelta(hours=5)
 tz = timezone(offset, name='Tashkent')
+calendar, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
+                                              additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
 
 
 @bot.message_handler(commands=['start'])
@@ -128,7 +130,7 @@ def callback_date(call: CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        result, key, step = DetailedTelegramCalendar(min_date=datetime.now().date(),
+        result, key, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
                                                      additional_buttons=[
                                                          {'text': 'cancel', 'callback_data': 'cancel'}]).process(call.data)
         bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
@@ -138,7 +140,6 @@ def callback_date(call: CallbackQuery):
                                   call.message.chat.id,
                                   call.message.message_id,
                                   reply_markup=key)
-            bot.send_message(call.message.chat.id, key)
         elif result:
             date = result.strftime('%Y-%m-%d')
             user_dict.update({str(call.from_user.id): {'date': date}})

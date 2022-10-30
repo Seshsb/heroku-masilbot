@@ -63,5 +63,3 @@ def booking_confirm(lang):
 #                          year=now.year,
 #                          month=now.month)
 
-calendar, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
-                                              additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
