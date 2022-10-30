@@ -27,6 +27,7 @@ user_dict = dict()
 offset = timedelta(hours=12)
 tz = timezone(offset, name='Tashkent')
 
+
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
     try:
@@ -206,6 +207,7 @@ def inline_seating_category(call: types.CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
+        bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
         seating_category = 0
         if call.data == trans['booking'][f'TABLES_{lang}']:
             seating_category = 1
@@ -239,6 +241,7 @@ def inline_choice_table(call: types.CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
+        bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
         if call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_CATEGORY_{lang}'],
                              reply_markup=inline_category(lang))
@@ -390,6 +393,7 @@ def inline_confirmation(call: types.CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
+        bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
         if call.data == 'confirm':
             user = call.from_user.id
             confirm_admin(call, user, user_dict[str(call.from_user.id)]['first_name'],
@@ -708,6 +712,7 @@ def inline_payment_method(call: types.CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
+        bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
         method_pay = ''
         if call.data == 'cash':
             method_pay = trans['delivery'][f'DELIVERY_CASH_METHOD_{lang}']
