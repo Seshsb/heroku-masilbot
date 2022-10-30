@@ -478,7 +478,7 @@ def delivery(message: types.Message):
                              reply_markup=food_categoriesRu(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
         else:
-            return bot.send_message(message.from_user.id, trans[''],
+            return bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_TIME_INVALID_{lang}'],
                                     reply_markup=general_nav.error())
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
