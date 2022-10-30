@@ -7,7 +7,7 @@ import telebot.storage
 import telebot.custom_filters
 import telebot.types
 from telebot.types import CallbackQuery
-from telegram_bot_calendar import LSTEP
+from functions.package.telegram_bot_calendar.base import LSTEP
 
 import dbworker
 import config
@@ -197,7 +197,7 @@ def reserve_time(message: types.Message):
 
         elif message.text == trans['general'][f'BACK_{lang}']:
             bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
-                             reply_markup=show_calendar)
+                             reply_markup=calendar)
             dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],

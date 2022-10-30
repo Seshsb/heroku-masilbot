@@ -2,7 +2,7 @@ import datetime
 
 import telebot
 from telebot import types
-from telegram_bot_calendar import DetailedTelegramCalendar
+from functions.package.telegram_bot_calendar.detailed import DetailedTelegramCalendar
 
 from data.config import trans
 from telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
