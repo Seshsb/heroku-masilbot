@@ -1,3 +1,4 @@
+import datetime
 import traceback
 import telebot.apihelper
 import telebot.storage
@@ -8,7 +9,7 @@ from telebot.types import CallbackQuery
 import dbworker
 import config
 
-from datetime import timedelta
+from datetime import timedelta, timezone
 from db import DataBase
 from connections import *
 from flask import request
@@ -21,6 +22,8 @@ from functions.handlers import *
 
 user_dict = dict()
 
+offset = timedelta(hours=5)
+tz = timezone(offset, name='Tashkent')
 
 @bot.message_handler(commands=['start'])
 def start(message: types.Message):
@@ -169,7 +172,7 @@ def reserve_time(message: types.Message):
                 date_time = datetime.strptime(f'{user_dict[str(message.from_user.id)]["date"]} {message.text}',
                                               '%Y-%m-%d %H:%M')
                 bot.send_message(message.from_user.id, f'{date_time}  {datetime.now()}')
-                if date_time < datetime.now():
+                if date_time < datetime.now(tz=tz):
                     return bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
                 datetime_start = f'{date_time}'
                 datetime_end = f'{date_time + timedelta(hours=2)}'
@@ -471,7 +474,7 @@ def delivery(message: types.Message):
     try:
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
-        if 10 < int(datetime.now().strftime('%H:%M')[:2]) < 23:
+        if 10 < int(datetime.now(tz=tz).strftime('%H:%M')[:2]) < 23:
             return bot.send_message(message.from_user.id, 'Заказы принимаются с 11:00 до 22:00',
                                     reply_markup=general_nav.error())
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
