@@ -206,7 +206,7 @@ DELIVERY_ORDER_ACCEPT_CLIENT_TAKEAWAY_KO = '<b>주문확인 </b>\n' \
                                            '결제방식: <b>{1}</b>\n\n\n'
 
 DELIVERY_ORDER_CLIENT_TOTAL_RU = '\n<b>Сумма заказа: {0:,} сум + стоимость доставки (определяется исходя от адреса доставки)</b>\n\n' \
-                                 'Для связи с оператором @seshsb'
+                                 'Для связи с оператором @masil_uz'
 DELIVERY_ORDER_CLIENT_TOTAL_KO = '\n<b>결제 금액: {0:,} сум + 배달비 (배달지에 따라 금액이 달라집니다)</b>\n\n' \
                                  '매니저와 연락을 원하시면 @seshsb'
 
