@@ -474,12 +474,13 @@ def delivery(message: types.Message):
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
         bot.send_message(message.from_user.id, f'{datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time()}')
-        if time(11, 00) > datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() > time(23, 00):
+        if time(11, 00) < datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() < time(23, 00):
+            bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
+                             reply_markup=food_categoriesRu(lang))
+            return dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
+        else:
             return bot.send_message(message.from_user.id, 'Заказы принимаются с 11:00 до 22:00',
                                     reply_markup=general_nav.error())
-        bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],
-                         reply_markup=food_categoriesRu(lang))
-        dbworker.set_states(message.from_user.id, config.States.S_DELIVERY_MENU_CATEGORY.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
