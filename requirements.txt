@@ -4,7 +4,7 @@ APScheduler==3.6.3
 async-timeout==4.0.2
 attrs==22.1.0
 Babel==2.9.1
-backports.zoneinfo;python_version<"3.8.7"
+backports.zoneinfo;python_version<"3.10"
 cachetools==4.2.2
 certifi==2022.9.14
 charset-normalizer==2.1.1
