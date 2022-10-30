@@ -132,7 +132,7 @@ def callback_date(call: CallbackQuery):
     try:
         result, key, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
                                                      additional_buttons=[
-                                                         {'text': 'cancel', 'callback_data': 'cancel'}]).process(call.data)
+                                                         {'text': 'Отмена', 'callback_data': 'cancel'}]).process(call.data)
         bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
 
         if not result and key:
@@ -158,7 +158,7 @@ def callback_date(call: CallbackQuery):
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
 @bot.callback_query_handler(func=lambda call: call.data.startswith('cancel'))
-def call(call):
+def cancel_date(call):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
     if not lang:
         bot.send_message(call.from_user.id, trans['general']['CHOICE_LANGUAGE'],
