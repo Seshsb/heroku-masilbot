@@ -7,6 +7,7 @@ import telebot.storage
 import telebot.custom_filters
 import telebot.types
 from telebot.types import CallbackQuery
+from telegram_bot_calendar import LSTEP
 
 import dbworker
 import config
@@ -109,7 +110,7 @@ def booking(message: types.Message):
 
     try:
         bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
-                         reply_markup=show_calendar)
+                         reply_markup=calendar)
         dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
@@ -119,8 +120,7 @@ def booking(message: types.Message):
 
 @bot.callback_query_handler(
     func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
-@bot.callback_query_handler(
-    func=lambda call: call.data.startswith(calendar_1.prefix))
+@bot.callback_query_handler(func=DetailedTelegramCalendar().func())
 def callback_date(call: CallbackQuery):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
     if not lang:
@@ -128,31 +128,44 @@ def callback_date(call: CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        name, action, year, month, day = call.data.split(calendar_1.sep)
+        result, key, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
+                                                     additional_buttons=[
+                                                         {'text': 'cancel', 'callback_data': 'cancel'}]).process(call.data)
         bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
 
-        if action == "DAY":
-            date = calendar.calendar_query_handler(
-                bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
-            ).strftime('%Y-%m-%d')
+        if not result and key:
+            bot.edit_message_text(f"Select {LSTEP[step]}",
+                                  call.message.chat.id,
+                                  call.message.message_id,
+                                  reply_markup=key)
+            bot.send_message(call.message.chat.id, key)
+        elif result:
+            date = result.strftime('%Y-%m-%d')
             user_dict.update({str(call.from_user.id): {'date': date}})
-            today_month = datetime.today().strftime('%m')
-            today_day = datetime.today().strftime('%d')
-            if int(month) == int(today_month) and int(day) < int(today_day):
-                bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_FAILED_DATE_{lang}'],
-                                 reply_markup=show_calendar)
-                return dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_DATE.value)
+            bot.edit_message_text(f"You selected {result}",
+                                  call.message.chat.id,
+                                  call.message.message_id)
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
             dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)
-        elif action == "CANCEL":
-            bot.send_message(call.from_user.id, trans['general'][f'START_{lang}'],
-                             reply_markup=general_nav.main_page(lang))
-            return dbworker.set_states(call.from_user.id, config.States.S_ACTION_CHOICE.value)
     except Exception as err:
         bot.send_message(call.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {call.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
+
+
+@bot.callback_query_handler(
+    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
+@bot.callback_query_handler(func=lambda call: call.data.startswith('cancel'))
+def call(call):
+    lang = DataBase.get_user_lang(call.from_user.id)[0]
+    if not lang:
+        bot.send_message(call.from_user.id, trans['general']['CHOICE_LANGUAGE'],
+                         reply_markup=general_nav.choice_lang())
+        return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
+    bot.send_message(call.from_user.id, trans['general'][f'START_{lang}'],
+                     reply_markup=general_nav.main_page(lang))
+    return dbworker.set_states(call.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 
 @bot.message_handler(

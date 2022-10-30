@@ -2,6 +2,7 @@ import datetime
 
 import telebot
 from telebot import types
+from telegram_bot_calendar import DetailedTelegramCalendar
 
 from data.config import trans
 from telebot_calendar import CallbackData, Calendar, RUSSIAN_LANGUAGE
@@ -56,8 +57,11 @@ def booking_confirm(lang):
 
 now = datetime.datetime.now()
 calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
-calendar = Calendar(language=RUSSIAN_LANGUAGE)
-show_calendar = calendar.create_calendar(
+calendar_ = Calendar(language=RUSSIAN_LANGUAGE)
+show_calendar = calendar_.create_calendar(
                          name=calendar_1.prefix,
                          year=now.year,
                          month=now.month)
+
+calendar, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
+                                              additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
