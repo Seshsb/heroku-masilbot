@@ -128,7 +128,7 @@ def callback_date(call: CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        result, key, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
+        result, key, step = DetailedTelegramCalendar(min_date=datetime.now().date(),
                                                      additional_buttons=[
                                                          {'text': 'cancel', 'callback_data': 'cancel'}]).process(call.data)
         bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
