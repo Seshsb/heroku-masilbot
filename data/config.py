@@ -79,7 +79,7 @@ BOOKING_FAILED_TIME_RU = 'Не удалось определить время, �
 BOOKING_FAILED_TIME_KO = '시간을 다시 한번 입력해주세요'
 
 BOOKING_FAILED_TIME_NOW_RU = 'Невозможно забронировать столик на это время, попробуйте выбрать другое время'
-BOOKING_FAILED_TIME_NOW_KO = 'Невозможно забронировать столик на это время, попробуйте выбрать другое время'
+BOOKING_FAILED_TIME_NOW_KO = '이 시간에는 예약하실 수 없습니다, 다른 시간을 선택해주세요'
 
 BOOKING_REQUEST_PEOPLE_RU = 'Пожалуйста, введите количество человек'
 BOOKING_REQUEST_PEOPLE_KO = '몇 분인지 입력해주세요'

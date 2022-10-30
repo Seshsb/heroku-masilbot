@@ -160,6 +160,7 @@ def reserve_time(message: types.Message):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if datetime.today().date() == datetime.strptime(user_dict[str(message.from_user.id)]['date'], '%Y-%m-%d'):
+            bot.send_message(message.from_user.id, user_dict[str(message.from_user.id)]['date'])
             time_now = datetime.now().time()
             if datetime.strptime(message.text, '%H:%M').time() < time_now:
                 return bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_FAILED_TIME_NOW_{lang}'])
