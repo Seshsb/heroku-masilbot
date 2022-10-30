@@ -474,7 +474,7 @@ def delivery(message: types.Message):
         if not DataBase.get_user(message.from_user.id):
             DataBase.register(message.from_user.id, lang)
         bot.send_message(message.from_user.id, f'{datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time()}')
-        if time(11, 00) < datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() < time(23, 00):
+        if time(11, 00) > datetime.now(tz=tz).replace(tzinfo=pytz.UTC).time() > time(23, 00):
             return bot.send_message(message.from_user.id, 'Заказы принимаются с 11:00 до 22:00',
                                     reply_markup=general_nav.error())
         bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_REQUEST_CATEGORY_{lang}'],

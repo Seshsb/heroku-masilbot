@@ -85,7 +85,7 @@ BOOKING_REQUEST_PEOPLE_RU = 'Пожалуйста, введите количес
 BOOKING_REQUEST_PEOPLE_KO = '몇 분인지 입력해주세요'
 
 BOOKING_FAILED_REQUEST_PEOPLE_RU = 'Некорректный ввод, попробуйте заново'
-BOOKING_FAILED_REQUEST_PEOPLE_KO = 'Некорректный ввод, попробуйте заново'
+BOOKING_FAILED_REQUEST_PEOPLE_KO = '번호를 다시 한번 적어주세요'
 
 BOOKING_FAILED_PEOPLE_QUANTITY_RU = 'Извините, но число людей не может превышать допустимого количества\n' \
                            'В эту кабинку разрешается от {0} до {1} человек'
@@ -121,7 +121,7 @@ BOOKING_ADMIN_CANCEL_RU = 'Сожалеем, но бронирование от�
 BOOKING_ADMIN_CANCEL_KO = '죄송합니다, 예약이 취소되었습니다, /start를 눌러서 다시 한번 시도해주세요'
 
 BOOKING_WAIT_CONFIRM_RU = 'Ожидайте подтверждение бронирования от оператора, это займет немного времени'
-BOOKING_WAIT_CONFIRM_KO = 'Ожидайте подтверждение бронирования от оператора, это займет немного времени'
+BOOKING_WAIT_CONFIRM_KO = '예약 확인을 위해 곧 매니저로부터 연락이 갈 것입니다, 조금만 기다려주세요'
 
 
 
@@ -285,7 +285,7 @@ DELIVERY_THANKS_RU = 'Благодарим за заказ, с вами свяж
 DELIVERY_THANKS_KO = '주문해주셔서 감사합니다, 매니저로부터 곧 연락이 갈 것입니다. 저희 가게를 선택해주셔서 감사합니다!'
 
 DELIVERY_TIME_INVALID_RU = 'Заказы принимаются с 11:00 до 22:00'
-DELIVERY_TIME_INVALID_KO = 'Заказы принимаются с 11:00 до 22:00'
+DELIVERY_TIME_INVALID_KO = '11:00부터 21:30까지 주문 가능합니다'
 
 # Кнопки
 BASKET_RU = 'Корзина 🛒'
