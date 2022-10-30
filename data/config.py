@@ -50,6 +50,9 @@ BACK_KO = '뒤로 🔙'
 ACCEPT_RU = 'Подтвердить ✅'
 ACCEPT_KO = '확인 ✅'
 
+ACCEPTING_RU = 'Подтверждено'
+ACCEPTING_KO = '확인되었습니다'
+
 CANCEL_RU = 'Отменить ❌'
 CANCEL_KO = '취소 ❌'
 
@@ -238,8 +241,6 @@ DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO = '주문해주셔서 감사합니다 <b>#{
 DELIVERY_QUESTION_ACCEPT_RU = '<b>Подтвердить заказ?</b>'
 DELIVERY_QUESTION_ACCEPT_KO = '<b>주문하시겠습니까?</b>'
 
-DELIVERY_ACCEPTING_RU = 'Подтверждено'
-DELIVERY_ACCEPTING_KO = 'Подтверждено'
 
 DELIVERY_COST_RU = "<b>Введите сумму доставки</b>"
 DELIVERY_COST_KO = "<b>배달비를 입력해주세요</b>"
@@ -428,8 +429,8 @@ trans = {
             'DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO': DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_KO,
             'DELIVERY_QUESTION_ACCEPT_RU': DELIVERY_QUESTION_ACCEPT_RU,
             'DELIVERY_QUESTION_ACCEPT_KO': DELIVERY_QUESTION_ACCEPT_KO,
-            'DELIVERY_ACCEPTING_RU': DELIVERY_ACCEPTING_RU,
-            'DELIVERY_ACCEPTING_KO': DELIVERY_ACCEPTING_KO,
+            'DELIVERY_ACCEPTING_RU': ACCEPTING_RU,
+            'DELIVERY_ACCEPTING_KO': ACCEPTING_KO,
             'DELIVERY_COST_RU': DELIVERY_COST_RU,
             'DELIVERY_COST_KO': DELIVERY_COST_KO,
             'DELIVERY_ORDER_RU': DELIVERY_ORDER_RU,

@@ -122,12 +122,12 @@ def callback_date(call: CallbackQuery):
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         name, action, year, month, day = call.data.split(calendar_1.sep)
+        bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
 
         if action == "DAY":
             date = calendar.calendar_query_handler(
                 bot=bot, call=call, name=name, action=action, year=year, month=month, day=day
             ).strftime('%Y-%m-%d')
-            bot.edit_message_reply_markup()
             user_dict.update({str(call.from_user.id): {'date': date}})
             today_month = datetime.today().strftime('%m')
             today_day = datetime.today().strftime('%d')
