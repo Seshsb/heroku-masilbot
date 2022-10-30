@@ -2,6 +2,7 @@ import traceback
 import telebot.apihelper
 import telebot.storage
 import telebot.custom_filters
+import telebot.types
 from telebot.types import CallbackQuery
 
 import dbworker
@@ -312,6 +313,7 @@ def request_contact(message: types.Message):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
+        bot.send_message(message.from_user.id, message.from_user.)
         phone_number = ''
         if message.content_type == 'text' and message.text.startswith('+998') and len(message.text) == 13:
             phone_number = message.text
@@ -325,6 +327,7 @@ def request_contact(message: types.Message):
                              reply_markup=general_nav.main_page(lang))
             return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
         elif message.content_type == 'contact':
+            bot.send_message(message.from_user.id, message)
             if ' ' in phone_number:
                 phone_number = f"+{phone_number.replace(' ', '')}"
         else:
