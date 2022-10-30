@@ -55,13 +55,13 @@ def booking_confirm(lang):
     return markup
 
 
-now = datetime.datetime.now()
-calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
-calendar_ = Calendar(language=RUSSIAN_LANGUAGE)
-show_calendar = calendar_.create_calendar(
-                         name=calendar_1.prefix,
-                         year=now.year,
-                         month=now.month)
+# now = datetime.datetime.now()
+# calendar_1 = CallbackData("calendar_1", "action", "year", "month", "day")
+# calendar_ = Calendar(language=RUSSIAN_LANGUAGE)
+# show_calendar = calendar_.create_calendar(
+#                          name=calendar_1.prefix,
+#                          year=now.year,
+#                          month=now.month)
 
 calendar, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
                                               additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
