@@ -16,6 +16,8 @@ from datetime import timedelta, timezone, time
 from db import DataBase
 from connections import *
 from flask import request
+
+from functions.package.telegram_bot_calendar.detailed import CalendarWithoutYears
 from keyboards import general_nav
 from keyboards.delivery.default.navigations import *
 from keyboards.delivery.inline.navigations import *
@@ -27,7 +29,7 @@ user_dict = dict()
 
 offset = timedelta(hours=5)
 tz = timezone(offset, name='Tashkent')
-calendar, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
+calendar, step = CalendarWithoutYears(min_date=datetime.now(tz=tz).date(),
                                           additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
 
 
@@ -119,7 +121,7 @@ def booking(message: types.Message):
                                     f'{traceback.format_exc()}')
 
 
-@bot.callback_query_handler(func=DetailedTelegramCalendar().func())
+@bot.callback_query_handler(func=CalendarWithoutYears().func())
 def callback_date(call: CallbackQuery):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
     if not lang:
@@ -127,7 +129,7 @@ def callback_date(call: CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        result, key, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
+        result, key, step = CalendarWithoutYears(min_date=datetime.now(tz=tz).date(),
                                                      additional_buttons=[
                                                          {'text': 'Отмена', 'callback_data': 'cancel'}]).process(
             call.data)
@@ -140,9 +142,6 @@ def callback_date(call: CallbackQuery):
         elif result:
             date = result.strftime('%Y-%m-%d')
             user_dict.update({str(call.from_user.id): {'date': date}})
-            bot.edit_message_text(f"You selected {result}",
-                                  call.message.chat.id,
-                                  call.message.message_id)
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_REQUEST_TIME_{lang}'],
                              reply_markup=base(lang))
             dbworker.set_states(call.from_user.id, config.States.S_BOOKING_START_TIME.value)

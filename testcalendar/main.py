@@ -6,13 +6,13 @@ bot = telebot.TeleBot('5423550151:AAEOLOSI7yPwQcv01btdGUY2YSqlY1I8RAw')
 from telebot import TeleBot
 
 from functions.package.telegram_bot_calendar.base import LSTEP
-from functions.package.telegram_bot_calendar.detailed import DetailedTelegramCalendar
+from functions.package.telegram_bot_calendar.detailed import DetailedTelegramCalendar, CalendarWithoutYears
 
 
 
 @bot.message_handler(commands=['start'])
 def start(m):
-    calendar, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
+    calendar, step = CalendarWithoutYears(min_date=datetime.date.today(),
                                               additional_buttons=[{'text': 'cancel', 'callback_data': 'cancel'}]).build()
     bot.send_message(m.chat.id,
                      f"Select {LSTEP[step]}",

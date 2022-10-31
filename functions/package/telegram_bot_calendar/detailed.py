@@ -158,3 +158,7 @@ class DetailedTelegramCalendar(TelegramCalendar):
                     dates.append(None)
 
         return dates
+
+
+class CalendarWithoutYears(DetailedTelegramCalendar):
+    first_step = DAY
