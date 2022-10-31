@@ -415,6 +415,7 @@ def inline_confirmation(call: types.CallbackQuery):
                           user_dict[str(call.from_user.id)]['seating_category'],
                           user_dict[str(call.from_user.id)]['table'],
                           user_dict[str(call.from_user.id)]['people'], lang)
+            return bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
         elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CANCELED_{lang}'],
                              reply_markup=general_nav.main_page(lang))
@@ -431,7 +432,6 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                      .format(first_name, phone_number, datetime_start.replace("-", "."),
                              bookingDB.seating_category(seating_category)[0], table, people),
                      reply_markup=confirm_keybord(lang))
-    return bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
 
 
 def confirmation_admin(message, user):
