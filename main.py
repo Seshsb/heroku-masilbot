@@ -431,7 +431,7 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                      .format(first_name, phone_number, datetime_start.replace("-", "."),
                              bookingDB.seating_category(seating_category)[0], table, people),
                      reply_markup=confirm_keybord(lang))
-    bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
+    return bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
 
 
 def confirmation_admin(message, user):
