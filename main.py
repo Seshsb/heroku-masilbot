@@ -406,7 +406,7 @@ def inline_confirmation(call: types.CallbackQuery):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(call.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
+        # bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
         if call.data == 'confirm':
             user = call.from_user.id
             confirm_admin(call, user, user_dict[str(call.from_user.id)]['first_name'],
