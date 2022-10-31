@@ -25,7 +25,7 @@ from keyboards.booking.inline.navigations import *
 from keyboards.booking.default import *
 from functions.handlers import *
 
-ADMIN = ADMIN
+ADMIN = int(ADMIN)
 
 user_dict = dict()
 
