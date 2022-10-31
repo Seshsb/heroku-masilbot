@@ -805,6 +805,8 @@ def delivery_amount(message: types.Message, client, phone_number, method_pay, ad
             return bot.register_next_step_handler_by_chat_id(
                 ADMIN, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
         bot.send_message(ADMIN, 'try again')
+        return bot.register_next_step_handler_by_chat_id(
+            ADMIN, delivery_amount, client, phone_number, method_pay, address, takeaway, lang)
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
