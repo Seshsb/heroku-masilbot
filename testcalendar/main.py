@@ -19,11 +19,14 @@ def start(m):
                      reply_markup=calendar)
 
 
+@bot.callback_query_handler(func=lambda c: True)
 @bot.callback_query_handler(func=DetailedTelegramCalendar().func())
 def cal(c):
     result, key, step = DetailedTelegramCalendar(min_date=datetime.date.today(),
                                               additional_buttons=[{'text': 'cancel', 'callback_data': 'cancel'}]).process(c.data)
     print(c)
+    if c.data == 'cancel':
+        bot.send_message(c.from_user.id, 'cancel')
     if not result and key:
         bot.edit_message_text(f"Select {LSTEP[step]}",
                               c.message.chat.id,
@@ -37,9 +40,9 @@ def cal(c):
     # elif:
     #     bot.send_message(c.message.chat.id, 'cancel')
 
-@bot.callback_query_handler(func=lambda call: call.data.startswith('cancel'))
-def call(call):
-    bot.send_message(call.from_user.id, 'cancel')
+# @bot.callback_query_handler(func=lambda call: call.data.startswith('cancel'))
+# def call(call):
+#     bot.send_message(call.from_user.id, 'cancel')
 
 
 bot.polling()

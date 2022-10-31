@@ -28,7 +28,7 @@ user_dict = dict()
 offset = timedelta(hours=5)
 tz = timezone(offset, name='Tashkent')
 calendar, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
-                                              additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
+                                          additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
 
 
 @bot.message_handler(commands=['start'])
@@ -113,15 +113,12 @@ def booking(message: types.Message):
     try:
         bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
                          reply_markup=calendar)
-        dbworker.set_states(message.from_user.id, config.States.S_BOOKING_START_DATE.value)
     except Exception as err:
         bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
                                     f'{traceback.format_exc()}')
 
 
-@bot.callback_query_handler(
-    func=lambda call: dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
 @bot.callback_query_handler(func=DetailedTelegramCalendar().func())
 def callback_date(call: CallbackQuery):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
@@ -132,7 +129,8 @@ def callback_date(call: CallbackQuery):
     try:
         result, key, step = DetailedTelegramCalendar(min_date=datetime.now(tz=tz).date(),
                                                      additional_buttons=[
-                                                         {'text': 'Отмена', 'callback_data': 'cancel'}]).process(call.data)
+                                                         {'text': 'Отмена', 'callback_data': 'cancel'}]).process(
+            call.data)
 
         if not result and key:
             bot.edit_message_text(f"Select {LSTEP[step]}",
@@ -157,7 +155,7 @@ def callback_date(call: CallbackQuery):
 
 @bot.callback_query_handler(
     func=lambda call: call.data.startswith('cancel') and
-                        dbworker.get_current_state(call.from_user.id) == config.States.S_BOOKING_START_DATE.value)
+                      dbworker.get_current_state(call.from_user.id) == config.States.S_ACTION_CHOICE.value)
 def cancel_date(call):
     lang = DataBase.get_user_lang(call.from_user.id)[0]
     if not lang:
@@ -288,13 +286,13 @@ def request_people(message: types.Message):
         if message.text == trans['general'][f'BACK_{lang}']:
             if user_dict[str(message.from_user.id)]['seating_category'] == 1:
                 bot.send_photo(message.from_user.id, open('./static/booking/tables.jpeg', 'rb'),
-                                      trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                                      reply_markup=choice_table(user_dict[str(message.from_user.id)]['date_time'],
-                                                                lang))
+                               trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
+                               reply_markup=choice_table(user_dict[str(message.from_user.id)]['date_time'],
+                                                         lang))
             else:
                 bot.send_photo(message.from_user.id, open('./static/booking/cabins.jpg', 'rb'),
-                                      trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
-                                      reply_markup=choice_cabins(user_dict[str(message.from_user.id)]['date_time'], lang))
+                               trans['booking'][f'BOOKING_GET_TABLEID_{lang}'],
+                               reply_markup=choice_cabins(user_dict[str(message.from_user.id)]['date_time'], lang))
             return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_SEATING_ID.value)
         elif message.text == trans['general'][f'BACK_TO_MAIN_PAGE_{lang}']:
             bot.send_message(message.from_user.id, trans['general'][f'START_{lang}'],
