@@ -441,7 +441,6 @@ def confirmation_admin(message, user):
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        bot.send_message(message.from_user.id, 'ok')
         if message.text == trans['general'][f'ACCEPT_{lang}']:
             bot.send_message(ADMIN, trans['general'][f'ACCEPTING_{lang}'], reply_markup=None)
             bookingDB.start_booking(user,
