@@ -431,13 +431,6 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                      .format(first_name, phone_number, datetime_start.replace("-", "."),
                              bookingDB.seating_category(seating_category)[0], table, people),
                      reply_markup=confirm_keybord(lang))
-    bookingDB.start_booking(call.from_user.id,
-                            user_dict[str(call.from_user.id)]['table_id'][0],
-                            user_dict[str(call.from_user.id)]['datetime_start'],
-                            user_dict[str(call.from_user.id)]['datetime_end'],
-                            user_dict[str(call.from_user.id)]['phone_number'],
-                            user_dict[str(call.from_user.id)]['first_name'],
-                            user_dict[str(call.from_user.id)]['people'])
     bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
 
 
