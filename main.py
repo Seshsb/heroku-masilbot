@@ -25,6 +25,8 @@ from keyboards.booking.inline.navigations import *
 from keyboards.booking.default import *
 from functions.handlers import *
 
+ADMIN = ADMIN
+
 user_dict = dict()
 
 offset = timedelta(hours=5)
@@ -425,7 +427,7 @@ def inline_confirmation(call: types.CallbackQuery):
 
 def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_category, table, people, lang):
     bot.send_message(user, trans['delivery'][f'DELIVERY_WAITING_{lang}'])
-    bot.send_message(2084497355, trans['booking'][f'BOOKING_DETAIL_{lang}']
+    bot.send_message(ADMIN, trans['booking'][f'BOOKING_DETAIL_{lang}']
                      .format(first_name, phone_number, datetime_start.replace("-", "."),
                              bookingDB.seating_category(seating_category)[0], table, people),
                      reply_markup=confirm_keybord(lang))
@@ -436,7 +438,7 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                             user_dict[str(call.from_user.id)]['phone_number'],
                             user_dict[str(call.from_user.id)]['first_name'],
                             user_dict[str(call.from_user.id)]['people'])
-    bot.register_next_step_handler_by_chat_id(2084497355, confirmation_admin, user)
+    bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
 
 
 def confirmation_admin(message, user):
@@ -447,7 +449,7 @@ def confirmation_admin(message, user):
         return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(2084497355, trans['general'][f'ACCEPTING_{lang}'], reply_markup=None)
+            bot.send_message(ADMIN, trans['general'][f'ACCEPTING_{lang}'], reply_markup=None)
             bookingDB.start_booking(user,
                                     user_dict[str(user)]['table_id'][0],
                                     user_dict[str(user)]['datetime_start'],
@@ -784,15 +786,15 @@ def accept_admin(client, phone_number, method_pay, address, takeaway, lang):
     bot.send_message(client, trans['delivery']['DELIVERY_ORDER_CLIENT_WAIT_ACCEPT_{}'.format(lang)].format(
         deliveryDB.order_id(client)),
                      parse_mode='html', reply_markup=types.ReplyKeyboardRemove())
-    bot.send_message(2084497355, order_admin, parse_mode='html')
+    bot.send_message(ADMIN, order_admin, parse_mode='html')
     if not takeaway:
-        bot.send_message(2084497355, trans['delivery'][f'DELIVERY_COST_{lang}'], parse_mode='html')
+        bot.send_message(ADMIN, trans['delivery'][f'DELIVERY_COST_{lang}'], parse_mode='html')
         return bot.register_next_step_handler_by_chat_id(
-            2084497355, delivery_amount, client, phone_number, method_pay, address, takeaway, lang)
-    bot.send_message(2084497355, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
+            ADMIN, delivery_amount, client, phone_number, method_pay, address, takeaway, lang)
+    bot.send_message(ADMIN, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                      reply_markup=accepting_order(lang))
     return bot.register_next_step_handler_by_chat_id(
-        2084497355, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount=0)
+        ADMIN, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount=0)
 
 
 def delivery_amount(message: types.Message, client, phone_number, method_pay, address, takeaway, lang):
@@ -804,11 +806,11 @@ def delivery_amount(message: types.Message, client, phone_number, method_pay, ad
     try:
         if message.text.isdigit():
             amount = int(message.text)
-            bot.send_message(2084497355, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
+            bot.send_message(ADMIN, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
                              reply_markup=accepting_order(lang))
             return bot.register_next_step_handler_by_chat_id(
-                2084497355, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
-        bot.send_message(2084497355, 'try again')
+                ADMIN, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
+        bot.send_message(ADMIN, 'try again')
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
@@ -823,7 +825,7 @@ def accepting_admin(message: types.Message, client, phone_number, method_pay, ad
         return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
         if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(2084497355, trans['general'][f'ACCEPTING_{lang}'])
+            bot.send_message(ADMIN, trans['general'][f'ACCEPTING_{lang}'])
             show_order(client, phone_number, method_pay, address, takeaway, lang, amount)
         elif message.text == trans['general'][f'CANCEL_{lang}']:
             bot.send_message(message.from_user.id, trans['delivery'][f'DELIVERY_CANCELED_{lang}'],
