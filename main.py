@@ -135,7 +135,7 @@ def callback_date(call: CallbackQuery):
             call.data)
 
         if not result and key:
-            bot.edit_message_text(f"Select {LSTEP[step]}",
+            bot.edit_message_text(trans['booking'][f'BOOKING_REQUEST_DATE_{lang}'],
                                   call.message.chat.id,
                                   call.message.message_id,
                                   reply_markup=key)
