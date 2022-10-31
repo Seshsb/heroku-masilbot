@@ -802,11 +802,13 @@ def delivery_amount(message: types.Message, client, phone_number, method_pay, ad
                          reply_markup=general_nav.choice_lang())
         return dbworker.set_states(client, config.States.S_CHOICE_LANGUAGE.value)
     try:
-        amount = int(message.text)
-        bot.send_message(2084497355, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
-                         reply_markup=accepting_order(lang))
-        return bot.register_next_step_handler_by_chat_id(
-            2084497355, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
+        if message.text.isdigit():
+            amount = int(message.text)
+            bot.send_message(2084497355, trans['delivery'][f'DELIVERY_QUESTION_ACCEPT_{lang}'], parse_mode='html',
+                             reply_markup=accepting_order(lang))
+            return bot.register_next_step_handler_by_chat_id(
+                2084497355, accepting_admin, client, phone_number, method_pay, address, takeaway, lang, amount)
+        bot.send_message(2084497355, 'try again')
     except Exception as err:
         bot.send_message(client, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
         bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
