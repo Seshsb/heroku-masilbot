@@ -29,7 +29,7 @@ ADMIN = int(ADMIN)
 
 user_dict = dict()
 
-offset = timedelta(hours=17)
+offset = timedelta(hours=5)
 tz = timezone(offset, name='Tashkent')
 calendar, step = CalendarWithoutYears(min_date=datetime.now(tz=tz).date(),
                                           additional_buttons=[{'text': 'Отмена', 'callback_data': 'cancel'}]).build()
