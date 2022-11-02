@@ -408,14 +408,14 @@ def inline_confirmation(call: types.CallbackQuery):
     try:
         # bot.edit_message_reply_markup(call.from_user.id, call.message.message_id, reply_markup=None)
         if call.data == 'confirm':
-            user = call.from_user.id
-            confirm_admin(call, user, user_dict[str(call.from_user.id)]['first_name'],
+            user_id = call.from_user.id
+            confirm_admin(call, user_id, user_dict[str(call.from_user.id)]['first_name'],
                           user_dict[str(call.from_user.id)]['phone_number'],
                           user_dict[str(call.from_user.id)]['datetime_start'],
                           user_dict[str(call.from_user.id)]['seating_category'],
                           user_dict[str(call.from_user.id)]['table'],
                           user_dict[str(call.from_user.id)]['people'], lang)
-            return bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user)
+            return bot.register_next_step_handler_by_chat_id(ADMIN, confirmation_admin, user_id, lang)
         elif call.data == 'cancel':
             bot.send_message(call.from_user.id, trans['booking'][f'BOOKING_CANCELED_{lang}'],
                              reply_markup=general_nav.main_page(lang))
@@ -434,36 +434,25 @@ def confirm_admin(call, user, first_name, phone_number, datetime_start, seating_
                      reply_markup=confirm_keybord(lang))
 
 
-def confirmation_admin(message, user):
-    lang = DataBase.get_user_lang(message.from_user.id)[0]
-    if not lang:
-        bot.send_message(message.from_user.id, trans['general']['CHOICE_LANGUAGE'],
-                         reply_markup=general_nav.choice_lang())
-        return dbworker.set_states(message.from_user.id, config.States.S_CHOICE_LANGUAGE.value)
-    try:
-        if message.text == trans['general'][f'ACCEPT_{lang}']:
-            bot.send_message(ADMIN, trans['general'][f'ACCEPTING_{lang}'], reply_markup=None)
-            bookingDB.start_booking(user,
-                                    user_dict[str(user)]['table_id'][0],
-                                    user_dict[str(user)]['datetime_start'],
-                                    user_dict[str(user)]['datetime_end'],
-                                    user_dict[str(user)]['phone_number'],
-                                    user_dict[str(user)]['first_name'],
-                                    user_dict[str(user)]['people'])
-            bot.send_message(user, trans['booking'][f'BOOKING_CONFIRMED_{lang}'])
-            bot.send_message(user, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
-                             reply_markup=general_nav.main_page(lang))
-            return dbworker.set_states(user, config.States.S_ACTION_CHOICE.value)
-        elif message.text == trans['general'][f'CANCEL_{lang}']:
-            bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_ADMIN_CANCEL_{lang}'],
-                             reply_markup=general_nav.back_to_main_page(lang))
+def confirmation_admin(message, user_id, lang):
+    if message.text == trans['general'][f'ACCEPT_{lang}']:
+        bot.send_message(ADMIN, trans['general'][f'ACCEPTING_{lang}'], reply_markup=None)
+        bookingDB.start_booking(user_id,
+                                user_dict[str(user_id)]['table_id'][0],
+                                user_dict[str(user_id)]['datetime_start'],
+                                user_dict[str(user_id)]['datetime_end'],
+                                user_dict[str(user_id)]['phone_number'],
+                                user_dict[str(user_id)]['first_name'],
+                                user_dict[str(user_id)]['people'])
+        bot.send_message(user_id, trans['booking'][f'BOOKING_CONFIRMED_{lang}'])
+        bot.send_message(user_id, trans['delivery']['DELIVERY_SOMETHING_ELSE_{}'.format(lang)],
+                         reply_markup=general_nav.main_page(lang))
+        return dbworker.set_states(user_id, config.States.S_ACTION_CHOICE.value)
+    elif message.text == trans['general'][f'CANCEL_{lang}']:
+        bot.send_message(message.from_user.id, trans['booking'][f'BOOKING_ADMIN_CANCEL_{lang}'],
+                         reply_markup=general_nav.back_to_main_page(lang))
 
-            return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
-    except Exception as err:
-        bot.send_message(message.from_user.id, trans['general'][f'ERROR_{lang}'], reply_markup=general_nav.error())
-        bot.send_message(275755142, f'Ошибка юзера {message.from_user.id}:\n'
-                                    f'{traceback.format_exc()}')
-
+        return dbworker.set_states(message.from_user.id, config.States.S_ACTION_CHOICE.value)
 
 ############################################################################################
 
